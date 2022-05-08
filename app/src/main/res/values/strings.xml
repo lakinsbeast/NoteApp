@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">(test) room and navigation drawer test</string>
+    <string name="title_activity_fullscreen_image">FullscreenImageActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title">Заголовок</string>
+    <string name="text">Начните ввод</string>
+</resources>
