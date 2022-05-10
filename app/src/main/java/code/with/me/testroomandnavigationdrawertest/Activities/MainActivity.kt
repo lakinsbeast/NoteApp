@@ -45,9 +45,8 @@ class MainActivity : AppCompatActivity() {
         val adapter = RecyclerViewAdapter({
             val intent = Intent(this, DetailActivity::class.java)
             intent.putExtra("id", it)
-            Log.d("id", it.toString())
             startActivity(intent)
-        },titlesList, textList, cameraInRecycler, drawInRecycler)
+        },titlesList, textList, cameraInRecycler, drawInRecycler, imageInRecycler)
         binding.recyc.adapter = adapter
 
         binding.fab.setOnClickListener {

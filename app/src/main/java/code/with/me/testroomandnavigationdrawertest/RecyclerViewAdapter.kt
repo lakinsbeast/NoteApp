@@ -1,23 +1,15 @@
 package code.with.me.testroomandnavigationdrawertest
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.text.InputFilter
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import code.with.me.testroomandnavigationdrawertest.databinding.ActivityMainBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.DbItemsBinding
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 
-class RecyclerViewAdapter(private val clickListener: (Int) -> Unit, private val titleList: List<String>, private val textList: List<String>, private val image: List<String>, private val draw: List<String>): RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
+class RecyclerViewAdapter(private val clickListener: (Int) -> Unit, private val titleList: List<String>, private val textList: List<String>, private val cameraImg: List<String>, private val draw: List<String>, private val image: List<String>): RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
 
 
     class ViewHolder(binding: DbItemsBinding): RecyclerView.ViewHolder(binding.root){
@@ -44,10 +36,18 @@ class RecyclerViewAdapter(private val clickListener: (Int) -> Unit, private val 
             textHolder.filters += InputFilter.LengthFilter(20)
             titleHolder.text = titleList[position]
             textHolder.text = textList[position]
-            if (image[position].isNotEmpty()) {
-                Picasso.get().load(Uri.parse(image[position])).into(imageView)
+            if (cameraImg[position].isNotEmpty()) {
+                Picasso.get().load(Uri.parse(cameraImg[position])).resize(120, 170).transform(
+                    RoundedCornersTransformation(15,16)
+                ).into(imageView)
             } else {
-                Picasso.get().load(Uri.parse(draw[position])).into(imageView)
+                if (draw[position].isNotEmpty()) {
+                    Picasso.get().load(Uri.parse(draw[position])).resize(120, 170).transform(RoundedCornersTransformation(15,16)).into(imageView)
+                } else {
+                    if (image[position].isNotEmpty()) {
+                        Picasso.get().load(Uri.parse(image[position])).resize(120, 170).transform(RoundedCornersTransformation(15,16)).into(imageView)
+                    }
+                }
             }
             cardView.setOnClickListener {
                 clickListener(position)

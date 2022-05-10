@@ -156,7 +156,11 @@ class DetailActivity : AppCompatActivity() {
             intent.putExtra("imageUrl", paintPath)
             startActivity(intent)
         }
-
+        binding.image.setOnClickListener {
+            val intent = Intent(this, ImageToFullScreenActivity::class.java)
+            intent.putExtra("imageUrl", imagePath)
+            startActivity(intent)
+        }
 
     }
 
