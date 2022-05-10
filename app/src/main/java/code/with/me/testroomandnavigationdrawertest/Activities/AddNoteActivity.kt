@@ -12,7 +12,6 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -30,9 +29,11 @@ class AddNoteActivity : AppCompatActivity() {
 
     private val PERMISSION_CODE = 1000
     private var image_uri: Uri? = null
-    private var imageInString: String = ""
+    private var camera_uri: Uri? = null
+    private var cameraInString: String = ""
     private var audioInString: String = ""
     private var paintInString: String = ""
+    private var imageInString: String = ""
 
     private val IMAGE_CAPTURE_CODE  = 1001
 
@@ -57,38 +58,16 @@ class AddNoteActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         supportActionBar?.title = "Новая заметка"
-
-//        supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-
-//        val intent = intent
-//        val paintBitmap = intent.getStringExtra("pathBitmap")
-//        if (paintBitmap != null) {
-//            Picasso.get().load(paintBitmap).into(binding.paintImage)
-//        }
 
         binding.imageButtonDraw.setOnClickListener {
             getPaint.launch(Intent(this, PaintActivity::class.java))
-//            startActivity(Intent(this, PaintActivity::class.java))
         }
         binding.imageButtonVoice.setOnClickListener {
             audioRec()
-//            binding.stopAudio.visibility = View.VISIBLE
         }
 
-        // надо добавить кнопку снизу для паузы
-//        binding.stopAudio.setOnClickListener {
-//            recorder?.apply {
-//                stop()
-//                reset()
-//                release()
-//                Toast.makeText(this@AddNoteActivity, "record stop", Toast.LENGTH_SHORT).show()
-//            }
-//            recorder = null
-//            binding.stopAudio.visibility = View.INVISIBLE
-//        }
-        binding.imageButtonCamera.setOnClickListener {
+        binding.cameraBtn.setOnClickListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
                     checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
@@ -104,6 +83,9 @@ class AddNoteActivity : AppCompatActivity() {
                 // system os is < marshmallow
                 openCamera()
             }
+        }
+        binding.imageBtn.setOnClickListener {
+            chooseImage()
         }
     }
 
@@ -138,6 +120,17 @@ class AddNoteActivity : AppCompatActivity() {
         }
     }
 
+    private fun chooseImage() {
+        getImageFromGallery.launch(arrayOf("image/*"))
+    }
+
+    private val getImageFromGallery = registerForActivityResult(ActivityResultContracts.OpenDocument()) { imageUri ->
+        this.contentResolver.takePersistableUriPermission(imageUri,
+            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+        imageInString = imageUri.toString()
+        Picasso.get().load(imageUri).resize(300, 450).centerCrop().transform(RoundedCornersTransformation(36,32)).into(binding.imageView)
+        Log.d("testImage", imageUri.toString())
+    }
 
     private fun openCamera() {
         val values = ContentValues()
@@ -149,13 +142,13 @@ class AddNoteActivity : AppCompatActivity() {
         }
         image_uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
         //camera intent
-        getPreviewImage.launch(image_uri)
+        getImageFromCamera.launch(image_uri)
     }
-    private val getPreviewImage = registerForActivityResult(ActivityResultContracts.TakePicture()) {
+    private val getImageFromCamera = registerForActivityResult(ActivityResultContracts.TakePicture()) {
         MediaStore.Images.Media.getBitmap(this.contentResolver, image_uri)
         val test = image_uri.toString()
-        imageInString = test
-        Picasso.get().load(image_uri).resize(300, 450).centerCrop().transform(RoundedCornersTransformation(36,32)).into(binding.imageView)
+        cameraInString = test
+        Picasso.get().load(image_uri).resize(300, 450).centerCrop().transform(RoundedCornersTransformation(36,32)).into(binding.cameraView)
     }
     private val getPaint = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         val paintBitmap = it.data?.extras?.getString("pathBitmap")
@@ -201,11 +194,11 @@ class AddNoteActivity : AppCompatActivity() {
             } else {
                 val title = binding.titleEdit.text.toString()
                 val text = binding.textEdit.text.toString()
-                val test = Note(0, title, text, imageInString, audioInString, paintInString)
+                val test = Note(0, title, text, cameraInString, audioInString, paintInString, imageInString)
                 noteViewModel.insert(test)
                 binding.titleEdit.text = null
                 binding.textEdit.text = null
-                binding.imageView.setImageURI(null)
+                binding.cameraView.setImageURI(null)
                 startActivity(Intent(this, MainActivity::class.java))
             }
         }

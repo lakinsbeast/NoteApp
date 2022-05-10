@@ -20,8 +20,9 @@ class MainActivity : AppCompatActivity() {
     private val idsList = ArrayList<Int>()
     private val titlesList = ArrayList<String>()
     private val textList = ArrayList<String>()
-    private var imageInRecycler = ArrayList<String>()
+    private var cameraInRecycler = ArrayList<String>()
     private var drawInRecycler = ArrayList<String>()
+    private var imageInRecycler = ArrayList<String>()
 
 //    private var isFabOpen: Boolean = false
 
@@ -46,7 +47,7 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra("id", it)
             Log.d("id", it.toString())
             startActivity(intent)
-        },titlesList, textList, imageInRecycler, drawInRecycler)
+        },titlesList, textList, cameraInRecycler, drawInRecycler)
         binding.recyc.adapter = adapter
 
         binding.fab.setOnClickListener {
@@ -56,12 +57,13 @@ class MainActivity : AppCompatActivity() {
         noteViewModel.allNotes.observe(this) {
             it.forEach { i ->
                 if (!(i.id in idsList && i.titleNote in titlesList && i.textNote in textList
-                            && i.imageById in imageInRecycler && i.paintUrl in drawInRecycler)) {
+                            && i.imageById in cameraInRecycler && i.paintUrl in drawInRecycler && i.imgFrmGlrUrl in imageInRecycler)) {
                 idsList.add(i.id)
                 titlesList.add(i.titleNote)
                 textList.add(i.textNote)
-                imageInRecycler.add(i.imageById)
+                cameraInRecycler.add(i.imageById)
                 drawInRecycler.add(i.paintUrl)
+                imageInRecycler.add(i.imgFrmGlrUrl)
                 Log.d("viewmodel", idsList.toString())
                 adapter.notifyDataSetChanged()
                 }

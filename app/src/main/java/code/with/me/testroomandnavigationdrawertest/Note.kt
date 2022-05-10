@@ -10,5 +10,6 @@ data class Note (
     @ColumnInfo(name = "text") val textNote: String,
     @ColumnInfo(name = "imgUrl") val imageById: String,
     @ColumnInfo(name = "audioUrl") val audioUrl: String,
-    @ColumnInfo(name = "paintUrl") val paintUrl: String
+    @ColumnInfo(name = "paintUrl") val paintUrl: String,
+    @ColumnInfo(name = "imgFrmGlrUrl") val imgFrmGlrUrl: String
     )

@@ -1,11 +1,15 @@
 package code.with.me.testroomandnavigationdrawertest.Activities
 
+import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -30,9 +34,10 @@ class DetailActivity : AppCompatActivity() {
     private var text: String = ""
     private var textEdited: String = ""
     private var id: Int = 0
-    private var imagePath: String = ""
+    private var cameraImgPath: String = ""
     private var audioPath: String = ""
     private var paintPath: String = ""
+    private var imagePath: String = ""
     private var isPlay: Boolean = true
 
 
@@ -40,9 +45,11 @@ class DetailActivity : AppCompatActivity() {
     private val idsList = ArrayList<Int>()
     private val titlesList = ArrayList<String>()
     private val textList = ArrayList<String>()
-    private var imageInRecycler = ArrayList<String>()
+    private var cameraInRecycler = ArrayList<String>()
     private var audioInRecycler = ArrayList<String>()
     private var paintInRecycler = ArrayList<String>()
+    private var imageInRecycler = ArrayList<String>()
+
     //
 
     private var mediaPlayer: MediaPlayer? = null
@@ -51,6 +58,7 @@ class DetailActivity : AppCompatActivity() {
         NoteViewModelFactory((application as NotesApplication).repo)
     }
 
+    @SuppressLint("Range")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDetailBinding.inflate(layoutInflater)
@@ -58,7 +66,7 @@ class DetailActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.playAudio.visibility = View.INVISIBLE
-        binding.image.background = null
+        binding.cameraImg.background = null
         binding.paintImage.background = null
         val idIntent = intent.getIntExtra("id", 0)
 
@@ -69,16 +77,18 @@ class DetailActivity : AppCompatActivity() {
 //            imagePath = it[idIntent].imageById
             it.forEach { i ->
                 if (!(i.id in idsList && i.titleNote in titlesList && i.textNote in textList
-                            && i.imageById in imageInRecycler && i.audioUrl in audioInRecycler && i.paintUrl in paintInRecycler)) {
+                            && i.imageById in cameraInRecycler && i.audioUrl in audioInRecycler && i.paintUrl in paintInRecycler && i.imgFrmGlrUrl in imageInRecycler)) {
                     idsList.add(i.id)
                     titlesList.add(i.titleNote)
                     textList.add(i.textNote)
-                    imageInRecycler.add(i.imageById)
+                    cameraInRecycler.add(i.imageById)
                     audioInRecycler.add(i.audioUrl)
                     paintInRecycler.add(i.paintUrl)
+                    imageInRecycler.add(i.imgFrmGlrUrl)
                 }
             }
             id = idsList[idIntent]
+            cameraImgPath = cameraInRecycler[idIntent]
             imagePath = imageInRecycler[idIntent]
             if (audioInRecycler[idIntent].isNotEmpty()) {
                 audioPath = audioInRecycler[idIntent]
@@ -91,9 +101,13 @@ class DetailActivity : AppCompatActivity() {
             binding.titleEditText.setText(titlesList[idIntent])
             supportActionBar?.title = titlesList[idIntent]
             binding.textEditText.setText(textList[idIntent])
-            if (imagePath.isNotEmpty()) {
-                Picasso.get().load(imagePath).resize(350, 450).centerCrop().transform(RoundedCornersTransformation(36,32)).into(binding.image)
+            if (cameraImgPath.isNotEmpty()) {
+                Picasso.get().load(cameraImgPath).resize(350, 450).centerCrop().transform(RoundedCornersTransformation(36,32)).into(binding.cameraImg)
             }
+            if (imagePath.isNotEmpty()) {
+                Picasso.get().load(Uri.parse(imagePath)).resize(350, 450).centerCrop().transform(RoundedCornersTransformation(36,32)).into(binding.image)
+            }
+
         }
 //        binding.updBtn.setOnClickListener {
 //            titleEdited = binding.titleEditText.text.toString()
@@ -132,9 +146,9 @@ class DetailActivity : AppCompatActivity() {
                 isPlay = true
             }
         }
-        binding.image.setOnClickListener {
+        binding.cameraImg.setOnClickListener {
             val intent = Intent(this, ImageToFullScreenActivity::class.java)
-            intent.putExtra("imageUrl", imagePath)
+            intent.putExtra("imageUrl", cameraImgPath)
             startActivity(intent)
         }
         binding.paintImage.setOnClickListener {
@@ -181,7 +195,7 @@ class DetailActivity : AppCompatActivity() {
         if (item.itemId == R.id.updateBtn) {
             titleEdited = binding.titleEditText.text.toString()
             textEdited = binding.textEditText.text.toString()
-            val updNote = Note(id,titleEdited, textEdited, imagePath, audioPath, paintPath)
+            val updNote = Note(id,titleEdited, textEdited, cameraImgPath, audioPath, paintPath, imagePath)
             noteViewModel.update(updNote)
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -192,13 +206,13 @@ class DetailActivity : AppCompatActivity() {
             val alrtDlg = AlertDialog.Builder(this)
             alrtDlg.setTitle("Удалить?")
                 .setPositiveButton("Да") { dialogInterface: DialogInterface, i: Int ->
-                    val dltNote = Note(id, title, text, imagePath, audioPath, paintPath)
+                    val dltNote = Note(id, title, text, cameraImgPath, audioPath, paintPath, imagePath)
                     noteViewModel.delete(dltNote)
                     val intent = Intent(this, MainActivity::class.java)
-                    val fileImage = DocumentFile.fromSingleUri(this, Uri.parse(imagePath))
+                    val fileImage = DocumentFile.fromSingleUri(this, Uri.parse(cameraImgPath))
                     val filePaint = DocumentFile.fromSingleUri(this, Uri.parse(paintPath))
                     if (fileImage != null) {
-                        contentResolver.delete(Uri.parse(imagePath), null, null)
+                        contentResolver.delete(Uri.parse(cameraImgPath), null, null)
                     }
                     if (filePaint != null) {
                         contentResolver.delete(Uri.parse(paintPath), null, null)
