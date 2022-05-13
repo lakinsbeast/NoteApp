@@ -11,7 +11,6 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -26,22 +25,23 @@
 
         <ImageView
             android:id="@+id/camera_view"
-            android:layout_width="wrap_content"
+            android:layout_width="300px"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/image_view"
-            android:layout_width="wrap_content"
+            android:layout_width="300px"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toStartOf="@+id/camera_view"
+            app:layout_constraintHorizontal_bias="0.808"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/paintImage"
-            android:layout_width="wrap_content"
+            android:layout_width="300px"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -92,7 +92,7 @@
             app:contentInsetStart="0dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:backgroundTint="@color/design_default_color_primary">
+            app:backgroundTint="@color/black">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -123,7 +123,7 @@
 
                 <ImageButton
                     android:id="@+id/imageButtonDraw"
-                    android:layout_width="60dp"
+                    android:layout_width="57dp"
                     android:layout_height="60dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/color_lens_btn" />

@@ -199,6 +199,7 @@ class AddNoteActivity : AppCompatActivity() {
                 binding.titleEdit.text = null
                 binding.textEdit.text = null
                 binding.cameraView.setImageURI(null)
+                finish()
                 startActivity(Intent(this, MainActivity::class.java))
             }
         }

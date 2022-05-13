@@ -1,11 +1,14 @@
 package code.with.me.testroomandnavigationdrawertest.Activities
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.drawToBitmap
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityPaintBinding
@@ -76,7 +79,13 @@ class PaintActivity : AppCompatActivity() {
             }
 
             clearBtn.setOnClickListener {
-                paintCanvas.clearCanvas()
+                val alrtDlg = AlertDialog.Builder(this@PaintActivity)
+                alrtDlg.setTitle("Хотите очистить холст?")
+                    .setPositiveButton("Да") { dialogInterface: DialogInterface, i: Int ->
+                        paintCanvas.clearCanvas()
+                    }.setNegativeButton("Нет") { DialogInterface: DialogInterface, i: Int ->
+                        Toast.makeText(this@PaintActivity, "Вы выбрали  \"нет\" ", Toast.LENGTH_SHORT).show()
+                    }.show()
             }
             eraseBtn.setOnClickListener {
                 paintCanvas.enableErasing()

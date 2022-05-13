@@ -26,7 +26,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginTop="4dp"
-                    android:layout_marginEnd="4dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
         </RelativeLayout>
@@ -44,7 +43,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
-                    app:backgroundTint="@color/design_default_color_primary"
+                    app:backgroundTint="@color/black"
                     app:fabAlignmentMode="end"
                     app:fabCradleMargin="-10dp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -55,25 +54,12 @@
                     android:id="@+id/fab"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="@color/white"
                     android:src="@drawable/menu_floating_btn"
+                    app:backgroundTint="#B6B6B6"
                     app:layout_anchor="@id/bottom_app_bar"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
-
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/fab1"
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="left"
-                    android:layout_margin="90dp"
-                    android:src="@drawable/note_add_btn"
-                    android:visibility="invisible"
-                    app:layout_anchor="@+id/fab"
-                    app:layout_anchorGravity="start|left"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="RtlHardcoded" />
-
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

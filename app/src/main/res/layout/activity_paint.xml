@@ -4,107 +4,118 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".Activities.PaintActivity">
 
     <com.luciferx86.doodlecanvaslibrary.DoodleCanvas
         android:id="@+id/paintCanvas"
+        android:background="@color/white"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <Button
-        android:id="@+id/clearBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Clear Canv"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/eraseBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:text="ERASE"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/clearBtn" />
-
-    <Button
-        android:id="@+id/undoBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:text="UNDO"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/eraseBtn" />
-
-    <Button
-        android:id="@+id/paintBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:text="PAINT"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/undoBtn" />
-
-    <Button
-        android:id="@+id/saveBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="160dp"
-        android:layout_marginBottom="80dp"
-        android:text="SAVE"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <ImageButton
-        android:id="@+id/colorswtchbtn"
-        android:layout_width="50dp"
-        android:layout_height="51dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="4dp"
-        app:layout_constraintBottom_toTopOf="@+id/paintBtn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/color_lens_btn" />
 
     <RadioButton
         android:id="@+id/rbtngray"
         android:layout_width="33dp"
         android:layout_height="33dp"
-        android:layout_marginEnd="32dp"
+        android:layout_marginEnd="60dp"
         android:buttonTint="#818181"
         android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/colorswtchbtn"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <RadioButton
-        android:id="@+id/rbtnlightblue"
-        android:layout_width="33dp"
-        android:layout_height="33dp"
-        android:layout_marginEnd="32dp"
-        android:buttonTint="@color/light_blue_600"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/rbtngray"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <RadioButton
-        android:id="@+id/rbtngreen"
-        android:layout_width="33dp"
-        android:layout_height="33dp"
-        android:layout_marginEnd="32dp"
-        android:buttonTint="#04FF2E"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/rbtnlightblue"
+        app:layout_constraintBottom_toTopOf="@+id/coordinatorLayout"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <RadioButton
         android:id="@+id/rbtnred"
         android:layout_width="33dp"
         android:layout_height="33dp"
-        android:layout_marginEnd="32dp"
+        android:layout_marginEnd="60dp"
         android:buttonTint="#FF0000"
         android:checked="false"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/rbtngreen"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <RadioButton
+        android:id="@+id/rbtngreen"
+        android:layout_width="33dp"
+        android:layout_height="33dp"
+        android:layout_marginEnd="60dp"
+        android:buttonTint="#04FF2E"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/rbtnlightblue"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <RadioButton
+        android:id="@+id/rbtnlightblue"
+        android:layout_width="33dp"
+        android:layout_height="33dp"
+        android:layout_marginEnd="60dp"
+        android:buttonTint="@color/light_blue_600"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/rbtngray"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinatorLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="-1dp">
+
+        <com.google.android.material.bottomappbar.BottomAppBar
+            android:id="@+id/bottom_app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:backgroundTint="@color/black"
+            app:contentInsetStart="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+
+                <ImageButton
+                    android:id="@+id/saveBtn"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_save_svgrepo_com" />
+                <ImageButton
+                    android:id="@+id/clearBtn"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_trash_svgrepo_com" />
+                <ImageButton
+                    android:id="@+id/eraseBtn"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_eraser" />
+                <ImageButton
+                    android:id="@+id/paintBtn"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_paint_brush_svgrepo_com" />
+                <ImageButton
+                    android:id="@+id/undoBtn"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_baseline_undo_24" />
+                <ImageButton
+                    android:id="@+id/colorswtchbtn"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_watercolor_svgrepo_com" />
+
+            </LinearLayout>
+        </com.google.android.material.bottomappbar.BottomAppBar>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -71,10 +71,6 @@ class DetailActivity : AppCompatActivity() {
         val idIntent = intent.getIntExtra("id", 0)
 
         noteViewModel.allNotes.observe(this) {
-//            title = it[idIntent].titleNote
-//            text = it[idIntent].textNote
-//            id = it[idIntent].id
-//            imagePath = it[idIntent].imageById
             it.forEach { i ->
                 if (!(i.id in idsList && i.titleNote in titlesList && i.textNote in textList
                             && i.imageById in cameraInRecycler && i.audioUrl in audioInRecycler && i.paintUrl in paintInRecycler && i.imgFrmGlrUrl in imageInRecycler)) {
@@ -109,31 +105,7 @@ class DetailActivity : AppCompatActivity() {
             }
 
         }
-//        binding.updBtn.setOnClickListener {
-//            titleEdited = binding.titleEditText.text.toString()
-//            textEdited = binding.textEditText.text.toString()
-//            val updNote = Note(id,titleEdited, textEdited, imagePath, audioPath, paintPath)
-//            noteViewModel.update(updNote)
-//            val intent = Intent(this, MainActivity::class.java)
-//            startActivity(intent)
-//        }
-//        binding.dltBtn.setOnClickListener {
-//            val dltNote = Note(id,title, text, imagePath, audioPath, paintPath)
-//            noteViewModel.delete(dltNote)
-//            val intent = Intent(this, MainActivity::class.java)
-//            val fileImage = DocumentFile.fromSingleUri(this, Uri.parse(imagePath))
-//            val filePaint = DocumentFile.fromSingleUri(this, Uri.parse(paintPath))
-//            if (fileImage != null) {
-//                contentResolver.delete(Uri.parse(imagePath), null, null)
-//            }
-//            if (filePaint != null) {
-//                contentResolver.delete(Uri.parse(paintPath), null, null)
-//            }
-//            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-//            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-//            startActivity(intent)
-//            finish()
-//        }
+
         binding.playAudio.setOnClickListener {
             if (isPlay) {
                 playAudio()
@@ -221,28 +193,13 @@ class DetailActivity : AppCompatActivity() {
                     if (filePaint != null) {
                         contentResolver.delete(Uri.parse(paintPath), null, null)
                     }
-                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+//                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+//                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     startActivity(intent)
                     finish()
                 }.setNegativeButton("Нет") { DialogInterface: DialogInterface, i: Int ->
                     Toast.makeText(this, "Вы выбрали  \"нет\" ", Toast.LENGTH_SHORT).show()
                 }.show()
-//            val dltNote = Note(id,title, text, imagePath, audioPath, paintPath)
-//            noteViewModel.delete(dltNote)
-//            val intent = Intent(this, MainActivity::class.java)
-//            val fileImage = DocumentFile.fromSingleUri(this, Uri.parse(imagePath))
-//            val filePaint = DocumentFile.fromSingleUri(this, Uri.parse(paintPath))
-//            if (fileImage != null) {
-//                contentResolver.delete(Uri.parse(imagePath), null, null)
-//            }
-//            if (filePaint != null) {
-//                contentResolver.delete(Uri.parse(paintPath), null, null)
-//            }
-//            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-//            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-//            startActivity(intent)
-//            finish()
         }
         return super.onOptionsItemSelected(item)
     }

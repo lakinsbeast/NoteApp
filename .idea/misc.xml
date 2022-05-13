@@ -19,9 +19,29 @@
         <entry key="..\:/Users/amogus/AndroidStudioProjects/testroomandnavigationdrawertest/app/src/main/res/menu/actionbarmenu.xml" value="0.25104166666666666" />
         <entry key="..\:/Users/amogus/AndroidStudioProjects/testroomandnavigationdrawertest/app/src/main/res/menu/detailnotemenu.xml" value="0.25104166666666666" />
         <entry key="..\:/Users/amogus/AndroidStudioProjects/testroomandnavigationdrawertest/app/src/main/res/menu/main_menu.xml" value="0.25104166666666666" />
-        <entry key="app/src/main/res/layout/activity_add_note.xml" value="0.26145833333333335" />
+        <entry key="app/src/main/res/drawable/camera_btn.xml" value="0.1285" />
+        <entry key="app/src/main/res/drawable/check_mark.xml" value="0.1285" />
+        <entry key="app/src/main/res/drawable/color_lens_btn.xml" value="0.1285" />
+        <entry key="app/src/main/res/drawable/delete_icon.xml" value="0.1205" />
+        <entry key="app/src/main/res/drawable/ic_baseline_arrow_back_24.xml" value="0.1285" />
+        <entry key="app/src/main/res/drawable/ic_baseline_brush_24.xml" value="0.2375" />
+        <entry key="app/src/main/res/drawable/ic_baseline_keyboard_voice_24.xml" value="0.1285" />
+        <entry key="app/src/main/res/drawable/ic_baseline_undo_24.xml" value="0.2375" />
+        <entry key="app/src/main/res/drawable/ic_eraser.xml" value="0.2375" />
+        <entry key="app/src/main/res/drawable/ic_paint_brush_svgrepo_com.xml" value="0.2375" />
+        <entry key="app/src/main/res/drawable/ic_save_svgrepo_com.xml" value="0.2375" />
+        <entry key="app/src/main/res/drawable/ic_trash_svgrepo_com.xml" value="0.2375" />
+        <entry key="app/src/main/res/drawable/ic_watercolor_svgrepo_com.xml" value="0.266" />
+        <entry key="app/src/main/res/drawable/image_camera_btn.xml" value="0.1285" />
+        <entry key="app/src/main/res/drawable/menu_floating_btn.xml" value="0.266" />
+        <entry key="app/src/main/res/drawable/play_arrow_btn.xml" value="0.1285" />
+        <entry key="app/src/main/res/drawable/update_arrow.xml" value="0.1285" />
+        <entry key="app/src/main/res/drawable/valik_btn.xml" value="0.2375" />
+        <entry key="app/src/main/res/layout/activity_add_note.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_detail.xml" value="0.24864130434782608" />
-        <entry key="app/src/main/res/layout/db_items.xml" value="0.19322916666666667" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.2" />
+        <entry key="app/src/main/res/layout/activity_paint.xml" value="0.22" />
+        <entry key="app/src/main/res/layout/db_items.xml" value="0.32695984703632885" />
       </map>
     </option>
   </component>

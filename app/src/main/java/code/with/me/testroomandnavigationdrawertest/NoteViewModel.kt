@@ -23,6 +23,9 @@ class NoteViewModel(private val repo: NoteRepository): ViewModel() {
     fun update(note: Note) = viewModelScope.launch {
         repo.update(note)
     }
+    fun deleteById(id: Int) = viewModelScope.launch {
+        repo.deleteById(id)
+    }
 
 }
 
