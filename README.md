@@ -1,7 +1,7 @@
 <h1 align="center">NotesApp</h1>
 <h1 align="center">Приложение будет активно дорабатываться!</h1>
 <h1 align="center">
-  <img src="https://github.com/lakinsbeast/NoteApp/blob/master/demonstrate.gif" alt="animated" width="400" height="720"/>
+  <img src="https://github.com/lakinsbeast/NoteApp/blob/master/demonstr.gif" alt="animated" width="350" height="720"/>
 </h1>
 
 Особенности:
