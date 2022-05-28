@@ -13,48 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-
-    <RadioButton
-        android:id="@+id/rbtngray"
-        android:layout_width="33dp"
-        android:layout_height="33dp"
-        android:layout_marginEnd="60dp"
-        android:buttonTint="#818181"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/coordinatorLayout"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <RadioButton
-        android:id="@+id/rbtnred"
-        android:layout_width="33dp"
-        android:layout_height="33dp"
-        android:layout_marginEnd="60dp"
-        android:buttonTint="#FF0000"
-        android:checked="false"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/rbtngreen"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <RadioButton
-        android:id="@+id/rbtngreen"
-        android:layout_width="33dp"
-        android:layout_height="33dp"
-        android:layout_marginEnd="60dp"
-        android:buttonTint="#04FF2E"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/rbtnlightblue"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <RadioButton
-        android:id="@+id/rbtnlightblue"
-        android:layout_width="33dp"
-        android:layout_height="33dp"
-        android:layout_marginEnd="60dp"
-        android:buttonTint="@color/light_blue_600"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/rbtngray"
-        app:layout_constraintEnd_toEndOf="parent" />
-
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/coordinatorLayout"
         android:layout_width="match_parent"
@@ -79,43 +37,76 @@
 
                 <ImageButton
                     android:id="@+id/saveBtn"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_save_svgrepo_com" />
+                    android:src="@drawable/save48px" />
                 <ImageButton
                     android:id="@+id/clearBtn"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_trash_svgrepo_com" />
+                    android:src="@drawable/delete48px" />
                 <ImageButton
                     android:id="@+id/eraseBtn"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_eraser" />
+                    android:src="@drawable/ic_erase_svgrepo_com" />
                 <ImageButton
                     android:id="@+id/paintBtn"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_paint_brush_svgrepo_com" />
+                    android:src="@drawable/brush48px" />
                 <ImageButton
                     android:id="@+id/undoBtn"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_baseline_undo_24" />
+                    android:src="@drawable/undo48px" />
+                <ImageButton
+                    android:id="@+id/strokeWidth"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/straighten48px" />
                 <ImageButton
                     android:id="@+id/colorswtchbtn"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_watercolor_svgrepo_com" />
+                    android:src="@drawable/palette48px" />
 
             </LinearLayout>
         </com.google.android.material.bottomappbar.BottomAppBar>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <LinearLayout
+        android:id="@+id/brushLayout"
+        android:layout_width="wrap_content"
+        android:visibility="invisible"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/coordinatorLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageView
+            android:id="@+id/brushSize"
+            android:layout_width="20px"
+            android:layout_height="20px"
+            android:src="@drawable/circle" />
+
+        <SeekBar
+            android:id="@+id/seekBar"
+            android:progress="20"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

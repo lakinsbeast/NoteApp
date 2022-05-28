@@ -1,9 +1,11 @@
 package code.with.me.testroomandnavigationdrawertest.Activities
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.ImageDecoder
 import android.media.AudioManager
 import android.media.MediaPlayer
@@ -14,15 +16,19 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewAnimationUtils
+import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.documentfile.provider.DocumentFile
+import androidx.lifecycle.viewModelScope
 import code.with.me.testroomandnavigationdrawertest.*
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityDetailBinding
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
+import kotlinx.coroutines.launch
 import java.io.IOException
 
 
@@ -38,6 +44,7 @@ class DetailActivity : AppCompatActivity() {
     private var audioPath: String = ""
     private var paintPath: String = ""
     private var imagePath: String = ""
+    private var pickedColorPath: String = ""
     private var isPlay: Boolean = true
 
 
@@ -49,6 +56,7 @@ class DetailActivity : AppCompatActivity() {
     private var audioInRecycler = ArrayList<String>()
     private var paintInRecycler = ArrayList<String>()
     private var imageInRecycler = ArrayList<String>()
+    private var pickedColorInRecycler = ArrayList<String>()
 
     //
 
@@ -64,16 +72,23 @@ class DetailActivity : AppCompatActivity() {
         binding = ActivityDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.playAudio.visibility = View.INVISIBLE
         binding.cameraImg.background = null
         binding.paintImage.background = null
         val idIntent = intent.getIntExtra("id", 0)
 
+
+
+
+
+
         noteViewModel.allNotes.observe(this) {
             it.forEach { i ->
                 if (!(i.id in idsList && i.titleNote in titlesList && i.textNote in textList
-                            && i.imageById in cameraInRecycler && i.audioUrl in audioInRecycler && i.paintUrl in paintInRecycler && i.imgFrmGlrUrl in imageInRecycler)) {
+                            && i.imageById in cameraInRecycler && i.audioUrl in audioInRecycler && i.paintUrl in paintInRecycler
+                            && i.imgFrmGlrUrl in imageInRecycler && i.colorCard in pickedColorInRecycler)) {
                     idsList.add(i.id)
                     titlesList.add(i.titleNote)
                     textList.add(i.textNote)
@@ -81,6 +96,7 @@ class DetailActivity : AppCompatActivity() {
                     audioInRecycler.add(i.audioUrl)
                     paintInRecycler.add(i.paintUrl)
                     imageInRecycler.add(i.imgFrmGlrUrl)
+                    pickedColorInRecycler.add(i.colorCard)
                 }
             }
             id = idsList[idIntent]
@@ -95,13 +111,19 @@ class DetailActivity : AppCompatActivity() {
                 Picasso.get().load(paintPath).resize(350, 450).centerCrop().transform(RoundedCornersTransformation(36,32)).into(binding.paintImage)
             }
             binding.titleEditText.setText(titlesList[idIntent])
-            supportActionBar?.title = titlesList[idIntent]
+//            supportActionBar?.title = titlesList[idIntent]
+
             binding.textEditText.setText(textList[idIntent])
             if (cameraImgPath.isNotEmpty()) {
                 Picasso.get().load(cameraImgPath).resize(350, 450).centerCrop().transform(RoundedCornersTransformation(36,32)).into(binding.cameraImg)
             }
             if (imagePath.isNotEmpty()) {
                 Picasso.get().load(Uri.parse(imagePath)).resize(350, 450).centerCrop().transform(RoundedCornersTransformation(36,32)).into(binding.image)
+            }
+            pickedColorPath = pickedColorInRecycler[idIntent]
+            if (pickedColorPath.isNotEmpty()) {
+
+                binding.layoutdetail.setBackgroundColor(Color.parseColor(pickedColorPath))
             }
 
         }
@@ -133,8 +155,8 @@ class DetailActivity : AppCompatActivity() {
             intent.putExtra("imageUrl", imagePath)
             startActivity(intent)
         }
-
     }
+
 
     private fun stopAudio() {
         if (mediaPlayer!!.isPlaying) {
@@ -165,38 +187,35 @@ class DetailActivity : AppCompatActivity() {
     }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
+            supportFinishAfterTransition()
             startActivity(Intent(this, MainActivity::class.java))
-            finish()
         }
         if (item.itemId == R.id.updateBtn) {
             titleEdited = binding.titleEditText.text.toString()
             textEdited = binding.textEditText.text.toString()
-            val updNote = Note(id,titleEdited, textEdited, cameraImgPath, audioPath, paintPath, imagePath)
+            val updNote = Note(id,titleEdited, textEdited, cameraImgPath, audioPath, paintPath, imagePath, pickedColorPath)
             noteViewModel.update(updNote)
-            val intent = Intent(this, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
+            startActivity(Intent(this, MainActivity::class.java))
         }
         if (item.itemId == R.id.deleteBtn) {
             val alrtDlg = AlertDialog.Builder(this)
             alrtDlg.setTitle("Удалить?")
                 .setPositiveButton("Да") { dialogInterface: DialogInterface, i: Int ->
-                    val dltNote = Note(id, title, text, cameraImgPath, audioPath, paintPath, imagePath)
+
+                    val dltNote =
+                        Note(id, title, text, cameraImgPath, audioPath, paintPath, imagePath, pickedColorPath)
                     noteViewModel.delete(dltNote)
-                    val intent = Intent(this, MainActivity::class.java)
-                    val fileImage = DocumentFile.fromSingleUri(this, Uri.parse(cameraImgPath))
-                    val filePaint = DocumentFile.fromSingleUri(this, Uri.parse(paintPath))
-                    if (fileImage != null) {
+                    val fileImage = DocumentFile.fromSingleUri(this@DetailActivity, Uri.parse(cameraImgPath))
+                    val filePaint = DocumentFile.fromSingleUri(this@DetailActivity, Uri.parse(paintPath))
+                    if (fileImage != null && cameraImgPath.isNotEmpty()) {
                         contentResolver.delete(Uri.parse(cameraImgPath), null, null)
                     }
-                    if (filePaint != null) {
+                    if (filePaint != null && paintPath.isNotEmpty()) {
                         contentResolver.delete(Uri.parse(paintPath), null, null)
                     }
-//                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-//                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    startActivity(intent)
-                    finish()
+
+                    startActivity(Intent(this, MainActivity::class.java))
+
                 }.setNegativeButton("Нет") { DialogInterface: DialogInterface, i: Int ->
                     Toast.makeText(this, "Вы выбрали  \"нет\" ", Toast.LENGTH_SHORT).show()
                 }.show()

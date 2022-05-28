@@ -12,7 +12,7 @@ class NoteViewModel(private val repo: NoteRepository): ViewModel() {
     // - Мы можем поместить наблюдателя на данные (вместо опроса на предмет изменений) и обновлять
     // пользовательский интерфейс только тогда, когда данные действительно изменяются.
     // - Репозиторий полностью отделен от пользовательского интерфейса через ViewModel.
-    val allNotes: LiveData<List<Note>> = repo.allNotes
+    val allNotes: LiveData<MutableList<Note>> = repo.allNotes
 
     fun insert(note: Note) = viewModelScope.launch {
         repo.insert(note)

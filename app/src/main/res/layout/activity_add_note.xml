@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:id="@+id/layouttocolor"
     android:layout_height="match_parent"
     tools:context=".Activities.AddNoteActivity">
 
@@ -79,6 +80,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/titleEdit" />
 
+    <LinearLayout
+        android:id="@+id/colorpickerlayout"
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@+id/textEdit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+        <androidx.cardview.widget.CardView
+            android:id="@+id/colorpickercardView"
+            android:layout_width="100dp"
+            android:layout_height="50dp"/>
+        <NumberPicker
+            android:id="@+id/colorpicker"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/coordinatorLayout2"
         android:layout_width="match_parent"
@@ -127,6 +147,12 @@
                     android:layout_height="60dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/color_lens_btn" />
+                <ImageButton
+                    android:id="@+id/cardcolorpicker"
+                    android:layout_width="57dp"
+                    android:layout_height="60dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/format_paint48px" />
             </LinearLayout>
         </com.google.android.material.bottomappbar.BottomAppBar>
 

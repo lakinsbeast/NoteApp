@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.ACTION_OPEN_DOCUMENT" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
+
     <uses-feature android:name="android.hardware.camera" />
 
     <application
@@ -25,12 +26,6 @@
             android:name=".Activities.ImageToFullScreenActivity"
             android:exported="false" />
         <activity
-            android:name=".FullscreenImageActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:exported="false"
-            android:label="@string/title_activity_fullscreen_image"
-            android:theme="@style/Theme.testRoomAndNavigationDrawerTest.Fullscreen" />
-        <activity
             android:name=".Activities.DetailActivity"
             android:exported="false" />
         <activity
@@ -45,6 +40,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider
+            android:authorities="code.with.me.testroomandnavigationdrawertest.Activities.AddNoteActivity.provider"
+            android:name="androidx.core.content.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

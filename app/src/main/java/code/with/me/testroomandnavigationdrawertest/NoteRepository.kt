@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 class NoteRepository(private val noteDao: NoteDAO) {
     // Room выполняет все запросы в отдельном потоке.
     // Observed Flow(или livedata, я его счас проверяю) уведомит наблюдателя об изменении данных.
-    val allNotes: LiveData<List<Note>> = noteDao.getAll()
+    val allNotes: LiveData<MutableList<Note>> = noteDao.getAll()
 
 
 

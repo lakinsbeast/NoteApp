@@ -1,28 +1,42 @@
 package code.with.me.testroomandnavigationdrawertest.Activities
 
 import android.Manifest
-import android.content.ContentValues
+import android.R.attr.thumbnail
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.NumberPicker
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.FileProvider
 import code.with.me.testroomandnavigationdrawertest.*
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityAddNoteBinding
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.io.File
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
+
 
 @Suppress("DEPRECATION")
 class AddNoteActivity : AppCompatActivity() {
@@ -34,6 +48,9 @@ class AddNoteActivity : AppCompatActivity() {
     private var audioInString: String = ""
     private var paintInString: String = ""
     private var imageInString: String = ""
+
+    private lateinit var file: File
+    lateinit var currentPhotoPath: String
 
     private val IMAGE_CAPTURE_CODE  = 1001
 
@@ -47,6 +64,12 @@ class AddNoteActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddNoteBinding
 
+    private var isClickedToColorPicker: Boolean = false
+    private var color: Array<String> = arrayOf("FFFFFFFF","EF9A9A","F8BBD0","E1BEE7", "FC85AE", "C5CAE9", "42A5F5", "26C6DA", "4DB6AC",
+    "81C784", "8BC34A", "DCEDC8","F7FE49", "FFF176", "FFE082","FFCC80", "FF8A65", "D7CCC8", "BDBDBD", "B0BEC5")
+    private var colornames: Array<String> = arrayOf("White","Red", "Pink", "Purple", "Deep Purple", "Indigo", "Blue", "Light Blue", "Cyan",
+    "Teal", "Green", "Light Green", "Lime", "Yellow", "Amber", "Orange", "Deep Orange", "Brown", "Grey", "Blue Grey")
+    private var pickedColor: String = "#FFFFFFFF"
     val noteViewModel: NoteViewModel by viewModels {
         NoteViewModelFactory((application as NotesApplication).repo)
     }
@@ -65,6 +88,27 @@ class AddNoteActivity : AppCompatActivity() {
         }
         binding.imageButtonVoice.setOnClickListener {
             audioRec()
+        }
+        binding.cardcolorpicker.setOnClickListener {
+            if (!isClickedToColorPicker) {
+                binding.colorpickerlayout.visibility = View.VISIBLE
+                isClickedToColorPicker = true
+            } else {
+                binding.colorpickerlayout.visibility = View.INVISIBLE
+                isClickedToColorPicker = false
+            }
+        }
+        binding.colorpicker.minValue = 0
+        binding.colorpicker.maxValue = colornames.size - 1
+        binding.colorpicker.displayedValues = colornames
+        binding.colorpicker.descendantFocusability = NumberPicker.FOCUS_BLOCK_DESCENDANTS
+        binding.colorpicker.wrapSelectorWheel = false
+        binding.colorpicker.setOnValueChangedListener { _, _, _ ->
+//            binding.colorpicker.textColor = Color.parseColor("#"+color[binding.colorpicker.value])
+            binding.colorpickercardView.setCardBackgroundColor(Color.parseColor("#"+color[binding.colorpicker.value]))
+            binding.layouttocolor.setBackgroundColor(Color.parseColor("#"+color[binding.colorpicker.value]))
+            binding.colorpicker.textSize = 50F
+            pickedColor = "#"+color[binding.colorpicker.value]
         }
 
         binding.cameraBtn.setOnClickListener {
@@ -133,23 +177,56 @@ class AddNoteActivity : AppCompatActivity() {
     }
 
     private fun openCamera() {
-        val values = ContentValues()
-        values.put(MediaStore.Images.Media.TITLE, ".nomedia")
-        values.put(MediaStore.Images.Media.DESCRIPTION, ".nomedia")
-        values.put(MediaStore.Images.Media.MIME_TYPE, "image/png")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            values.put(MediaStore.Images.Media.RELATIVE_PATH, "DCIM/" + "NOTESBYEBLAN")
+//        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+//        file = savePhoto()
+//        val uri = FileProvider.getUriForFile(this, "code.with.me.testroomandnavigationdrawertest.Activities.AddNoteActivity.provider", file)
+//        intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
+//        if (intent.resolveActivity(packageManager) != null) {
+//            startActivityForResult(intent, 200)
+//        }
+        var timeStamp = SimpleDateFormat("yyyyMMddHHmmSS").format(Date())
+        var storageDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "NotesPhotos")
+        storageDir.mkdir()
+        val imageFile = File(storageDir, "image".plus(Calendar.getInstance().timeInMillis).plus(timeStamp).plus(".jpg"))
+        imageFile.createNewFile()
+        if (!imageFile.parentFile?.exists()!!) {
+            imageFile.parentFile?.mkdirs()
         }
-        image_uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
-        //camera intent
-        getImageFromCamera.launch(image_uri)
+        if (!imageFile.exists()) {
+            imageFile.mkdirs()
+        }
+        camera_uri = FileProvider.getUriForFile(this, "code.with.me.testroomandnavigationdrawertest.Activities.AddNoteActivity.provider", imageFile)
+        GlobalScope.launch(Dispatchers.IO) {
+            getImageFromCamera.launch(camera_uri)
+        }
+
+
+//        val values = ContentValues()
+//        values.put(MediaStore.Images.Media.TITLE, ".nomedia")
+//        values.put(MediaStore.Images.Media.DESCRIPTION, ".nomedia")
+//        values.put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+////            values.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/" + ".nomedia")
+//        }
+//        image_uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+//
+//        //camera intent
+//        GlobalScope.launch(Dispatchers.IO) {
+//            getImageFromCamera.launch(image_uri)
+//        }
     }
     private val getImageFromCamera = registerForActivityResult(ActivityResultContracts.TakePicture()) {
-        MediaStore.Images.Media.getBitmap(this.contentResolver, image_uri)
-        val test = image_uri.toString()
-        cameraInString = test
-        Picasso.get().load(image_uri).resize(300, 450).centerCrop().transform(RoundedCornersTransformation(36,32)).into(binding.cameraView)
+    Log.d("image_uri", camera_uri!!.encodedPath.toString())
+        if (it) {
+            MediaStore.Images.Media.getBitmap(this.contentResolver, camera_uri)
+            val test = camera_uri.toString()
+            cameraInString = test
+            Picasso.get().load(camera_uri).resize(300, 450).centerCrop()
+                .transform(RoundedCornersTransformation(36, 32)).into(binding.cameraView)
+
+        }
     }
+
     private val getPaint = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         val paintBitmap = it.data?.extras?.getString("pathBitmap")
         if (paintBitmap != null) {
@@ -194,12 +271,11 @@ class AddNoteActivity : AppCompatActivity() {
             } else {
                 val title = binding.titleEdit.text.toString()
                 val text = binding.textEdit.text.toString()
-                val test = Note(0, title, text, cameraInString, audioInString, paintInString, imageInString)
+                val test = Note(0, title, text, cameraInString, audioInString, paintInString, imageInString, pickedColor)
                 noteViewModel.insert(test)
                 binding.titleEdit.text = null
                 binding.textEdit.text = null
                 binding.cameraView.setImageURI(null)
-                finish()
                 startActivity(Intent(this, MainActivity::class.java))
             }
         }
