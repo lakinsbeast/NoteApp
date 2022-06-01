@@ -1,5 +1,5 @@
 <h1 align="center">NotesApp</h1>
-<h1 align="center">Приложение будет активно дорабатываться!</h1>
+<h2 align="center">Приложение будет активно дорабатываться! В коде есть мусор, позже зарефакторю, если нез забуду))) </h2>
 <h1 align="center">
   <img src="https://github.com/lakinsbeast/NoteApp/blob/master/2595177958027.gif" alt="animated" width="388" height="690"/>
 </h1>
