@@ -23,10 +23,6 @@ interface NoteDAO {
     @Delete
     suspend fun delete(note: Note): Int
 
-    @Query("DELETE FROM note WHERE id LIKE :id")
-    suspend fun deleteById(id: Int)
-
-
 //    update nihyua ne working nenvizhu eto govno
     @Update
     suspend fun update(note: Note)

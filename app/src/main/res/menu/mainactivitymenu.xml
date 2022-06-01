@@ -6,6 +6,13 @@
         android:id="@+id/nightMode"
         android:icon="@drawable/dark_mode48px"
         android:title="nightMode"
+        android:visible="false"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/googleTasks"
+        android:icon="@drawable/task_alt48px"
+        android:title="Google"
+        android:visible="false"
         app:showAsAction="always"/>
 
 

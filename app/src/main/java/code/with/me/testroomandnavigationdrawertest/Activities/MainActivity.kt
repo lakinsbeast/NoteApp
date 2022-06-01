@@ -1,13 +1,9 @@
 package code.with.me.testroomandnavigationdrawertest.Activities
 
 import android.annotation.SuppressLint
-import android.app.ActivityOptions
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.transition.Fade
-import android.transition.TransitionInflater
-import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -17,7 +13,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.*
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityMainBinding
@@ -25,7 +20,6 @@ import code.with.me.testroomandnavigationdrawertest.databinding.ActivityMainBind
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-
 
     private val idsList = ArrayList<Int>()
     private val titlesList = ArrayList<String>()
@@ -40,7 +34,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sharedPrefsEdit: SharedPreferences.Editor
     private var isNightModeOn: Boolean = false
 
-    val noteViewModel: NoteViewModel by viewModels {
+    private val noteViewModel: NoteViewModel by viewModels {
         NoteViewModelFactory((application as NotesApplication).repo)
     }
 
@@ -70,16 +64,15 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        val adapter = RecyclerViewAdapter({
-            openFragment(it)
-//            val intent = Intent(this, DetailActivity::class.java)
-//            intent.putExtra("id", it)
-//            startActivity(intent)
+        val adapter = DatabaseRVAdapter({
+            openDetailFragment(it)
         },titlesList, textList, cameraInRecycler, audioInRecycler, drawInRecycler, imageInRecycler, pickedColorInRecycler)
 
         binding.fab.setOnClickListener {
             startActivity(Intent(this, AddNoteActivity::class.java))
+
         }
+
         binding.recyc.scheduleLayoutAnimation()
         binding.recyc.layoutManager = LinearLayoutManager(this)
         binding.recyc.itemAnimator = null
@@ -126,101 +119,12 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, AddNoteActivity::class.java))
         }
     }
-
-//    private val itemTouchHelper by lazy {
-//        val simpleItemTouchCallback = object: ItemTouchHelper.Callback() {
-//            // Используется для установки направления перетаскивания и скольжения
-//            override fun getMovementFlags(
-//                recyclerView: RecyclerView,
-//                viewHolder: RecyclerView.ViewHolder
-//            ): Int {
-//                // Устанавливаем направление, в котором разрешено перетаскивать элемент, линейный макет имеет 2 направления
-//                val dragFlags = UP or DOWN or START or END
-//                // Устанавливаем направление скольжения с двух сторон
-//                val swipeFlags = START
-//                return makeMovementFlags(0, 0)
-//            }
-//
-//            override fun onMove(
-//                recyclerView: RecyclerView,
-//                viewHolder: RecyclerView.ViewHolder,
-//                target: RecyclerView.ViewHolder
-//            ): Boolean {
-//                return false
-//            }
-//            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-////                if (direction == START) {
-////                    val pos = viewHolder.adapterPosition
-////                    val noteToDel = Note(idsList[pos], titlesList[pos], textList[pos], cameraInRecycler[pos],
-////                        audioInRecycler[pos], drawInRecycler[pos], imageInRecycler[pos], )
-//////                    noteViewModel.delete(noteToDel)
-////                    GlobalScope.launch(Dispatchers.IO) {
-////                        noteViewModel.delete(noteToDel)
-////                    }
-////                    val fileImage = DocumentFile.fromSingleUri(this@MainActivity, Uri.parse(cameraInRecycler[pos]))
-////                    val filePaint = DocumentFile.fromSingleUri(this@MainActivity, Uri.parse(drawInRecycler[pos]))
-////                    if (fileImage != null && cameraInRecycler[pos].isNotEmpty()) {
-////                        GlobalScope.launch(Dispatchers.IO) {
-////                            contentResolver.delete(Uri.parse(cameraInRecycler[pos]), null, null)
-////                        }
-////                    }
-////                    if (filePaint != null && drawInRecycler[pos].isNotEmpty()) {
-////                        GlobalScope.launch(Dispatchers.IO) {
-////                            contentResolver.delete(Uri.parse(drawInRecycler[pos]), null, null)
-////                        }
-////                    }
-////
-////
-//////                    binding.recyc.scheduleLayoutAnimation()
-//////                    val snackbar: Snackbar = Snackbar.make(binding.activitytorefresh, "Восстановить?", Snackbar.LENGTH_LONG)
-//////                    snackbar.setAction("Да") {
-//////                        noteViewModel.insert(noteToDel)
-//////                        binding.recyc.adapter?.notifyItemInserted(noteToDel.id)
-//////                        Toast.makeText(this@MainActivity, "Типо восстановил", Toast.LENGTH_SHORT)
-//////                            .show()
-//////                    }
-//////                    snackbar.show()
-////
-////                }
-//            }
-//
-////            override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
-////                                     dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean
-////            ) {
-////                val icon =
-////                    AppCompatResources.getDrawable(this@MainActivity, R.drawable.delete_icon)!!.toBitmap()
-////                val itemView = viewHolder.itemView
-////                val red = Paint()
-////                red.setARGB(255, 255, 0, 0)
-////                val green = Paint()
-////                green.setARGB(255, 0, 255, 0)
-////                val white = Paint()
-////                white.setARGB(255,255,255,255)
-////
-////                if (dX < 0) {
-////                    c.drawRect(
-////                        itemView.left.toFloat(), itemView.top.toFloat(),
-////                        itemView.right.toFloat(), itemView.bottom.toFloat(), red)
-////                    c.drawBitmap(icon,itemView.right.toFloat() + convertDpToPx(-16) - icon.width, itemView.top.toFloat() +
-////                            (itemView.bottom.toFloat() - itemView.top.toFloat() - icon.height)/2, red)
-////                }
-////                val alpha = ALPHA_FULL - abs(dX) / viewHolder.itemView.width.toFloat()
-////                viewHolder.itemView.alpha = alpha
-////                viewHolder.itemView.translationX = dX
-////
-////                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive
-////                )
-////            }
-//        }
-//        ItemTouchHelper(simpleItemTouchCallback)
-//    }
-
     override fun onPause() {
         super.onPause()
         overridePendingTransition(0, 0)
     }
 
-    private fun openFragment(id: Int) {
+    private fun openDetailFragment(id: Int) {
         binding.relativeLayout.visibility = View.INVISIBLE
         binding.toolbar.visibility = View.INVISIBLE
         val bundle = Bundle()
@@ -233,11 +137,6 @@ class MainActivity : AppCompatActivity() {
             .addToBackStack(null)
             .commit()
     }
-
-    private fun convertDpToPx(dp: Int): Int {
-        return Math.round(dp * (resources.displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT))
-    }
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.mainactivitymenu, menu)
         if (isNightModeOn) {
@@ -273,9 +172,6 @@ class MainActivity : AppCompatActivity() {
                 sharedPrefsEdit.apply()
             }
         }
-//        if (item.itemId == R.id.dayMode) {
-//            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-//        }
         return super.onOptionsItemSelected(item)
     }
 }

@@ -23,9 +23,5 @@ class NoteRepository(private val noteDao: NoteDAO) {
     suspend fun update(note: Note) {
         noteDao.update(note)
     }
-    @WorkerThread
-    suspend fun deleteById(id: Int) {
-        noteDao.deleteById(id)
-    }
 
 }

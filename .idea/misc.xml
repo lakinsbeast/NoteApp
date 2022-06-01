@@ -61,6 +61,7 @@
         <entry key="app/src/main/res/drawable/save48px.xml" value="0.1285" />
         <entry key="app/src/main/res/drawable/search48px.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/straighten48px.xml" value="0.2375" />
+        <entry key="app/src/main/res/drawable/task_alt48px.xml" value="0.143" />
         <entry key="app/src/main/res/drawable/undo-48px.xml" value="0.2375" />
         <entry key="app/src/main/res/drawable/undo48px.xml" value="0.1285" />
         <entry key="app/src/main/res/drawable/update_arrow.xml" value="0.1285" />
@@ -68,14 +69,16 @@
         <entry key="app/src/main/res/font/testfonts.xml" value="0.29010416666666666" />
         <entry key="app/src/main/res/layout/activity_add_note.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_detail.xml" value="0.24864130434782608" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.22" />
         <entry key="app/src/main/res/layout/activity_paint.xml" value="0.28278041074249605" />
         <entry key="app/src/main/res/layout/db_items.xml" value="0.22" />
-        <entry key="app/src/main/res/layout/fragment_detail.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_detail.xml" value="0.5" />
+        <entry key="app/src/main/res/layout/fragment_google_tasks.xml" value="0.16" />
         <entry key="app/src/main/res/layout/fragment_main.xml" value="0.24864130434782608" />
+        <entry key="app/src/main/res/layout/fragment_to_do.xml" value="0.33" />
         <entry key="app/src/main/res/menu/detailnotemenu.xml" value="0.33" />
         <entry key="app/src/main/res/menu/main_menu.xml" value="0.67" />
-        <entry key="app/src/main/res/menu/mainactivitymenu.xml" value="0.5" />
+        <entry key="app/src/main/res/menu/mainactivitymenu.xml" value="0.22" />
         <entry key="app/src/main/res/xml/file_paths.xml" value="0.1" />
         <entry key="app/src/main/res/xml/provider_paths.xml" value="0.1" />
         <entry key="app/src/main/res/xml/roundcorner.xml" value="0.24864130434782608" />

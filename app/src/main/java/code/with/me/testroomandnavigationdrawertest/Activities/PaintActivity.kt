@@ -1,5 +1,6 @@
 package code.with.me.testroomandnavigationdrawertest.Activities
 
+import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Bitmap
@@ -29,13 +30,14 @@ import java.util.*
 
 @Suppress("DEPRECATION")
 class PaintActivity : AppCompatActivity() {
-    private var draw_uri: Uri? = null
+    private var drawuri: Uri? = null
 
 
     private lateinit var binding: ActivityPaintBinding
     private var isClicked: Boolean = false
     private var brushSizeForUndo: Float = 20f
     private var colorBrush: Int = -99999999
+    @SuppressLint("SimpleDateFormat")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPaintBinding.inflate(layoutInflater)
@@ -61,12 +63,12 @@ class PaintActivity : AppCompatActivity() {
                         }
                         .setPositiveButton(
                             "ok"
-                        ) { dialog, selectedColor, allColors ->
+                        ) { _, _, _ ->
 
                         }
                         .setNegativeButton(
                             "cancel"
-                        ) { dialog, which -> }
+                        ) { _, _ -> }
                         .build()
                         .show()
 
@@ -77,9 +79,9 @@ class PaintActivity : AppCompatActivity() {
             clearBtn.setOnClickListener {
                 val alrtDlg = AlertDialog.Builder(this@PaintActivity)
                 alrtDlg.setTitle("Хотите очистить холст?")
-                    .setPositiveButton("Да") { dialogInterface: DialogInterface, i: Int ->
+                    .setPositiveButton("Да") { _: DialogInterface, _: Int ->
                         paintCanvas.clearCanvas()
-                    }.setNegativeButton("Нет") { DialogInterface: DialogInterface, i: Int ->
+                    }.setNegativeButton("Нет") { _: DialogInterface, _: Int ->
                         Toast.makeText(this@PaintActivity, "Вы выбрали  \"нет\" ", Toast.LENGTH_SHORT).show()
                     }.show()
             }
@@ -138,13 +140,9 @@ class PaintActivity : AppCompatActivity() {
 
             saveBtn.setOnClickListener {
                 val bitmap: Bitmap = binding.paintCanvas.drawToBitmap()
-                val stream = ByteArrayOutputStream()
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 60, ByteArrayOutputStream())
 
-
-
-
-                var timeStamp = SimpleDateFormat("yyyyMMddHHmmSS").format(Date())
+                val timeStamp = SimpleDateFormat("yyyyMMddHHmmSS").format(Date())
                 val storageDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "NotesPhotos")
                 storageDir.mkdir()
                 val imageFile = File(storageDir, "draw".plus(Calendar.getInstance().timeInMillis).plus(timeStamp).plus(".jpg"))
@@ -160,16 +158,10 @@ class PaintActivity : AppCompatActivity() {
                 if (!imageFile.exists()) {
                     imageFile.mkdirs()
                 }
-                draw_uri = FileProvider.getUriForFile(this@PaintActivity, "code.with.me.testroomandnavigationdrawertest.Activities.AddNoteActivity.provider", imageFile)
+                drawuri = FileProvider.getUriForFile(this@PaintActivity, "code.with.me.testroomandnavigationdrawertest.Activities.AddNoteActivity.provider", imageFile)
 
-//                val path: String = MediaStore.Images.Media.insertImage(
-//                    contentResolver,
-//                    bitmap,
-//                    "Title",
-//                    null
-//                )
                 val intent = Intent(this@PaintActivity, AddNoteActivity::class.java)
-                intent.putExtra("pathBitmap", draw_uri.toString())
+                intent.putExtra("pathBitmap", drawuri.toString())
                 setResult(RESULT_OK, intent)
                 finish()
             }

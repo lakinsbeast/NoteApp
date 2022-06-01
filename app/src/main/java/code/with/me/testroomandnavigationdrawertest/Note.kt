@@ -1,6 +1,5 @@
 package code.with.me.testroomandnavigationdrawertest
 
-import android.graphics.Path
 import androidx.room.*
 
 @Entity
@@ -12,5 +11,4 @@ data class Note (
     @ColumnInfo(name = "audioUrl") val audioUrl: String,
     @ColumnInfo(name = "paintUrl") val paintUrl: String,
     @ColumnInfo(name = "imgFrmGlrUrl") val imgFrmGlrUrl: String,
-    @ColumnInfo(name = "colorCard") val colorCard: String
-    )
+    @ColumnInfo(name = "colorCard") val colorCard: String)

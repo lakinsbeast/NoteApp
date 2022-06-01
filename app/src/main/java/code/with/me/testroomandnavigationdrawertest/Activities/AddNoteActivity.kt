@@ -1,8 +1,6 @@
 package code.with.me.testroomandnavigationdrawertest.Activities
 
 import android.Manifest
-import android.R.attr.thumbnail
-import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -18,7 +16,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.NumberPicker
 import android.widget.Toast
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -29,6 +26,7 @@ import code.with.me.testroomandnavigationdrawertest.*
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityAddNoteBinding
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -42,17 +40,11 @@ import java.util.*
 class AddNoteActivity : AppCompatActivity() {
 
     private val PERMISSION_CODE = 1000
-    private var image_uri: Uri? = null
     private var camera_uri: Uri? = null
     private var cameraInString: String = ""
     private var audioInString: String = ""
     private var paintInString: String = ""
     private var imageInString: String = ""
-
-    private lateinit var file: File
-    lateinit var currentPhotoPath: String
-
-    private val IMAGE_CAPTURE_CODE  = 1001
 
     private var RECORD_AUDIO: Int = 0
 
@@ -65,6 +57,7 @@ class AddNoteActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAddNoteBinding
 
     private var isClickedToColorPicker: Boolean = false
+
     private var color: Array<String> = arrayOf("FFFFFFFF","EF9A9A","F8BBD0","E1BEE7", "FC85AE", "C5CAE9", "42A5F5", "26C6DA", "4DB6AC",
     "81C784", "8BC34A", "DCEDC8","F7FE49", "FFF176", "FFE082","FFCC80", "FF8A65", "D7CCC8", "BDBDBD", "B0BEC5")
     private var colornames: Array<String> = arrayOf("White","Red", "Pink", "Purple", "Deep Purple", "Indigo", "Blue", "Light Blue", "Cyan",
@@ -112,19 +105,14 @@ class AddNoteActivity : AppCompatActivity() {
         }
 
         binding.cameraBtn.setOnClickListener {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
-                    checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-                    //permission was not enabled
-                    val permission = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    //show popup to request permission
-                    requestPermissions(permission, PERMISSION_CODE)
-                } else {
-                    //permission already granter
-                    openCamera()
-                }
+            if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
+                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+                //permission was not enabled
+                val permission = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                //show popup to request permission
+                requestPermissions(permission, PERMISSION_CODE)
             } else {
-                // system os is < marshmallow
+                //permission already granter
                 openCamera()
             }
         }
@@ -176,6 +164,7 @@ class AddNoteActivity : AppCompatActivity() {
         Log.d("testImage", imageUri.toString())
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     private fun openCamera() {
 //        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 //        file = savePhoto()
@@ -184,8 +173,8 @@ class AddNoteActivity : AppCompatActivity() {
 //        if (intent.resolveActivity(packageManager) != null) {
 //            startActivityForResult(intent, 200)
 //        }
-        var timeStamp = SimpleDateFormat("yyyyMMddHHmmSS").format(Date())
-        var storageDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "NotesPhotos")
+        val timeStamp = SimpleDateFormat("yyyyMMddHHmmSS").format(Date())
+        val storageDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "NotesPhotos")
         storageDir.mkdir()
         val imageFile = File(storageDir, "image".plus(Calendar.getInstance().timeInMillis).plus(timeStamp).plus(".jpg"))
         imageFile.createNewFile()
@@ -226,7 +215,6 @@ class AddNoteActivity : AppCompatActivity() {
 
         }
     }
-
     private val getPaint = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         val paintBitmap = it.data?.extras?.getString("pathBitmap")
         if (paintBitmap != null) {

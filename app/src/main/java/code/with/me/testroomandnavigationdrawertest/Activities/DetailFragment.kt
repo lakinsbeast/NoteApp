@@ -21,8 +21,6 @@ import code.with.me.testroomandnavigationdrawertest.databinding.FragmentDetailBi
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import java.io.IOException
-import java.util.concurrent.TimeUnit
-
 
 @Suppress("DEPRECATION")
 class DetailFragment : Fragment() {
@@ -73,15 +71,6 @@ class DetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentDetailBinding.inflate(inflater, container, false)
-
-//        setHasOptionsMenu(true)
-        //((AppCompatActivity)getActivity()).setSupportActionBar(mToolbar)
-//        (activity as AppCompatActivity?)!!.setSupportActionBar(binding.toolbar)
-//        (activity as AppCompatActivity?)!!.supportActionBar?.setDisplayShowTitleEnabled(false)
-//        (activity as AppCompatActivity?)!!.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-
-        // Inflate the layout for this fragment
         return binding.root
     }
 
@@ -110,8 +99,7 @@ class DetailFragment : Fragment() {
                 R.id.deleteBtn -> {
                     val alrtDlg = AlertDialog.Builder(requireActivity())
                     alrtDlg.setTitle("Удалить?")
-                        .setPositiveButton("Да") { dialogInterface: DialogInterface, i: Int ->
-
+                        .setPositiveButton("Да") { _: DialogInterface, _: Int ->
                             val dltNote =
                                 Note(idS, title, text, cameraImgPath, audioPath, paintPath, imagePath, pickedColorPath)
                             noteViewModel.delete(dltNote)
@@ -123,10 +111,8 @@ class DetailFragment : Fragment() {
                             if (filePaint != null && paintPath.isNotEmpty()) {
                                 requireActivity().contentResolver.delete(Uri.parse(paintPath), null, null)
                             }
-
                             startActivity(Intent(requireActivity(), MainActivity::class.java))
-
-                        }.setNegativeButton("Нет") { DialogInterface: DialogInterface, i: Int ->
+                        }.setNegativeButton("Нет") { _: DialogInterface, _: Int ->
                             Toast.makeText(requireActivity(), "Вы выбрали  \"нет\" ", Toast.LENGTH_SHORT).show()
                         }.show()
                 }
