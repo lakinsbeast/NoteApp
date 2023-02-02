@@ -1,4 +1,4 @@
-package code.with.me.testroomandnavigationdrawertest.Activities
+package code.with.me.testroomandnavigationdrawertest.ui
 
 import android.annotation.SuppressLint
 import android.content.DialogInterface
@@ -8,7 +8,6 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
-import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.SeekBar
@@ -158,7 +157,7 @@ class PaintActivity : AppCompatActivity() {
                 if (!imageFile.exists()) {
                     imageFile.mkdirs()
                 }
-                drawuri = FileProvider.getUriForFile(this@PaintActivity, "code.with.me.testroomandnavigationdrawertest.Activities.AddNoteActivity.provider", imageFile)
+                drawuri = FileProvider.getUriForFile(this@PaintActivity, "code.with.me.testroomandnavigationdrawertest.ui.AddNoteActivity.provider", imageFile)
 
                 val intent = Intent(this@PaintActivity, AddNoteActivity::class.java)
                 intent.putExtra("pathBitmap", drawuri.toString())

@@ -1,18 +1,14 @@
-package code.with.me.testroomandnavigationdrawertest
+package code.with.me.testroomandnavigationdrawertest.ui
 
-import android.content.Context
-import android.util.Log
 import androidx.lifecycle.*
+import code.with.me.testroomandnavigationdrawertest.Note
+import code.with.me.testroomandnavigationdrawertest.domain.NoteRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
 
 class NoteViewModel(private val repo: NoteRepository): ViewModel() {
-
-    // Использование LiveData и кэширование того, что возвращает allWords, имеет несколько преимуществ:
-    // - Мы можем поместить наблюдателя на данные (вместо опроса на предмет изменений) и обновлять
-    // пользовательский интерфейс только тогда, когда данные действительно изменяются.
-    // - Репозиторий полностью отделен от пользовательского интерфейса через ViewModel.
-    val allNotes: LiveData<MutableList<Note>> = repo.allNotes
+    fun getAll(): Flow<List<Note>> = repo.getAll()
 
     fun insert(note: Note) = viewModelScope.launch {
         repo.insert(note)

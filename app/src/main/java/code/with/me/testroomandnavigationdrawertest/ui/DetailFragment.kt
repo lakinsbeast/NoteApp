@@ -1,4 +1,4 @@
-package code.with.me.testroomandnavigationdrawertest.Activities
+package code.with.me.testroomandnavigationdrawertest.ui
 
 import android.content.DialogInterface
 import android.content.Intent
@@ -16,10 +16,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import code.with.me.testroomandnavigationdrawertest.*
 import code.with.me.testroomandnavigationdrawertest.databinding.FragmentDetailBinding
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
+import kotlinx.coroutines.launch
 import java.io.IOException
 
 @Suppress("DEPRECATION")
@@ -40,19 +42,6 @@ class DetailFragment : Fragment() {
     private var imagePath: String = ""
     private var pickedColorPath: String = ""
     private var isPlay: Boolean = true
-
-
-    // пришлось добавить, чтоб не было ошибки outofboundexception, который фиксился только добавлением эти массивов
-    private val idsList = ArrayList<Int>()
-    private val titlesList = ArrayList<String>()
-    private val textList = ArrayList<String>()
-    private var cameraInRecycler = ArrayList<String>()
-    private var audioInRecycler = ArrayList<String>()
-    private var paintInRecycler = ArrayList<String>()
-    private var imageInRecycler = ArrayList<String>()
-    private var pickedColorInRecycler = ArrayList<String>()
-
-    //
 
     private var mediaPlayer: MediaPlayer? = null
 
@@ -76,6 +65,7 @@ class DetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         binding.playAudio.visibility = View.INVISIBLE
         binding.cameraImg.background = null
         binding.paintImage.background = null
@@ -119,60 +109,44 @@ class DetailFragment : Fragment() {
             }
             true
         }
-        //
+
 
         val idIntent = this.requireArguments().getInt("num")
-
-        noteViewModel.allNotes.observe(viewLifecycleOwner) {
-            it.forEach { i ->
-                if (!(i.id in idsList && i.titleNote in titlesList && i.textNote in textList
-                            && i.imageById in cameraInRecycler && i.audioUrl in audioInRecycler && i.paintUrl in paintInRecycler
-                            && i.imgFrmGlrUrl in imageInRecycler && i.colorCard in pickedColorInRecycler)) {
-                    idsList.add(i.id)
-                    titlesList.add(i.titleNote)
-                    textList.add(i.textNote)
-                    cameraInRecycler.add(i.imageById)
-                    audioInRecycler.add(i.audioUrl)
-                    paintInRecycler.add(i.paintUrl)
-                    imageInRecycler.add(i.imgFrmGlrUrl)
-                    pickedColorInRecycler.add(i.colorCard)
+        Log.d("id", idIntent.toString())
+        lifecycleScope.launch{
+            noteViewModel.getAll().collect {
+                if (it.isNotEmpty()) {
+                    idS = it[idIntent].id
+                    imagePath = it[idIntent].imageById
+                    if (it[idIntent].audioUrl.isNotEmpty()) {
+                        audioPath = it[idIntent].audioUrl
+                        binding.playAudio.visibility = View.VISIBLE
+                    }
+                    if (it[idIntent].paintUrl.isNotEmpty()) {
+                        paintPath = it[idIntent].paintUrl
+                        Picasso.get().load(paintPath).resize(350, 450).centerCrop().transform(
+                            RoundedCornersTransformation(36,32)
+                        ).into(binding.paintImage)
+                    }
+                    binding.titleEditText.setText(it[idIntent].titleNote)
+                    binding.textEditText.setText(it[idIntent].textNote)
+                    if (it[idIntent].imgFrmGlrUrl.isNotEmpty()) {
+                        Picasso.get().load(it[idIntent].imgFrmGlrUrl).resize(350, 450).centerCrop().transform(
+                            RoundedCornersTransformation(36,32)
+                        ).into(binding.cameraImg)
+                    }
+                    if (it[idIntent].imageById.isNotEmpty()) {
+                        Picasso.get().load(Uri.parse(it[idIntent].imageById)).resize(350, 450).centerCrop().transform(
+                            RoundedCornersTransformation(36,32)
+                        ).into(binding.image)
+                    }
+                    pickedColorPath = it[idIntent].colorCard
+                    if (pickedColorPath.isNotEmpty()) {
+                        binding.layoutdetail.setBackgroundColor(Color.parseColor(pickedColorPath))
+                    }
                 }
             }
-            idS = idsList[idIntent]
-            cameraImgPath = cameraInRecycler[idIntent]
-            imagePath = imageInRecycler[idIntent]
-            if (audioInRecycler[idIntent].isNotEmpty()) {
-                audioPath = audioInRecycler[idIntent]
-                binding.playAudio.visibility = View.VISIBLE
-            }
-            if (paintInRecycler[idIntent].isNotEmpty()) {
-                paintPath = paintInRecycler[idIntent]
-                Picasso.get().load(paintPath).resize(350, 450).centerCrop().transform(
-                    RoundedCornersTransformation(36,32)
-                ).into(binding.paintImage)
-            }
-            binding.titleEditText.setText(titlesList[idIntent])
-//            supportActionBar?.title = titlesList[idIntent]
-
-            binding.textEditText.setText(textList[idIntent])
-            if (cameraImgPath.isNotEmpty()) {
-                Picasso.get().load(cameraImgPath).resize(350, 450).centerCrop().transform(
-                    RoundedCornersTransformation(36,32)
-                ).into(binding.cameraImg)
-            }
-            if (imagePath.isNotEmpty()) {
-                Picasso.get().load(Uri.parse(imagePath)).resize(350, 450).centerCrop().transform(
-                    RoundedCornersTransformation(36,32)
-                ).into(binding.image)
-            }
-            pickedColorPath = pickedColorInRecycler[idIntent]
-            if (pickedColorPath.isNotEmpty()) {
-
-                binding.layoutdetail.setBackgroundColor(Color.parseColor(pickedColorPath))
-            }
-
         }
-
         binding.playAudio.setOnClickListener {
             if (isPlay) {
                 playAudio()

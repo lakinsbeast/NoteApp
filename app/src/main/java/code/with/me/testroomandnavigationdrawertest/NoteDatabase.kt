@@ -10,18 +10,6 @@ import kotlinx.coroutines.launch
 abstract class NoteDatabase: RoomDatabase() {
     abstract fun noteDao(): NoteDAO
 
-    private class NoteDatabaseCallback(private val scope: CoroutineScope): RoomDatabase.Callback() {
-        override fun onCreate(db: SupportSQLiteDatabase) {
-            super.onCreate(db)
-            INSTANCE?.let { database ->
-                scope.launch {
-                    val noteDAO = database.noteDao()
-                }
-            }
-        }
-
-    }
-
 
     companion object {
         // Singleton предотвращает одновременное открытие нескольких экземпляров базы данных //

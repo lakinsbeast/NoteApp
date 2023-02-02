@@ -6,14 +6,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
+import code.with.me.testroomandnavigationdrawertest.data.DataClassAdapter
 import code.with.me.testroomandnavigationdrawertest.databinding.DbItemsBinding
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 
-class DatabaseRVAdapter(private val clickListener: (Int) -> Unit,
-                        private val titleList: List<String>, private val textList: List<String>,
-                        private val cameraImg: List<String>, private val audioList: List<String>, private val draw: List<String>,
-                        private val image: List<String>, private val colors: List<String>): RecyclerView.Adapter<DatabaseRVAdapter.ViewHolder>() {
+class DatabaseRVAdapter(private val dataClassAdapter: DataClassAdapter): RecyclerView.Adapter<DatabaseRVAdapter.ViewHolder>() {
 
     class ViewHolder(binding: DbItemsBinding): RecyclerView.ViewHolder(binding.root){
         val titleHolder = binding.titleID
@@ -31,47 +29,35 @@ class DatabaseRVAdapter(private val clickListener: (Int) -> Unit,
         with(holder) {
 //            cardView.radius = 100F
             ViewCompat.setTransitionName(holder.titleHolder, holder.textHolder.toString())
-            if (colors.isNotEmpty()) {
-                if (colors[position] == "#9575CD") {
-                    cardView.setCardBackgroundColor(Color.parseColor(colors[position]))
+            if (dataClassAdapter.colors.isNotEmpty()) {
+                if (dataClassAdapter.colors[position] == "#9575CD") {
+                    cardView.setCardBackgroundColor(Color.parseColor(dataClassAdapter.colors[position]))
                     titleHolder.setTextColor(Color.WHITE)
                     textHolder.setTextColor(Color.parseColor("#BDBDBD"))
-                } else if (colors[position] == "#B0BEC5") {
-                    cardView.setCardBackgroundColor(Color.parseColor(colors[position]))
+                } else if (dataClassAdapter.colors[position] == "#B0BEC5") {
+                    cardView.setCardBackgroundColor(Color.parseColor(dataClassAdapter.colors[position]))
                     titleHolder.setTextColor(Color.WHITE)
                     textHolder.setTextColor(Color.parseColor("#BDBDBD"))
                 } else {
-                    cardView.setCardBackgroundColor(Color.parseColor(colors[position]))
+                    cardView.setCardBackgroundColor(Color.parseColor(dataClassAdapter.colors[position]))
                 }
 
 
             }
             cardView.setContentPadding(0,10,0,10)
-            titleHolder.text = titleList[position]
-            textHolder.text = textList[position]
-            if (cameraImg[position].isNotEmpty()) {
-//                imageView.requestLayout()
-//                imageView.layoutParams.height = 170
-//                imageView.layoutParams.width = 100
-//                imageView.setImageURI(Uri.parse(cameraImg[position]))
-                Picasso.get().load(Uri.parse(cameraImg[position])).resize(120, 170).transform(
+            titleHolder.text = dataClassAdapter.titleList[position]
+            textHolder.text = dataClassAdapter.textList[position]
+            if (dataClassAdapter.cameraImg[position].isNotEmpty()) {
+                Picasso.get().load(Uri.parse(dataClassAdapter.cameraImg[position])).resize(120, 170).transform(
                     RoundedCornersTransformation(15,8)
                 ).into(imageView)
             } else {
-                if (image[position].isNotEmpty()) {
-//                imageView.requestLayout()
-//                imageView.layoutParams.height = 170
-//                imageView.layoutParams.width = 100
-//                imageView.setImageURI(Uri.parse(draw[position]))
-                    Picasso.get().load(Uri.parse(image[position])).resize(120, 170)
+                if (dataClassAdapter.image[position].isNotEmpty()) {
+                    Picasso.get().load(Uri.parse(dataClassAdapter.image[position])).resize(120, 170)
                         .transform(RoundedCornersTransformation(15, 8)).into(imageView)
                 } else {
-                    if (draw[position].isNotEmpty()){
-//                    imageView.requestLayout()
-//                    imageView.layoutParams.height = 170
-//                    imageView.layoutParams.width = 100
-//                    imageView.setImageURI(Uri.parse(image[position]))
-                        Picasso.get().load(Uri.parse(draw[position])).resize(120, 170)
+                    if (dataClassAdapter.draw[position].isNotEmpty()){
+                        Picasso.get().load(Uri.parse(dataClassAdapter.draw[position])).resize(120, 170)
                             .transform(RoundedCornersTransformation(15,8)).into(imageView)
 
                     }
@@ -80,14 +66,14 @@ class DatabaseRVAdapter(private val clickListener: (Int) -> Unit,
             }
 
             cardView.setOnClickListener {
-                clickListener(position)
+                dataClassAdapter.clickListener(position)
             }
         }
     }
 
 
     override fun getItemCount(): Int {
-        return titleList.size
+        return dataClassAdapter.titleList.size
     }
 
 

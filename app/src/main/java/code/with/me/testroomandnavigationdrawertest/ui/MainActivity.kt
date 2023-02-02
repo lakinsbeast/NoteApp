@@ -1,4 +1,4 @@
-package code.with.me.testroomandnavigationdrawertest.Activities
+package code.with.me.testroomandnavigationdrawertest.ui
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -13,9 +13,12 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.*
+import code.with.me.testroomandnavigationdrawertest.data.DataClassAdapter
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityMainBinding
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
@@ -52,21 +55,32 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
-        supportActionBar?.setHomeAsUpIndicator(R.drawable.search48px)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowTitleEnabled(false)
-        supportActionBar?.title = "SimpleNote"
-        supportActionBar?.elevation = 32F
-
+        with(supportActionBar) {
+            this?.setHomeAsUpIndicator(R.drawable.search48px)
+            this?.setDisplayHomeAsUpEnabled(true)
+            this?.setDisplayShowTitleEnabled(false)
+            title = "SimpleNote"
+            this?.elevation = 32F
+        }
 
         val dbca = AnimationUtils.loadAnimation(this, R.anim.detail_background_color_anim)
         binding.welcomeLayout.startAnimation(dbca)
 
 
-
-        val adapter = DatabaseRVAdapter({
-            openDetailFragment(it)
-        },titlesList, textList, cameraInRecycler, audioInRecycler, drawInRecycler, imageInRecycler, pickedColorInRecycler)
+        val adapter = DatabaseRVAdapter(
+            DataClassAdapter(
+                {
+                    openDetailFragment(it)
+                },
+                titlesList,
+                textList,
+                cameraInRecycler,
+                audioInRecycler,
+                drawInRecycler,
+                imageInRecycler,
+                pickedColorInRecycler
+            )
+        )
 
         binding.fab.setOnClickListener {
             startActivity(Intent(this, AddNoteActivity::class.java))
@@ -79,46 +93,47 @@ class MainActivity : AppCompatActivity() {
         binding.recyc.adapter = adapter
 //        itemTouchHelper.attachToRecyclerView(binding.recyc)
 
-        noteViewModel.allNotes.observe(this) {
-            it.forEach { i ->
-                if (!(i.id in idsList && i.titleNote in titlesList && i.textNote in textList && i.audioUrl in audioInRecycler
-                            && i.imageById in cameraInRecycler && i.paintUrl in
-                            drawInRecycler && i.imgFrmGlrUrl in imageInRecycler && i.colorCard in pickedColorInRecycler)) {
-                    idsList.add(i.id)
-                    titlesList.add(i.titleNote)
-                    textList.add(i.textNote)
-                    cameraInRecycler.add(i.imageById)
-                    audioInRecycler.add(i.audioUrl)
-                    drawInRecycler.add(i.paintUrl)
-                    imageInRecycler.add(i.imgFrmGlrUrl)
-                    pickedColorInRecycler.add(i.colorCard)
-                    if (idsList.isEmpty()) {
-                        Log.d("itemcount", binding.recyc.adapter?.itemCount.toString())
-                        with (binding) {
-                            welcomeTitle.visibility = View.VISIBLE
-                            welcomeText.visibility = View.VISIBLE
-                            addnewnote.visibility = View.VISIBLE
-                            importnotes.visibility = View.VISIBLE
-                            welcomeImage.visibility = View.VISIBLE
+        lifecycleScope.launch{
+            noteViewModel.getAll().collect {
+                if (it.isNotEmpty()) {
+                    it.forEach {
+                        idsList.add(it.id)
+                        titlesList.add(it.titleNote)
+                        textList.add(it.textNote)
+                        cameraInRecycler.add(it.imageById)
+                        audioInRecycler.add(it.audioUrl)
+                        drawInRecycler.add(it.paintUrl)
+                        imageInRecycler.add(it.imgFrmGlrUrl)
+                        pickedColorInRecycler.add(it.colorCard)
+                        if (idsList.isEmpty()) {
+                            Log.d("itemcount", binding.recyc.adapter?.itemCount.toString())
+                            with(binding) {
+                                welcomeTitle.visibility = View.VISIBLE
+                                welcomeText.visibility = View.VISIBLE
+                                addnewnote.visibility = View.VISIBLE
+                                importnotes.visibility = View.VISIBLE
+                                welcomeImage.visibility = View.VISIBLE
+                            }
+                        } else {
+                            with(binding) {
+                                welcomeTitle.visibility = View.INVISIBLE
+                                welcomeText.visibility = View.INVISIBLE
+                                addnewnote.visibility = View.INVISIBLE
+                                importnotes.visibility = View.INVISIBLE
+                                welcomeImage.visibility = View.INVISIBLE
+                            }
                         }
-                    } else {
-                        with (binding) {
-                            welcomeTitle.visibility = View.INVISIBLE
-                            welcomeText.visibility = View.INVISIBLE
-                            addnewnote.visibility = View.INVISIBLE
-                            importnotes.visibility = View.INVISIBLE
-                            welcomeImage.visibility = View.INVISIBLE
-                        }
+                        binding.recyc.adapter?.notifyDataSetChanged()
+                        binding.recyc.scheduleLayoutAnimation()
                     }
                 }
             }
-            binding.recyc.adapter?.notifyDataSetChanged()
-            binding.recyc.scheduleLayoutAnimation()
         }
         binding.addnewnote.setOnClickListener {
             startActivity(Intent(this, AddNoteActivity::class.java))
         }
     }
+
     override fun onPause() {
         super.onPause()
         overridePendingTransition(0, 0)
@@ -129,7 +144,7 @@ class MainActivity : AppCompatActivity() {
         binding.toolbar.visibility = View.INVISIBLE
         val bundle = Bundle()
         bundle.putInt("num", id)
-        val fragment =  DetailFragment()
+        val fragment = DetailFragment()
         fragment.arguments = bundle
         supportFragmentManager
             .beginTransaction()
@@ -137,6 +152,7 @@ class MainActivity : AppCompatActivity() {
             .addToBackStack(null)
             .commit()
     }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.mainactivitymenu, menu)
         if (isNightModeOn) {
@@ -160,6 +176,9 @@ class MainActivity : AppCompatActivity() {
             super.onBackPressed()
         }
     }
+
+
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.nightMode) {
             if (isNightModeOn) {

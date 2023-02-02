@@ -1,4 +1,4 @@
-package code.with.me.testroomandnavigationdrawertest.Activities
+package code.with.me.testroomandnavigationdrawertest.ui
 
 import android.Manifest
 import android.content.Intent
@@ -63,7 +63,8 @@ class AddNoteActivity : AppCompatActivity() {
     private var colornames: Array<String> = arrayOf("White","Red", "Pink", "Purple", "Deep Purple", "Indigo", "Blue", "Light Blue", "Cyan",
     "Teal", "Green", "Light Green", "Lime", "Yellow", "Amber", "Orange", "Deep Orange", "Brown", "Grey", "Blue Grey")
     private var pickedColor: String = "#FFFFFFFF"
-    val noteViewModel: NoteViewModel by viewModels {
+
+    private val noteViewModel: NoteViewModel by viewModels {
         NoteViewModelFactory((application as NotesApplication).repo)
     }
 
@@ -97,7 +98,6 @@ class AddNoteActivity : AppCompatActivity() {
         binding.colorpicker.descendantFocusability = NumberPicker.FOCUS_BLOCK_DESCENDANTS
         binding.colorpicker.wrapSelectorWheel = false
         binding.colorpicker.setOnValueChangedListener { _, _, _ ->
-//            binding.colorpicker.textColor = Color.parseColor("#"+color[binding.colorpicker.value])
             binding.colorpickercardView.setCardBackgroundColor(Color.parseColor("#"+color[binding.colorpicker.value]))
             binding.layouttocolor.setBackgroundColor(Color.parseColor("#"+color[binding.colorpicker.value]))
             binding.colorpicker.textSize = 50F
@@ -126,7 +126,7 @@ class AddNoteActivity : AppCompatActivity() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(
                 this,
-                arrayOf( Manifest.permission.RECORD_AUDIO ),
+                arrayOf( Manifest.permission.RECORD_AUDIO),
                 RECORD_AUDIO
             )
         } else {
@@ -157,8 +157,10 @@ class AddNoteActivity : AppCompatActivity() {
     }
 
     private val getImageFromGallery = registerForActivityResult(ActivityResultContracts.OpenDocument()) { imageUri ->
-        this.contentResolver.takePersistableUriPermission(imageUri,
-            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+        if (imageUri != null) {
+            this.contentResolver.takePersistableUriPermission(imageUri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+        }
         imageInString = imageUri.toString()
         Picasso.get().load(imageUri).resize(300, 450).centerCrop().transform(RoundedCornersTransformation(36,32)).into(binding.imageView)
         Log.d("testImage", imageUri.toString())
@@ -166,13 +168,6 @@ class AddNoteActivity : AppCompatActivity() {
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun openCamera() {
-//        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-//        file = savePhoto()
-//        val uri = FileProvider.getUriForFile(this, "code.with.me.testroomandnavigationdrawertest.Activities.AddNoteActivity.provider", file)
-//        intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
-//        if (intent.resolveActivity(packageManager) != null) {
-//            startActivityForResult(intent, 200)
-//        }
         val timeStamp = SimpleDateFormat("yyyyMMddHHmmSS").format(Date())
         val storageDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "NotesPhotos")
         storageDir.mkdir()
@@ -184,10 +179,11 @@ class AddNoteActivity : AppCompatActivity() {
         if (!imageFile.exists()) {
             imageFile.mkdirs()
         }
-        camera_uri = FileProvider.getUriForFile(this, "code.with.me.testroomandnavigationdrawertest.Activities.AddNoteActivity.provider", imageFile)
+        camera_uri = FileProvider.getUriForFile(this, "code.with.me.testroomandnavigationdrawertest.ui.AddNoteActivity.provider", imageFile)
         GlobalScope.launch(Dispatchers.IO) {
             getImageFromCamera.launch(camera_uri)
         }
+
 
 
 //        val values = ContentValues()

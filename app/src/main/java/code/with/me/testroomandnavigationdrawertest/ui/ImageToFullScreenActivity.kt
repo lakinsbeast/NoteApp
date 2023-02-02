@@ -1,4 +1,4 @@
-package code.with.me.testroomandnavigationdrawertest.Activities
+package code.with.me.testroomandnavigationdrawertest.ui
 
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity

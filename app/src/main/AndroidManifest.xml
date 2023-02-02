@@ -25,19 +25,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.testRoomAndNavigationDrawerTest" >
         <activity
-            android:name=".Activities.PaintActivity"
+            android:name=".ui.PaintActivity"
             android:exported="false" />
         <activity
-            android:name=".Activities.ImageToFullScreenActivity"
+            android:name=".ui.ImageToFullScreenActivity"
             android:exported="false" />
         <activity
-            android:name=".Activities.DetailActivity"
+            android:name=".ui.DetailActivity"
             android:exported="false" />
         <activity
-            android:name=".Activities.AddNoteActivity"
+            android:name=".ui.AddNoteActivity"
             android:exported="false" />
         <activity
-            android:name=".Activities.MainActivity"
+            android:name=".ui.MainActivity"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -46,7 +46,7 @@
             </intent-filter>
         </activity>
         <provider
-            android:authorities="code.with.me.testroomandnavigationdrawertest.Activities.AddNoteActivity.provider"
+            android:authorities="code.with.me.testroomandnavigationdrawertest.ui.AddNoteActivity.provider"
             android:name="androidx.core.content.FileProvider"
             android:exported="false"
             android:grantUriPermissions="true">

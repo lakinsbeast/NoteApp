@@ -1,12 +1,14 @@
-package code.with.me.testroomandnavigationdrawertest
+package code.with.me.testroomandnavigationdrawertest.domain
 
 import androidx.annotation.WorkerThread
-import androidx.lifecycle.LiveData
+import code.with.me.testroomandnavigationdrawertest.Note
+import code.with.me.testroomandnavigationdrawertest.NoteDAO
+import kotlinx.coroutines.flow.Flow
 
 class NoteRepository(private val noteDao: NoteDAO) {
     // Room выполняет все запросы в отдельном потоке.
     // Observed Flow(или livedata, я его счас проверяю) уведомит наблюдателя об изменении данных.
-    val allNotes: LiveData<MutableList<Note>> = noteDao.getAll()
+    fun getAll(): Flow<List<Note>> = noteDao.getAll()
 
 
 

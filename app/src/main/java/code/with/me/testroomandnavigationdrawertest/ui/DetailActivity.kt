@@ -1,29 +1,23 @@
-package code.with.me.testroomandnavigationdrawertest.Activities
+package code.with.me.testroomandnavigationdrawertest.ui
 
-import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.graphics.ImageDecoder
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewAnimationUtils
-import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.documentfile.provider.DocumentFile
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.lifecycleScope
 import code.with.me.testroomandnavigationdrawertest.*
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityDetailBinding
 import com.squareup.picasso.Picasso
@@ -79,53 +73,54 @@ class DetailActivity : AppCompatActivity() {
         binding.paintImage.background = null
         val idIntent = intent.getIntExtra("id", 0)
 
+        lifecycleScope.launch{
+            noteViewModel.getAll().collect {
+                if (it.isNotEmpty()) {
+                    it.forEach {
+                        idsList.add(it.id)
+                        titlesList.add(it.titleNote)
+                        textList.add(it.textNote)
+                        cameraInRecycler.add(it.imageById)
+                        audioInRecycler.add(it.audioUrl)
+                        paintInRecycler.add(it.paintUrl)
+                        imageInRecycler.add(it.imgFrmGlrUrl)
+                        pickedColorInRecycler.add(it.colorCard)
 
-
-
-
-
-        noteViewModel.allNotes.observe(this) {
-            it.forEach { i ->
-                if (!(i.id in idsList && i.titleNote in titlesList && i.textNote in textList
-                            && i.imageById in cameraInRecycler && i.audioUrl in audioInRecycler && i.paintUrl in paintInRecycler
-                            && i.imgFrmGlrUrl in imageInRecycler && i.colorCard in pickedColorInRecycler)) {
-                    idsList.add(i.id)
-                    titlesList.add(i.titleNote)
-                    textList.add(i.textNote)
-                    cameraInRecycler.add(i.imageById)
-                    audioInRecycler.add(i.audioUrl)
-                    paintInRecycler.add(i.paintUrl)
-                    imageInRecycler.add(i.imgFrmGlrUrl)
-                    pickedColorInRecycler.add(i.colorCard)
-                }
-            }
-            id = idsList[idIntent]
-            cameraImgPath = cameraInRecycler[idIntent]
-            imagePath = imageInRecycler[idIntent]
-            if (audioInRecycler[idIntent].isNotEmpty()) {
-                audioPath = audioInRecycler[idIntent]
-                binding.playAudio.visibility = View.VISIBLE
-            }
-            if (paintInRecycler[idIntent].isNotEmpty()) {
-                paintPath = paintInRecycler[idIntent]
-                Picasso.get().load(paintPath).resize(350, 450).centerCrop().transform(RoundedCornersTransformation(36,32)).into(binding.paintImage)
-            }
-            binding.titleEditText.setText(titlesList[idIntent])
+                        id = idsList[idIntent]
+                        cameraImgPath = cameraInRecycler[idIntent]
+                        imagePath = imageInRecycler[idIntent]
+                        if (audioInRecycler[idIntent].isNotEmpty()) {
+                            audioPath = audioInRecycler[idIntent]
+                            binding.playAudio.visibility = View.VISIBLE
+                        }
+                        if (paintInRecycler[idIntent].isNotEmpty()) {
+                            paintPath = paintInRecycler[idIntent]
+                            Picasso.get().load(paintPath).resize(350, 450).centerCrop().transform(
+                                RoundedCornersTransformation(36,32)
+                            ).into(binding.paintImage)
+                        }
+                        binding.titleEditText.setText(titlesList[idIntent])
 //            supportActionBar?.title = titlesList[idIntent]
 
-            binding.textEditText.setText(textList[idIntent])
-            if (cameraImgPath.isNotEmpty()) {
-                Picasso.get().load(cameraImgPath).resize(350, 450).centerCrop().transform(RoundedCornersTransformation(36,32)).into(binding.cameraImg)
-            }
-            if (imagePath.isNotEmpty()) {
-                Picasso.get().load(Uri.parse(imagePath)).resize(350, 450).centerCrop().transform(RoundedCornersTransformation(36,32)).into(binding.image)
-            }
-            pickedColorPath = pickedColorInRecycler[idIntent]
-            if (pickedColorPath.isNotEmpty()) {
+                        binding.textEditText.setText(textList[idIntent])
+                        if (cameraImgPath.isNotEmpty()) {
+                            Picasso.get().load(cameraImgPath).resize(350, 450).centerCrop().transform(
+                                RoundedCornersTransformation(36,32)
+                            ).into(binding.cameraImg)
+                        }
+                        if (imagePath.isNotEmpty()) {
+                            Picasso.get().load(Uri.parse(imagePath)).resize(350, 450).centerCrop().transform(
+                                RoundedCornersTransformation(36,32)
+                            ).into(binding.image)
+                        }
+                        pickedColorPath = pickedColorInRecycler[idIntent]
+                        if (pickedColorPath.isNotEmpty()) {
 
-                binding.layoutdetail.setBackgroundColor(Color.parseColor(pickedColorPath))
+                            binding.layoutdetail.setBackgroundColor(Color.parseColor(pickedColorPath))
+                        }
+                    }
+                }
             }
-
         }
 
         binding.playAudio.setOnClickListener {

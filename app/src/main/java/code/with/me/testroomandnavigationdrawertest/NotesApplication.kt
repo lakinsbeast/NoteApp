@@ -1,7 +1,7 @@
 package code.with.me.testroomandnavigationdrawertest
 
 import android.app.Application
-import android.content.Context
+import code.with.me.testroomandnavigationdrawertest.domain.NoteRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 
@@ -10,6 +10,6 @@ class NotesApplication: Application() {
     val applicationScope = CoroutineScope(SupervisorJob())
 
     val db by lazy { NoteDatabase.getDb(this, applicationScope) }
-    val repo by lazy { NoteRepository(db.noteDao())}
+    val repo by lazy { NoteRepository(db.noteDao()) }
 
 }
