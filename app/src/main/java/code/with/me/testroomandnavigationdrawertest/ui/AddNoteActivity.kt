@@ -28,8 +28,6 @@ import code.with.me.testroomandnavigationdrawertest.databinding.ActivityAddNoteB
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
@@ -41,9 +39,8 @@ import java.util.*
 class AddNoteActivity : AppCompatActivity() {
 
     private var stateOfAudioRecorder = false
-
     private val PERMISSION_CODE = 1000
-    private var camera_uri: Uri? = null
+    private var cameraUri: Uri? = null
     private var cameraInString: String = ""
     private var audioInString: String = ""
     private var paintInString: String = ""
@@ -124,12 +121,12 @@ class AddNoteActivity : AppCompatActivity() {
             getPaint.launch(Intent(this, PaintActivity::class.java))
         }
         binding.imageButtonVoice.setOnClickListener {
-            if (!stateOfAudioRecorder) {
+            stateOfAudioRecorder = if (!stateOfAudioRecorder) {
                 audioRec()
-                stateOfAudioRecorder = true
+                true
             } else {
                 stopAudio()
-                stateOfAudioRecorder = false
+                false
             }
 
         }
@@ -175,9 +172,15 @@ class AddNoteActivity : AppCompatActivity() {
     }
 
     private fun stopAudio() {
-        recorder?.apply {
-            stop()
-            release()
+        try {
+            recorder?.apply {
+                stop()
+                release()
+            }
+            binding.imageButtonVoice.setImageResource(R.drawable.ic_baseline_keyboard_voice_24)
+            Toast.makeText(this, "Запись голоса завершена", Toast.LENGTH_SHORT)
+        } catch (e: Exception) {
+            Log.d("audioRecorder", e.message.toString())
         }
     }
 
@@ -207,11 +210,12 @@ class AddNoteActivity : AppCompatActivity() {
                 try {
                     prepare()
                     start()
+                    binding.imageButtonVoice.setImageResource(R.drawable.mic_off48px)
                 } catch (e: IOException) {
                     Log.d("audioException", e.message.toString())
                     Toast.makeText(this@AddNoteActivity, e.message.toString(), Toast.LENGTH_SHORT).show()
                 }
-                Toast.makeText(this@AddNoteActivity, "record start", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@AddNoteActivity, "Началась запись голоса", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -260,13 +264,13 @@ class AddNoteActivity : AppCompatActivity() {
 //        if (!imageFile.exists()) {
 //            imageFile.mkdirs()
 //        }
-        camera_uri = FileProvider.getUriForFile(
+        cameraUri = FileProvider.getUriForFile(
             this,
             "code.with.me.testroomandnavigationdrawertest.ui.AddNoteActivity.provider",
             imageFile
         )
         lifecycleScope.launch{
-            getImageFromCamera.launch(camera_uri)
+            getImageFromCamera.launch(cameraUri)
         }
 //        GlobalScope.launch(Dispatchers.IO) {
 //            getImageFromCamera.launch(camera_uri)
@@ -290,12 +294,12 @@ class AddNoteActivity : AppCompatActivity() {
 
     private val getImageFromCamera =
         registerForActivityResult(ActivityResultContracts.TakePicture()) {
-            Log.d("image_uri", camera_uri!!.encodedPath.toString())
+            Log.d("image_uri", cameraUri!!.encodedPath.toString())
             if (it) {
-                MediaStore.Images.Media.getBitmap(this.contentResolver, camera_uri)
-                val test = camera_uri.toString()
+                MediaStore.Images.Media.getBitmap(this.contentResolver, cameraUri)
+                val test = cameraUri.toString()
                 cameraInString = test
-                Picasso.get().load(camera_uri).resize(300, 450).centerCrop()
+                Picasso.get().load(cameraUri).resize(300, 450).centerCrop()
                     .transform(RoundedCornersTransformation(36, 32)).into(binding.cameraView)
 
             }
