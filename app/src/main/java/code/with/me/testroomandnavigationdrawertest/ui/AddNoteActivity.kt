@@ -22,6 +22,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
+import androidx.lifecycle.lifecycleScope
 import code.with.me.testroomandnavigationdrawertest.*
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityAddNoteBinding
 import com.squareup.picasso.Picasso
@@ -39,6 +40,8 @@ import java.util.*
 @Suppress("DEPRECATION")
 class AddNoteActivity : AppCompatActivity() {
 
+    private var stateOfAudioRecorder = false
+
     private val PERMISSION_CODE = 1000
     private var camera_uri: Uri? = null
     private var cameraInString: String = ""
@@ -48,7 +51,7 @@ class AddNoteActivity : AppCompatActivity() {
 
     private var RECORD_AUDIO: Int = 0
 
-    private val randomNum = System.currentTimeMillis()/1000
+    private val randomNum = System.currentTimeMillis() / 1000
 
     private var fileAudioName: String? = null
 
@@ -58,10 +61,50 @@ class AddNoteActivity : AppCompatActivity() {
 
     private var isClickedToColorPicker: Boolean = false
 
-    private var color: Array<String> = arrayOf("FFFFFFFF","EF9A9A","F8BBD0","E1BEE7", "FC85AE", "C5CAE9", "42A5F5", "26C6DA", "4DB6AC",
-    "81C784", "8BC34A", "DCEDC8","F7FE49", "FFF176", "FFE082","FFCC80", "FF8A65", "D7CCC8", "BDBDBD", "B0BEC5")
-    private var colornames: Array<String> = arrayOf("White","Red", "Pink", "Purple", "Deep Purple", "Indigo", "Blue", "Light Blue", "Cyan",
-    "Teal", "Green", "Light Green", "Lime", "Yellow", "Amber", "Orange", "Deep Orange", "Brown", "Grey", "Blue Grey")
+    private var color: Array<String> = arrayOf(
+        "FFFFFFFF",
+        "EF9A9A",
+        "F8BBD0",
+        "E1BEE7",
+        "FC85AE",
+        "C5CAE9",
+        "42A5F5",
+        "26C6DA",
+        "4DB6AC",
+        "81C784",
+        "8BC34A",
+        "DCEDC8",
+        "F7FE49",
+        "FFF176",
+        "FFE082",
+        "FFCC80",
+        "FF8A65",
+        "D7CCC8",
+        "BDBDBD",
+        "B0BEC5"
+    )
+    private var colornames: Array<String> = arrayOf(
+        "White",
+        "Red",
+        "Pink",
+        "Purple",
+        "Deep Purple",
+        "Indigo",
+        "Blue",
+        "Light Blue",
+        "Cyan",
+        "Teal",
+        "Green",
+        "Light Green",
+        "Lime",
+        "Yellow",
+        "Amber",
+        "Orange",
+        "Deep Orange",
+        "Brown",
+        "Grey",
+        "Blue Grey"
+    )
     private var pickedColor: String = "#FFFFFFFF"
 
     private val noteViewModel: NoteViewModel by viewModels {
@@ -81,7 +124,14 @@ class AddNoteActivity : AppCompatActivity() {
             getPaint.launch(Intent(this, PaintActivity::class.java))
         }
         binding.imageButtonVoice.setOnClickListener {
-            audioRec()
+            if (!stateOfAudioRecorder) {
+                audioRec()
+                stateOfAudioRecorder = true
+            } else {
+                stopAudio()
+                stateOfAudioRecorder = false
+            }
+
         }
         binding.cardcolorpicker.setOnClickListener {
             if (!isClickedToColorPicker) {
@@ -92,23 +142,26 @@ class AddNoteActivity : AppCompatActivity() {
                 isClickedToColorPicker = false
             }
         }
-        binding.colorpicker.minValue = 0
-        binding.colorpicker.maxValue = colornames.size - 1
-        binding.colorpicker.displayedValues = colornames
-        binding.colorpicker.descendantFocusability = NumberPicker.FOCUS_BLOCK_DESCENDANTS
-        binding.colorpicker.wrapSelectorWheel = false
-        binding.colorpicker.setOnValueChangedListener { _, _, _ ->
-            binding.colorpickercardView.setCardBackgroundColor(Color.parseColor("#"+color[binding.colorpicker.value]))
-            binding.layouttocolor.setBackgroundColor(Color.parseColor("#"+color[binding.colorpicker.value]))
-            binding.colorpicker.textSize = 50F
-            pickedColor = "#"+color[binding.colorpicker.value]
+        binding.colorpicker.apply {
+            minValue = 0
+            maxValue = colornames.size - 1
+            displayedValues = colornames
+            descendantFocusability = NumberPicker.FOCUS_BLOCK_DESCENDANTS
+            wrapSelectorWheel = false
+            setOnValueChangedListener { _, _, _ ->
+                binding.colorpickercardView.setCardBackgroundColor(Color.parseColor("#" + color[binding.colorpicker.value]))
+                textSize = 50F
+                binding.layouttocolor.setBackgroundColor(Color.parseColor("#" + color[binding.colorpicker.value]))
+                pickedColor = "#" + color[value]
+            }
         }
-
         binding.cameraBtn.setOnClickListener {
             if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
-                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
+            ) {
                 //permission was not enabled
-                val permission = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                val permission =
+                    arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 //show popup to request permission
                 requestPermissions(permission, PERMISSION_CODE)
             } else {
@@ -121,20 +174,30 @@ class AddNoteActivity : AppCompatActivity() {
         }
     }
 
+    private fun stopAudio() {
+        recorder?.apply {
+            stop()
+            release()
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun audioRec() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.RECORD_AUDIO
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             ActivityCompat.requestPermissions(
                 this,
-                arrayOf( Manifest.permission.RECORD_AUDIO),
+                arrayOf(Manifest.permission.RECORD_AUDIO),
                 RECORD_AUDIO
             )
         } else {
-
             fileAudioName = externalCacheDir?.absolutePath.toString() + "/$randomNum.3gp"
             audioInString = fileAudioName.toString()
             Log.d("filename", fileAudioName!!)
-            @Suppress("DEPRECATION")
+
             recorder = MediaRecorder().apply {
                 setAudioSource(MediaRecorder.AudioSource.MIC)
                 setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
@@ -143,11 +206,12 @@ class AddNoteActivity : AppCompatActivity() {
 
                 try {
                     prepare()
+                    start()
                 } catch (e: IOException) {
                     Log.d("audioException", e.message.toString())
+                    Toast.makeText(this@AddNoteActivity, e.message.toString(), Toast.LENGTH_SHORT).show()
                 }
                 Toast.makeText(this@AddNoteActivity, "record start", Toast.LENGTH_SHORT).show()
-                start()
             }
         }
     }
@@ -156,34 +220,57 @@ class AddNoteActivity : AppCompatActivity() {
         getImageFromGallery.launch(arrayOf("image/*"))
     }
 
-    private val getImageFromGallery = registerForActivityResult(ActivityResultContracts.OpenDocument()) { imageUri ->
-        if (imageUri != null) {
-            this.contentResolver.takePersistableUriPermission(imageUri,
-                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+    private val getImageFromGallery =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { imageUri ->
+            if (imageUri != null) {
+                this.contentResolver.takePersistableUriPermission(
+                    imageUri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+            }
+            imageInString = imageUri.toString()
+            Picasso.get().load(imageUri).resize(300, 450).centerCrop()
+                .transform(RoundedCornersTransformation(36, 32)).into(binding.imageView)
+            Log.d("testImage", imageUri.toString())
         }
-        imageInString = imageUri.toString()
-        Picasso.get().load(imageUri).resize(300, 450).centerCrop().transform(RoundedCornersTransformation(36,32)).into(binding.imageView)
-        Log.d("testImage", imageUri.toString())
-    }
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun openCamera() {
         val timeStamp = SimpleDateFormat("yyyyMMddHHmmSS").format(Date())
-        val storageDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "NotesPhotos")
-        storageDir.mkdir()
-        val imageFile = File(storageDir, "image".plus(Calendar.getInstance().timeInMillis).plus(timeStamp).plus(".jpg"))
-        imageFile.createNewFile()
-        if (!imageFile.parentFile?.exists()!!) {
-            imageFile.parentFile?.mkdirs()
+        val storageDir = File(
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),
+            "NotesPhotos"
+        ).apply { mkdir() }
+        val imageFile = File(
+            storageDir,
+            "image".plus(Calendar.getInstance().timeInMillis).plus(timeStamp).plus(".jpg")
+        ).apply {
+            createNewFile()
+            if (parentFile?.exists()!!) {
+                parentFile?.mkdirs()
+            }
+            if (exists()) {
+                mkdirs()
+            }
         }
-        if (!imageFile.exists()) {
-            imageFile.mkdirs()
-        }
-        camera_uri = FileProvider.getUriForFile(this, "code.with.me.testroomandnavigationdrawertest.ui.AddNoteActivity.provider", imageFile)
-        GlobalScope.launch(Dispatchers.IO) {
+//        imageFile.createNewFile()
+//        if (!imageFile.parentFile?.exists()!!) {
+//            imageFile.parentFile?.mkdirs()
+//        }
+//        if (!imageFile.exists()) {
+//            imageFile.mkdirs()
+//        }
+        camera_uri = FileProvider.getUriForFile(
+            this,
+            "code.with.me.testroomandnavigationdrawertest.ui.AddNoteActivity.provider",
+            imageFile
+        )
+        lifecycleScope.launch{
             getImageFromCamera.launch(camera_uri)
         }
-
+//        GlobalScope.launch(Dispatchers.IO) {
+//            getImageFromCamera.launch(camera_uri)
+//        }
 
 
 //        val values = ContentValues()
@@ -200,26 +287,30 @@ class AddNoteActivity : AppCompatActivity() {
 //            getImageFromCamera.launch(image_uri)
 //        }
     }
-    private val getImageFromCamera = registerForActivityResult(ActivityResultContracts.TakePicture()) {
-    Log.d("image_uri", camera_uri!!.encodedPath.toString())
-        if (it) {
-            MediaStore.Images.Media.getBitmap(this.contentResolver, camera_uri)
-            val test = camera_uri.toString()
-            cameraInString = test
-            Picasso.get().load(camera_uri).resize(300, 450).centerCrop()
-                .transform(RoundedCornersTransformation(36, 32)).into(binding.cameraView)
 
+    private val getImageFromCamera =
+        registerForActivityResult(ActivityResultContracts.TakePicture()) {
+            Log.d("image_uri", camera_uri!!.encodedPath.toString())
+            if (it) {
+                MediaStore.Images.Media.getBitmap(this.contentResolver, camera_uri)
+                val test = camera_uri.toString()
+                cameraInString = test
+                Picasso.get().load(camera_uri).resize(300, 450).centerCrop()
+                    .transform(RoundedCornersTransformation(36, 32)).into(binding.cameraView)
+
+            }
         }
-    }
-    private val getPaint = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        val paintBitmap = it.data?.extras?.getString("pathBitmap")
-        if (paintBitmap != null) {
-            paintInString = paintBitmap
-            Picasso.get().load(paintBitmap).resize(300, 450).centerCrop().transform(RoundedCornersTransformation(36,32)).into(binding.paintImage)
-        } else {
-            Log.d("actforresult", "actforres не сработал")
+    private val getPaint =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            val paintBitmap = it.data?.extras?.getString("pathBitmap")
+            if (paintBitmap != null) {
+                paintInString = paintBitmap
+                Picasso.get().load(paintBitmap).resize(300, 450).centerCrop()
+                    .transform(RoundedCornersTransformation(36, 32)).into(binding.paintImage)
+            } else {
+                Log.d("actforresult", "actforres не сработал")
+            }
         }
-    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -227,7 +318,7 @@ class AddNoteActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when(requestCode) {
+        when (requestCode) {
             PERMISSION_CODE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //perm from popup was granted
@@ -244,6 +335,7 @@ class AddNoteActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.actionbarmenu, menu)
         return super.onCreateOptionsMenu(menu)
     }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
             startActivity(Intent(this, MainActivity::class.java))
@@ -255,7 +347,16 @@ class AddNoteActivity : AppCompatActivity() {
             } else {
                 val title = binding.titleEdit.text.toString()
                 val text = binding.textEdit.text.toString()
-                val test = Note(0, title, text, cameraInString, audioInString, paintInString, imageInString, pickedColor)
+                val test = Note(
+                    0,
+                    title,
+                    text,
+                    cameraInString,
+                    audioInString,
+                    paintInString,
+                    imageInString,
+                    pickedColor
+                )
                 noteViewModel.insert(test)
                 binding.titleEdit.text = null
                 binding.textEdit.text = null

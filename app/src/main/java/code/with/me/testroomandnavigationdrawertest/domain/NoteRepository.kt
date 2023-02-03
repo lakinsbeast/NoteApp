@@ -6,8 +6,6 @@ import code.with.me.testroomandnavigationdrawertest.NoteDAO
 import kotlinx.coroutines.flow.Flow
 
 class NoteRepository(private val noteDao: NoteDAO) {
-    // Room выполняет все запросы в отдельном потоке.
-    // Observed Flow(или livedata, я его счас проверяю) уведомит наблюдателя об изменении данных.
     fun getAll(): Flow<List<Note>> = noteDao.getAll()
 
 

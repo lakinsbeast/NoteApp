@@ -24,14 +24,7 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
-    private val idsList = ArrayList<Int>()
-    private val titlesList = ArrayList<String>()
-    private val textList = ArrayList<String>()
-    private var audioInRecycler = ArrayList<String>()
-    private var cameraInRecycler = ArrayList<String>()
-    private var drawInRecycler = ArrayList<String>()
-    private var imageInRecycler = ArrayList<String>()
-    private var pickedColorInRecycler = ArrayList<String>()
+    private val NotesArray: ArrayList<Note> = ArrayList()
 
     private lateinit var appSettingPrefs: SharedPreferences
     private lateinit var sharedPrefsEdit: SharedPreferences.Editor
@@ -41,11 +34,13 @@ class MainActivity : AppCompatActivity() {
         NoteViewModelFactory((application as NotesApplication).repo)
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
-        appSettingPrefs = getSharedPreferences("AppSettingPrefs", 0)
-        sharedPrefsEdit = appSettingPrefs.edit()
-        isNightModeOn = appSettingPrefs.getBoolean("NightMode", false)
+        appSettingPrefs = getSharedPreferences("AppSettingPrefs", 0).also {
+            sharedPrefsEdit = it.edit()
+            isNightModeOn = it.getBoolean("NightMode", false)
+        }
+//        sharedPrefsEdit = appSettingPrefs.edit()
+//        isNightModeOn = appSettingPrefs.getBoolean("NightMode", false)
         if (isNightModeOn) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         } else {
@@ -62,69 +57,56 @@ class MainActivity : AppCompatActivity() {
             title = "SimpleNote"
             this?.elevation = 32F
         }
+        AnimationUtils.loadAnimation(this, R.anim.detail_background_color_anim).apply {
+            binding.welcomeLayout.startAnimation(this)
+        }
 
-        val dbca = AnimationUtils.loadAnimation(this, R.anim.detail_background_color_anim)
-        binding.welcomeLayout.startAnimation(dbca)
 
-
-        val adapter = DatabaseRVAdapter(
+        DatabaseRVAdapter(
             DataClassAdapter(
                 {
                     openDetailFragment(it)
                 },
-                titlesList,
-                textList,
-                cameraInRecycler,
-                audioInRecycler,
-                drawInRecycler,
-                imageInRecycler,
-                pickedColorInRecycler
+                NotesArray
             )
-        )
-
-        binding.fab.setOnClickListener {
-            startActivity(Intent(this, AddNoteActivity::class.java))
-
+        ).apply {
+            binding.recyc.adapter = this
         }
 
-        binding.recyc.scheduleLayoutAnimation()
-        binding.recyc.layoutManager = LinearLayoutManager(this)
-        binding.recyc.itemAnimator = null
-        binding.recyc.adapter = adapter
-//        itemTouchHelper.attachToRecyclerView(binding.recyc)
+        binding.apply {
+            fab.setOnClickListener {
+                startActivity(Intent(this@MainActivity, AddNoteActivity::class.java))
+            }
+            recyc.apply {
+                scheduleLayoutAnimation()
+                layoutManager = LinearLayoutManager(this@MainActivity)
+                itemAnimator = null
+            }
+        }
 
-        lifecycleScope.launch{
+        lifecycleScope.launch {
             noteViewModel.getAll().collect {
                 if (it.isNotEmpty()) {
+                    NotesArray.clear()
                     it.forEach {
-                        idsList.add(it.id)
-                        titlesList.add(it.titleNote)
-                        textList.add(it.textNote)
-                        cameraInRecycler.add(it.imageById)
-                        audioInRecycler.add(it.audioUrl)
-                        drawInRecycler.add(it.paintUrl)
-                        imageInRecycler.add(it.imgFrmGlrUrl)
-                        pickedColorInRecycler.add(it.colorCard)
-                        if (idsList.isEmpty()) {
-                            Log.d("itemcount", binding.recyc.adapter?.itemCount.toString())
-                            with(binding) {
-                                welcomeTitle.visibility = View.VISIBLE
-                                welcomeText.visibility = View.VISIBLE
-                                addnewnote.visibility = View.VISIBLE
-                                importnotes.visibility = View.VISIBLE
-                                welcomeImage.visibility = View.VISIBLE
-                            }
-                        } else {
-                            with(binding) {
-                                welcomeTitle.visibility = View.INVISIBLE
-                                welcomeText.visibility = View.INVISIBLE
-                                addnewnote.visibility = View.INVISIBLE
-                                importnotes.visibility = View.INVISIBLE
-                                welcomeImage.visibility = View.INVISIBLE
-                            }
+                        NotesArray.add(it)
+                        binding.apply {
+                            welcomeTitle.visibility = View.INVISIBLE
+                            welcomeText.visibility = View.INVISIBLE
+                            addnewnote.visibility = View.INVISIBLE
+                            importnotes.visibility = View.INVISIBLE
+                            welcomeImage.visibility = View.INVISIBLE
                         }
                         binding.recyc.adapter?.notifyDataSetChanged()
                         binding.recyc.scheduleLayoutAnimation()
+                    }
+                } else {
+                    binding.apply {
+                        welcomeTitle.visibility = View.VISIBLE
+                        welcomeText.visibility = View.VISIBLE
+                        addnewnote.visibility = View.VISIBLE
+                        importnotes.visibility = View.VISIBLE
+                        welcomeImage.visibility = View.VISIBLE
                     }
                 }
             }
@@ -134,23 +116,38 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+//    fun transformNoteToDataClassAdapter(
+//        note: Note,
+//        dataClassAdapter: DataClassAdapter, clickListener: (Int) -> Unit,
+//    ): DataClassAdapter {
+//        return DataClassAdapter(clickListener, note.titleNote, note.textNote)
+//    }
+
     override fun onPause() {
         super.onPause()
         overridePendingTransition(0, 0)
     }
 
     private fun openDetailFragment(id: Int) {
-        binding.relativeLayout.visibility = View.INVISIBLE
-        binding.toolbar.visibility = View.INVISIBLE
-        val bundle = Bundle()
-        bundle.putInt("num", id)
-        val fragment = DetailFragment()
-        fragment.arguments = bundle
-        supportFragmentManager
-            .beginTransaction()
-            .add(R.id.fragment_detail, fragment)
-            .addToBackStack(null)
-            .commit()
+        binding.apply {
+            relativeLayout.visibility = View.INVISIBLE
+            toolbar.visibility = View.INVISIBLE
+        }
+        supportFragmentManager.beginTransaction()
+            .add(R.id.fragment_detail, DetailFragment().apply {
+                arguments = Bundle().apply {
+                    putInt("num", id)
+                }
+            }).addToBackStack(null).commit()
+//        val bundle = Bundle()
+//        bundle.putInt("num", id)
+//        val fragment = DetailFragment()
+//        fragment.arguments = bundle
+//        supportFragmentManager
+//            .beginTransaction()
+//            .add(R.id.fragment_detail, fragment)
+//            .addToBackStack(null)
+//            .commit()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -176,7 +173,6 @@ class MainActivity : AppCompatActivity() {
             super.onBackPressed()
         }
     }
-
 
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

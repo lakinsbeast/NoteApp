@@ -9,9 +9,11 @@ class ImageToFullScreenActivity : AppCompatActivity() {
     private lateinit var binding: ActivityImageToFullScreenBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityImageToFullScreenBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        val imageIntent = intent.getStringExtra("imageUrl")
-        binding.imageToFS.setImageURI(Uri.parse(imageIntent))
+        binding = ActivityImageToFullScreenBinding.inflate(layoutInflater).apply {
+            setContentView(this.root)
+        }
+        intent.getStringExtra("imageUrl").apply {
+            binding.imageToFS.setImageURI(Uri.parse(this))
+        }
     }
 }

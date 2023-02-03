@@ -29,35 +29,35 @@ class DatabaseRVAdapter(private val dataClassAdapter: DataClassAdapter): Recycle
         with(holder) {
 //            cardView.radius = 100F
             ViewCompat.setTransitionName(holder.titleHolder, holder.textHolder.toString())
-            if (dataClassAdapter.colors.isNotEmpty()) {
-                if (dataClassAdapter.colors[position] == "#9575CD") {
-                    cardView.setCardBackgroundColor(Color.parseColor(dataClassAdapter.colors[position]))
+            if (dataClassAdapter.notesArray[position].colorCard.isNotEmpty()) {
+                if (dataClassAdapter.notesArray[position].colorCard == "#9575CD") {
+                    cardView.setCardBackgroundColor(Color.parseColor(dataClassAdapter.notesArray[position].colorCard))
                     titleHolder.setTextColor(Color.WHITE)
                     textHolder.setTextColor(Color.parseColor("#BDBDBD"))
-                } else if (dataClassAdapter.colors[position] == "#B0BEC5") {
-                    cardView.setCardBackgroundColor(Color.parseColor(dataClassAdapter.colors[position]))
+                } else if (dataClassAdapter.notesArray[position].colorCard == "#B0BEC5") {
+                    cardView.setCardBackgroundColor(Color.parseColor(dataClassAdapter.notesArray[position].colorCard))
                     titleHolder.setTextColor(Color.WHITE)
                     textHolder.setTextColor(Color.parseColor("#BDBDBD"))
                 } else {
-                    cardView.setCardBackgroundColor(Color.parseColor(dataClassAdapter.colors[position]))
+                    cardView.setCardBackgroundColor(Color.parseColor(dataClassAdapter.notesArray[position].colorCard))
                 }
 
 
             }
             cardView.setContentPadding(0,10,0,10)
-            titleHolder.text = dataClassAdapter.titleList[position]
-            textHolder.text = dataClassAdapter.textList[position]
-            if (dataClassAdapter.cameraImg[position].isNotEmpty()) {
-                Picasso.get().load(Uri.parse(dataClassAdapter.cameraImg[position])).resize(120, 170).transform(
+            titleHolder.text = dataClassAdapter.notesArray[position].titleNote
+            textHolder.text = dataClassAdapter.notesArray[position].textNote
+            if (dataClassAdapter.notesArray[position].colorCard.isNotEmpty()) {
+                Picasso.get().load(Uri.parse(dataClassAdapter.notesArray[position].colorCard)).resize(120, 170).transform(
                     RoundedCornersTransformation(15,8)
                 ).into(imageView)
             } else {
-                if (dataClassAdapter.image[position].isNotEmpty()) {
-                    Picasso.get().load(Uri.parse(dataClassAdapter.image[position])).resize(120, 170)
+                if (dataClassAdapter.notesArray[position].imageById.isNotEmpty()) {
+                    Picasso.get().load(Uri.parse(dataClassAdapter.notesArray[position].imageById)).resize(120, 170)
                         .transform(RoundedCornersTransformation(15, 8)).into(imageView)
                 } else {
-                    if (dataClassAdapter.draw[position].isNotEmpty()){
-                        Picasso.get().load(Uri.parse(dataClassAdapter.draw[position])).resize(120, 170)
+                    if (dataClassAdapter.notesArray[position].paintUrl.isNotEmpty()){
+                        Picasso.get().load(Uri.parse(dataClassAdapter.notesArray[position].paintUrl)).resize(120, 170)
                             .transform(RoundedCornersTransformation(15,8)).into(imageView)
 
                     }
@@ -73,7 +73,7 @@ class DatabaseRVAdapter(private val dataClassAdapter: DataClassAdapter): Recycle
 
 
     override fun getItemCount(): Int {
-        return dataClassAdapter.titleList.size
+        return dataClassAdapter.notesArray.size
     }
 
 

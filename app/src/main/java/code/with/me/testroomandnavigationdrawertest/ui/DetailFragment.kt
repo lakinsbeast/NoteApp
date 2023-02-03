@@ -18,12 +18,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import code.with.me.testroomandnavigationdrawertest.*
+import code.with.me.testroomandnavigationdrawertest.data.NoteForDetailFragment
 import code.with.me.testroomandnavigationdrawertest.databinding.FragmentDetailBinding
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.IOException
 
+//TODO{ЗАРЕФАКТОРИТЬ ДАННЫЙ ФРАГМЕНТ}
 @Suppress("DEPRECATION")
 class DetailFragment : Fragment() {
 
@@ -35,12 +38,14 @@ class DetailFragment : Fragment() {
     private var titleEdited: String = ""
     private var text: String = ""
     private var textEdited: String = ""
-    private var idS: Int = 0
-    private var cameraImgPath: String = ""
-    private var audioPath: String = ""
-    private var paintPath: String = ""
-    private var imagePath: String = ""
-    private var pickedColorPath: String = ""
+
+//    private var idS: Int = 0
+//    private var cameraImgPath: String = ""
+//    private var audioPath: String = ""
+//    private var paintPath: String = ""
+//    private var imagePath: String = ""
+//    private var pickedColorPath: String = ""
+
     private var isPlay: Boolean = true
 
     private var mediaPlayer: MediaPlayer? = null
@@ -51,13 +56,15 @@ class DetailFragment : Fragment() {
         NoteViewModelFactory((this.activity?.application as NotesApplication).repo)
     }
 
+    var note = NoteForDetailFragment()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(R.transition.change_text_transform)
+        sharedElementEnterTransition =
+            TransitionInflater.from(context).inflateTransition(R.transition.change_text_transform)
     }
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentDetailBinding.inflate(inflater, container, false)
         return binding.root
@@ -65,45 +72,87 @@ class DetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        binding.playAudio.visibility = View.INVISIBLE
-        binding.cameraImg.background = null
-        binding.paintImage.background = null
+        binding.apply {
+            playAudio.visibility = View.INVISIBLE
+            cameraImg.background = null
+            paintImage.background = null
+        }
 
         // menu
-        (activity as AppCompatActivity).supportActionBar?.setDisplayShowTitleEnabled(false)
-        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        (activity as AppCompatActivity).supportActionBar?.apply {
+            setDisplayShowTitleEnabled(false)
+            setDisplayHomeAsUpEnabled(true)
+        }
         binding.toolbar.inflateMenu(R.menu.detailnotemenu)
-        binding.toolbar.setOnMenuItemClickListener { item->
+        binding.toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 android.R.id.home -> {
-                    startActivity(Intent(requireActivity().baseContext, MainActivity::class.java))
+                    requireActivity().supportFragmentManager.beginTransaction().remove(this)
+                        .commit()
+                    requireActivity().onBackPressed()
                 }
                 R.id.updateBtn -> {
-                    titleEdited = binding.titleEditText.text.toString()
-                    textEdited = binding.textEditText.text.toString()
-                    val updNote = Note(idS,titleEdited, textEdited, cameraImgPath, audioPath, paintPath, imagePath, pickedColorPath)
-                    noteViewModel.update(updNote)
-                    startActivity(Intent(requireActivity(), MainActivity::class.java))
+                    binding.apply {
+                        titleEdited = titleEditText.text.toString()
+                        textEdited = textEditText.text.toString()
+                    }
+                    noteViewModel.update(
+                        Note(
+                            note.id,
+                            titleEdited,
+                            textEdited,
+                            note.imgFrmGlrUrl,
+                            note.audioUrl,
+                            note.paintUrl,
+                            note.imageById,
+                            note.colorCard
+                        )
+                    )
+                    requireActivity().supportFragmentManager.beginTransaction().remove(this)
+                        .commit()
+                    requireActivity().onBackPressed()
                 }
                 R.id.deleteBtn -> {
-                    val alrtDlg = AlertDialog.Builder(requireActivity())
-                    alrtDlg.setTitle("Удалить?")
+                    AlertDialog.Builder(requireActivity()).setTitle("Удалить?")
                         .setPositiveButton("Да") { _: DialogInterface, _: Int ->
-                            val dltNote =
-                                Note(idS, title, text, cameraImgPath, audioPath, paintPath, imagePath, pickedColorPath)
-                            noteViewModel.delete(dltNote)
-                            val fileImage = DocumentFile.fromSingleUri(requireActivity(), Uri.parse(cameraImgPath))
-                            val filePaint = DocumentFile.fromSingleUri(requireActivity(), Uri.parse(paintPath))
-                            if (fileImage != null && cameraImgPath.isNotEmpty()) {
-                                requireActivity().contentResolver.delete(Uri.parse(cameraImgPath), null, null)
+                            noteViewModel.delete(
+                                Note(
+                                    note.id,
+                                    note.titleNote,
+                                    note.textNote,
+                                    note.imgFrmGlrUrl,
+                                    note.audioUrl,
+                                    note.paintUrl,
+                                    note.imageById,
+                                    note.colorCard
+                                )
+                            )
+                            DocumentFile.fromSingleUri(
+                                requireActivity(), Uri.parse(note.imgFrmGlrUrl)
+                            ).apply {
+                                if (this != null && note.imgFrmGlrUrl.isNotEmpty()) {
+                                    requireActivity().contentResolver.delete(
+                                        Uri.parse(note.imgFrmGlrUrl), null, null
+                                    )
+                                }
                             }
-                            if (filePaint != null && paintPath.isNotEmpty()) {
-                                requireActivity().contentResolver.delete(Uri.parse(paintPath), null, null)
-                            }
-                            startActivity(Intent(requireActivity(), MainActivity::class.java))
+                            DocumentFile.fromSingleUri(requireActivity(), Uri.parse(note.paintUrl))
+                                .apply {
+                                    if (this != null && note.paintUrl.isNotEmpty()) {
+                                        requireActivity().contentResolver.delete(
+                                            Uri.parse(
+                                                note.paintUrl
+                                            ), null, null
+                                        )
+                                    }
+                                }
+                            requireActivity().supportFragmentManager.beginTransaction().remove(this)
+                                .commit()
+                            requireActivity().onBackPressed()
                         }.setNegativeButton("Нет") { _: DialogInterface, _: Int ->
-                            Toast.makeText(requireActivity(), "Вы выбрали  \"нет\" ", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                requireActivity(), "Вы выбрали  \"нет\" ", Toast.LENGTH_SHORT
+                            ).show()
                         }.show()
                 }
             }
@@ -113,36 +162,43 @@ class DetailFragment : Fragment() {
 
         val idIntent = this.requireArguments().getInt("num")
         Log.d("id", idIntent.toString())
-        lifecycleScope.launch{
+        lifecycleScope.launch {
             noteViewModel.getAll().collect {
                 if (it.isNotEmpty()) {
-                    idS = it[idIntent].id
-                    imagePath = it[idIntent].imageById
-                    if (it[idIntent].audioUrl.isNotEmpty()) {
-                        audioPath = it[idIntent].audioUrl
+                    note = NoteForDetailFragment(
+                        it[idIntent].id,
+                        it[idIntent].titleNote,
+                        it[idIntent].textNote,
+                        it[idIntent].imageById,
+                        it[idIntent].audioUrl,
+                        it[idIntent].paintUrl,
+                        it[idIntent].imgFrmGlrUrl,
+                        it[idIntent].colorCard
+                    )
+                    if (note.audioUrl.isNotEmpty()) {
                         binding.playAudio.visibility = View.VISIBLE
                     }
-                    if (it[idIntent].paintUrl.isNotEmpty()) {
-                        paintPath = it[idIntent].paintUrl
-                        Picasso.get().load(paintPath).resize(350, 450).centerCrop().transform(
-                            RoundedCornersTransformation(36,32)
+                    if (note.paintUrl.isNotEmpty()) {
+                        Picasso.get().load(note.paintUrl).resize(350, 450).centerCrop().transform(
+                            RoundedCornersTransformation(36, 32)
                         ).into(binding.paintImage)
                     }
-                    binding.titleEditText.setText(it[idIntent].titleNote)
-                    binding.textEditText.setText(it[idIntent].textNote)
-                    if (it[idIntent].imgFrmGlrUrl.isNotEmpty()) {
-                        Picasso.get().load(it[idIntent].imgFrmGlrUrl).resize(350, 450).centerCrop().transform(
-                            RoundedCornersTransformation(36,32)
-                        ).into(binding.cameraImg)
+                    binding.titleEditText.setText(note.titleNote)
+                    binding.textEditText.setText(note.textNote)
+                    if (note.imgFrmGlrUrl.isNotEmpty()) {
+                        Picasso.get().load(note.imgFrmGlrUrl).resize(350, 450).centerCrop()
+                            .transform(
+                                RoundedCornersTransformation(36, 32)
+                            ).into(binding.cameraImg)
                     }
-                    if (it[idIntent].imageById.isNotEmpty()) {
-                        Picasso.get().load(Uri.parse(it[idIntent].imageById)).resize(350, 450).centerCrop().transform(
-                            RoundedCornersTransformation(36,32)
-                        ).into(binding.image)
+                    if (note.imageById.isNotEmpty()) {
+                        Picasso.get().load(Uri.parse(note.imageById)).resize(350, 450)
+                            .centerCrop().transform(
+                                RoundedCornersTransformation(36, 32)
+                            ).into(binding.image)
                     }
-                    pickedColorPath = it[idIntent].colorCard
-                    if (pickedColorPath.isNotEmpty()) {
-                        binding.layoutdetail.setBackgroundColor(Color.parseColor(pickedColorPath))
+                    if (note.colorCard.isNotEmpty()) {
+                        binding.layoutdetail.setBackgroundColor(Color.parseColor(note.colorCard))
                     }
                 }
             }
@@ -160,42 +216,68 @@ class DetailFragment : Fragment() {
             }
         }
         binding.cameraImg.setOnClickListener {
-            val intent = Intent(requireActivity(), ImageToFullScreenActivity::class.java)
-            intent.putExtra("imageUrl", cameraImgPath)
-            startActivity(intent)
+            Intent(requireActivity(), ImageToFullScreenActivity::class.java).apply {
+                putExtra("imageUrl", note.imgFrmGlrUrl)
+                startActivity(this)
+            }
         }
         binding.paintImage.setOnClickListener {
-            val intent = Intent(requireActivity(), ImageToFullScreenActivity::class.java)
-            intent.putExtra("imageUrl", paintPath)
-            startActivity(intent)
+            Intent(requireActivity(), ImageToFullScreenActivity::class.java).apply {
+                putExtra("imageUrl", note.paintUrl)
+                startActivity(this)
+            }
         }
         binding.image.setOnClickListener {
-            val intent = Intent(requireActivity(), ImageToFullScreenActivity::class.java)
-            intent.putExtra("imageUrl", imagePath)
-            startActivity(intent)
-        }
-    }
-    private fun stopAudio() {
-        if (mediaPlayer!!.isPlaying) {
-            mediaPlayer!!.stop()
-            mediaPlayer!!.reset()
-            mediaPlayer!!.release()
-            Toast.makeText(activity, "Голосовая заметка не проигрывается", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(activity, "Аудио не играет для паузы", Toast.LENGTH_SHORT).show()
+            Intent(requireActivity(), ImageToFullScreenActivity::class.java).apply {
+                putExtra("imageUrl", note.imageById)
+                startActivity(this)
+            }
         }
     }
 
-    private fun playAudio() {
-        mediaPlayer = MediaPlayer()
-        mediaPlayer!!.setAudioStreamType(AudioManager.STREAM_MUSIC)
-        try {
-            mediaPlayer!!.setDataSource(audioPath)
-            mediaPlayer!!.prepare()
-            mediaPlayer!!.start()
-        } catch (e: IOException) {
-            e.printStackTrace()
+    private fun stopAudio() {
+        with(mediaPlayer!!) {
+            if (this.isPlaying) {
+                stop()
+                reset()
+                release()
+                Toast.makeText(activity, "Голосовая заметка не проигрывается", Toast.LENGTH_SHORT)
+                    .show()
+            } else {
+                Toast.makeText(activity, "Аудио не играет для паузы", Toast.LENGTH_SHORT).show()
+            }
         }
+//
+//        if (mediaPlayer!!.isPlaying) {
+//            mediaPlayer!!.stop()
+//            mediaPlayer!!.reset()
+//            mediaPlayer!!.release()
+//            Toast.makeText(activity, "Голосовая заметка не проигрывается", Toast.LENGTH_SHORT)
+//                .show()
+//        } else {
+//            Toast.makeText(activity, "Аудио не играет для паузы", Toast.LENGTH_SHORT).show()
+//        }
+    }
+
+    private fun playAudio() {
+        mediaPlayer = MediaPlayer().apply {
+            setAudioStreamType(AudioManager.STREAM_MUSIC)
+            try {
+                setDataSource(note.audioUrl)
+                prepare()
+                start()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+//        mediaPlayer!!.setAudioStreamType(AudioManager.STREAM_MUSIC)
+//        try {
+//            mediaPlayer!!.setDataSource(audioPath)
+//            mediaPlayer!!.prepare()
+//            mediaPlayer!!.start()
+//        } catch (e: IOException) {
+//            e.printStackTrace()
+//        }
         Toast.makeText(activity, "Проигрывается голосовая заметка", Toast.LENGTH_SHORT).show()
     }
 
