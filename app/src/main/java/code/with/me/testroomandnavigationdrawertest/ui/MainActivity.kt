@@ -1,10 +1,8 @@
 package code.with.me.testroomandnavigationdrawertest.ui
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -13,12 +11,16 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.*
-import code.with.me.testroomandnavigationdrawertest.data.DataClassAdapter
+import code.with.me.testroomandnavigationdrawertest.data.data_classes.DataClassAdapter
+import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityMainBinding
+import code.with.me.testroomandnavigationdrawertest.ui.dropbox.MasterDropboxSettingsActivity
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
 class MainActivity : AppCompatActivity() {
@@ -30,17 +32,20 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sharedPrefsEdit: SharedPreferences.Editor
     private var isNightModeOn: Boolean = false
 
-    private val noteViewModel: NoteViewModel by viewModels {
-        NoteViewModelFactory((application as NotesApplication).repo)
-    }
+    @Inject
+    lateinit var factory: ViewModelProvider.Factory
+    private lateinit var noteViewModel: NoteViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val appComponent = (application as NotesApplication).appComponent
+        appComponent.inject(this)
         appSettingPrefs = getSharedPreferences("AppSettingPrefs", 0).also {
             sharedPrefsEdit = it.edit()
             isNightModeOn = it.getBoolean("NightMode", false)
         }
 //        sharedPrefsEdit = appSettingPrefs.edit()
 //        isNightModeOn = appSettingPrefs.getBoolean("NightMode", false)
+
         if (isNightModeOn) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         } else {
@@ -57,10 +62,12 @@ class MainActivity : AppCompatActivity() {
             title = "SimpleNote"
             this?.elevation = 32F
         }
+
+        noteViewModel = ViewModelProvider(this, factory)[NoteViewModel::class.java]
+
         AnimationUtils.loadAnimation(this, R.anim.detail_background_color_anim).apply {
             binding.welcomeLayout.startAnimation(this)
         }
-
 
         DatabaseRVAdapter(
             DataClassAdapter(
@@ -84,29 +91,26 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        binding.importnotes.setOnClickListener {
+            startActivity(Intent(this@MainActivity, MasterDropboxSettingsActivity::class.java))
+        }
+
+
         lifecycleScope.launch {
-            noteViewModel.getAll().collect {
+            noteViewModel.getAllNotes().collect {
                 if (it.isNotEmpty()) {
                     NotesArray.clear()
                     it.forEach {
                         NotesArray.add(it)
                         binding.apply {
-                            welcomeTitle.visibility = View.INVISIBLE
-                            welcomeText.visibility = View.INVISIBLE
-                            addnewnote.visibility = View.INVISIBLE
-                            importnotes.visibility = View.INVISIBLE
-                            welcomeImage.visibility = View.INVISIBLE
+                            welcomeLayout.visibility = View.GONE
                         }
                         binding.recyc.adapter?.notifyDataSetChanged()
                         binding.recyc.scheduleLayoutAnimation()
                     }
                 } else {
                     binding.apply {
-                        welcomeTitle.visibility = View.VISIBLE
-                        welcomeText.visibility = View.VISIBLE
-                        addnewnote.visibility = View.VISIBLE
-                        importnotes.visibility = View.VISIBLE
-                        welcomeImage.visibility = View.VISIBLE
+                        welcomeLayout.visibility = View.VISIBLE
                     }
                 }
             }
@@ -114,6 +118,8 @@ class MainActivity : AppCompatActivity() {
         binding.addnewnote.setOnClickListener {
             startActivity(Intent(this, AddNoteActivity::class.java))
         }
+        
+
     }
 
 //    fun transformNoteToDataClassAdapter(
@@ -139,15 +145,6 @@ class MainActivity : AppCompatActivity() {
                     putInt("num", id)
                 }
             }).addToBackStack(null).commit()
-//        val bundle = Bundle()
-//        bundle.putInt("num", id)
-//        val fragment = DetailFragment()
-//        fragment.arguments = bundle
-//        supportFragmentManager
-//            .beginTransaction()
-//            .add(R.id.fragment_detail, fragment)
-//            .addToBackStack(null)
-//            .commit()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

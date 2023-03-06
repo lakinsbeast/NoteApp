@@ -1,8 +1,10 @@
 package code.with.me.testroomandnavigationdrawertest.ui
 
 import android.Manifest
+import android.app.Application
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.database.sqlite.SQLiteException
 import android.graphics.Color
 import android.media.MediaRecorder
 import android.net.Uri
@@ -22,8 +24,14 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import code.with.me.testroomandnavigationdrawertest.*
+import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
+import code.with.me.testroomandnavigationdrawertest.data.di.AppComponent
+import code.with.me.testroomandnavigationdrawertest.data.di.DaggerAppComponent
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityAddNoteBinding
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
@@ -33,9 +41,9 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
 
-@Suppress("DEPRECATION")
 class AddNoteActivity : AppCompatActivity() {
 
     private var stateOfAudioRecorder = false
@@ -104,18 +112,22 @@ class AddNoteActivity : AppCompatActivity() {
     )
     private var pickedColor: String = "#FFFFFFFF"
 
-    private val noteViewModel: NoteViewModel by viewModels {
-        NoteViewModelFactory((application as NotesApplication).repo)
-    }
+    @Inject
+    lateinit var factory: ViewModelProvider.Factory
+    private lateinit var noteViewModel: NoteViewModel
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
+        val appComponent = (application as NotesApplication).appComponent
+        appComponent.inject(this)
         super.onCreate(savedInstanceState)
         binding = ActivityAddNoteBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         supportActionBar?.title = "Новая заметка"
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        noteViewModel = ViewModelProvider(this, factory)[NoteViewModel::class.java]
 
         binding.imageButtonDraw.setOnClickListener {
             getPaint.launch(Intent(this, PaintActivity::class.java))
@@ -178,7 +190,7 @@ class AddNoteActivity : AppCompatActivity() {
                 release()
             }
             binding.imageButtonVoice.setImageResource(R.drawable.ic_baseline_keyboard_voice_24)
-            Toast.makeText(this, "Запись голоса завершена", Toast.LENGTH_SHORT)
+            Toast.makeText(this, "Запись голоса завершена", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             Log.d("audioRecorder", e.message.toString())
         }
@@ -211,11 +223,13 @@ class AddNoteActivity : AppCompatActivity() {
                     prepare()
                     start()
                     binding.imageButtonVoice.setImageResource(R.drawable.mic_off48px)
+                    Toast.makeText(this@AddNoteActivity, "Началась запись голоса", Toast.LENGTH_SHORT)
+                        .show()
                 } catch (e: IOException) {
                     Log.d("audioException", e.message.toString())
-                    Toast.makeText(this@AddNoteActivity, e.message.toString(), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@AddNoteActivity, e.message.toString(), Toast.LENGTH_SHORT)
+                        .show()
                 }
-                Toast.makeText(this@AddNoteActivity, "Началась запись голоса", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -235,10 +249,8 @@ class AddNoteActivity : AppCompatActivity() {
             imageInString = imageUri.toString()
             Picasso.get().load(imageUri).resize(300, 450).centerCrop()
                 .transform(RoundedCornersTransformation(36, 32)).into(binding.imageView)
-            Log.d("testImage", imageUri.toString())
         }
 
-    @OptIn(DelicateCoroutinesApi::class)
     private fun openCamera() {
         val timeStamp = SimpleDateFormat("yyyyMMddHHmmSS").format(Date())
         val storageDir = File(
@@ -257,39 +269,14 @@ class AddNoteActivity : AppCompatActivity() {
                 mkdirs()
             }
         }
-//        imageFile.createNewFile()
-//        if (!imageFile.parentFile?.exists()!!) {
-//            imageFile.parentFile?.mkdirs()
-//        }
-//        if (!imageFile.exists()) {
-//            imageFile.mkdirs()
-//        }
         cameraUri = FileProvider.getUriForFile(
             this,
             "code.with.me.testroomandnavigationdrawertest.ui.AddNoteActivity.provider",
             imageFile
         )
-        lifecycleScope.launch{
+        lifecycleScope.launch {
             getImageFromCamera.launch(cameraUri)
         }
-//        GlobalScope.launch(Dispatchers.IO) {
-//            getImageFromCamera.launch(camera_uri)
-//        }
-
-
-//        val values = ContentValues()
-//        values.put(MediaStore.Images.Media.TITLE, ".nomedia")
-//        values.put(MediaStore.Images.Media.DESCRIPTION, ".nomedia")
-//        values.put(MediaStore.Images.Media.MIME_TYPE, "image/png")
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-////            values.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/" + ".nomedia")
-//        }
-//        image_uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
-//
-//        //camera intent
-//        GlobalScope.launch(Dispatchers.IO) {
-//            getImageFromCamera.launch(image_uri)
-//        }
     }
 
     private val getImageFromCamera =
@@ -325,10 +312,8 @@ class AddNoteActivity : AppCompatActivity() {
         when (requestCode) {
             PERMISSION_CODE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    //perm from popup was granted
                     openCamera()
                 } else {
-                    // perm from popup was denied
                     Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -346,26 +331,29 @@ class AddNoteActivity : AppCompatActivity() {
             finish()
         }
         if (item.itemId == R.id.saveBtn) {
+            val data = Note(
+                0,
+                binding.titleEdit.text.toString(),
+                binding.textEdit.text.toString(),
+                cameraInString,
+                audioInString,
+                paintInString,
+                imageInString,
+                pickedColor
+            )
             if (binding.titleEdit.text.isEmpty()) {
                 binding.titleEdit.error = "Необходимо ввести хотя бы заголовок"
             } else {
-                val title = binding.titleEdit.text.toString()
-                val text = binding.textEdit.text.toString()
-                val test = Note(
-                    0,
-                    title,
-                    text,
-                    cameraInString,
-                    audioInString,
-                    paintInString,
-                    imageInString,
-                    pickedColor
-                )
-                noteViewModel.insert(test)
-                binding.titleEdit.text = null
-                binding.textEdit.text = null
-                binding.cameraView.setImageURI(null)
-                startActivity(Intent(this, MainActivity::class.java))
+                try {
+                    noteViewModel.insert(data)
+                } catch (e: SQLiteException) {
+                    Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
+                } catch (e: Exception) {
+                    Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
+                } finally {
+                    startActivity(Intent(this, MainActivity::class.java))
+                    finish()
+                }
             }
         }
         return super.onOptionsItemSelected(item)

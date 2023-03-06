@@ -1,34 +1,56 @@
 package code.with.me.testroomandnavigationdrawertest.ui
 
 import androidx.lifecycle.*
-import code.with.me.testroomandnavigationdrawertest.Note
-import code.with.me.testroomandnavigationdrawertest.domain.NoteRepository
+import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
+//import code.with.me.testroomandnavigationdrawertest.data.repos.NoteRepository
+import code.with.me.testroomandnavigationdrawertest.data.localDataSource.NoteDAO
+import code.with.me.testroomandnavigationdrawertest.domain.noteUseCases.deleteNoteUseCase
+import code.with.me.testroomandnavigationdrawertest.domain.noteUseCases.getListOfNotesUseCase
+import code.with.me.testroomandnavigationdrawertest.domain.noteUseCases.insertNoteUseCase
+import code.with.me.testroomandnavigationdrawertest.domain.noteUseCases.updateNoteUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
+import javax.inject.Inject
 
-class NoteViewModel(private val repo: NoteRepository) : ViewModel() {
-    fun getAll(): Flow<List<Note>> = repo.getAll()
+class NoteViewModel @Inject constructor(
+    private val deleteNoteUseCase: deleteNoteUseCase,
+    private val getListOfNotesUseCase: getListOfNotesUseCase,
+    private val insertNoteUseCase: insertNoteUseCase,
+    private val updateNoteUseCase: updateNoteUseCase
+) : ViewModel() {
+
+    fun getAllNotes(): Flow<List<Note>> = getListOfNotesUseCase()
 
     fun insert(note: Note) = viewModelScope.launch {
-        repo.insert(note)
+        insertNoteUseCase(note)
     }
 
     fun delete(note: Note) = viewModelScope.launch {
-        repo.delete(note)
+        deleteNoteUseCase(note)
     }
 
     fun update(note: Note) = viewModelScope.launch {
-        repo.update(note)
+        updateNoteUseCase(note)
     }
 
 }
 
-class NoteViewModelFactory(private val repo: NoteRepository) : ViewModelProvider.Factory {
+class NoteViewModelFactory @Inject constructor(
+    private val deleteNoteUseCase: deleteNoteUseCase,
+    private val getListOfNotesUseCase: getListOfNotesUseCase,
+    private val insertNoteUseCase: insertNoteUseCase,
+    private val updateNoteUseCase: updateNoteUseCase
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(NoteViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return NoteViewModel(repo) as T
+            return NoteViewModel(
+                deleteNoteUseCase,
+                getListOfNotesUseCase,
+                insertNoteUseCase,
+                updateNoteUseCase
+            ) as T
         }
         throw IllegalArgumentException("ukn VM class")
     }

@@ -6,51 +6,49 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACTION_OPEN_DOCUMENT" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.INTERNET" />
-
-
-<!--    <uses-permission android:name="android.permission.GET_ACCOUNTS" android:maxSdkVersion="25"/>-->
-<!--    <uses-permission android:name="android.permission.USE_CREDENTIALS" android:maxSdkVersion="22" />-->
-
-
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- <uses-permission android:name="android.permission.GET_ACCOUNTS" android:maxSdkVersion="25"/> -->
+    <!-- <uses-permission android:name="android.permission.USE_CREDENTIALS" android:maxSdkVersion="22" /> -->
     <uses-feature android:name="android.hardware.camera" />
 
     <application
         android:name=".NotesApplication"
         android:allowBackup="true"
-        android:requestLegacyExternalStorage="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.testRoomAndNavigationDrawerTest" >
+        android:theme="@style/Theme.testRoomAndNavigationDrawerTest">
+        <activity
+            android:name=".ui.dropbox.MasterDropboxSettingsActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.PaintActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.ImageToFullScreenActivity"
-            android:exported="false" />
-        <activity
+            android:launchMode="singleInstance"
             android:name=".ui.AddNoteActivity"
             android:exported="false" />
         <activity
             android:name=".ui.MainActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <provider
-            android:authorities="code.with.me.testroomandnavigationdrawertest.ui.AddNoteActivity.provider"
             android:name="androidx.core.content.FileProvider"
+            android:authorities="code.with.me.testroomandnavigationdrawertest.ui.AddNoteActivity.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"/>
+                android:resource="@xml/file_paths" />
         </provider>
+
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

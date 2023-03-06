@@ -1,4 +1,4 @@
-package code.with.me.testroomandnavigationdrawertest.data
+package code.with.me.testroomandnavigationdrawertest.data.data_classes
 
 import androidx.room.ColumnInfo
 import androidx.room.PrimaryKey

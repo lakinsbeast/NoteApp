@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id "org.jetbrains.kotlin.kapt"
+    id 'kotlin-kapt'
 }
 
 android {
@@ -40,13 +41,30 @@ android {
     buildFeatures {
         viewBinding true
     }
+    kapt {
+        generateStubs = true
+    }
     namespace 'code.with.me.testroomandnavigationdrawertest'
 }
 
 ext {
     room_version = '2.5.0'
+    viewmodel_version = '2.5.1'
+    retrofit_version = '2.9.0'
 }
 dependencies {
+    //dagger 2
+    implementation 'com.google.dagger:dagger:2.45'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.45'
+    kapt 'com.google.dagger:dagger-compiler:2.45'
+
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0-RC")
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
+
+
+    //data store
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
     //transofrm for pciaso
     implementation 'jp.wasabeef:picasso-transformations:2.4.0'
     //room
@@ -55,6 +73,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
     implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
+    implementation 'com.google.android.material:material:1.4.0'
 //    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.8.0'
     kapt "androidx.room:room-compiler:${room_version}"
 
@@ -63,18 +82,16 @@ dependencies {
     implementation 'com.github.QuadFlask:colorpicker:0.0.15'
 
     //viewmodels
-    implementation "androidx.lifecycle:lifecycle-viewmodel:2.5.1"
-    //livedata
-//    implementation "androidx.lifecycle:lifecycle-livedata:2.4.1"
+    implementation "androidx.lifecycle:lifecycle-viewmodel:${viewmodel_version}"
 
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-savedstate:2.5.1'
+    implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:${viewmodel_version}"
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
 
     //viewmodelscope
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${viewmodel_version}"
 
     //lifecyclescope
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:${viewmodel_version}"
 
     //?? by viewModels
     implementation 'androidx.fragment:fragment-ktx:1.5.5'
@@ -95,16 +112,16 @@ dependencies {
     implementation "com.github.Luciferx86:DoodleCanvasLibrary:0.1.0-alpha3"
 
     //retrofit
-    implementation "com.squareup.retrofit2:retrofit:2.9.0"
+    implementation "com.squareup.retrofit2:retrofit:${retrofit_version}"
     //retrofit gson converter
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation "com.squareup.retrofit2:converter-gson:${retrofit_version}"
 
     //gms
     implementation 'com.google.android.gms:play-services-auth:20.4.1'
 
-    implementation 'androidx.core:core-ktx:1.8.0'
-    implementation 'androidx.appcompat:appcompat:1.6.0'
-    //implementation group: 'com.google.android.material', name: 'material', version: '1.9.0'
+    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+//    implementation group: 'com.google.android.material', name: 'material', version: '1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
