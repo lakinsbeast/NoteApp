@@ -11,6 +11,7 @@ import android.transition.TransitionInflater
 import android.util.Log
 import android.view.*
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.documentfile.provider.DocumentFile
@@ -18,25 +19,20 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import code.with.me.testroomandnavigationdrawertest.*
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.NoteForDetailFragment
 import code.with.me.testroomandnavigationdrawertest.databinding.FragmentDetailBinding
+import code.with.me.testroomandnavigationdrawertest.databinding.FragmentNotesListBinding
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.coroutines.launch
 import java.io.IOException
 import javax.inject.Inject
 
-//TODO{ЗАРЕФАКТОРИТЬ ДАННЫЙ ФРАГМЕНТ}
-@Suppress("DEPRECATION")
-class DetailFragment : Fragment() {
 
-    //первоначально присвоите переменной _binding значение null и
-    //когда view снова уничтожается, оно должно быть установлено в значение null
-    private var _binding: FragmentDetailBinding? = null
-    private val binding get() = _binding!!
-
+class DetailFragment() : BaseFragment<FragmentDetailBinding>(FragmentDetailBinding::inflate) {
     private var titleEdited: String = ""
     private var textEdited: String = ""
 
@@ -53,22 +49,20 @@ class DetailFragment : Fragment() {
         super.onCreate(savedInstanceState)
         val appComponent = (requireActivity().application as NotesApplication).appComponent
         appComponent.inject(this)
-        noteViewModel = ViewModelProvider(this,factory)[NoteViewModel::class.java]
-        sharedElementEnterTransition =
-            TransitionInflater.from(context).inflateTransition(R.transition.change_text_transform)
+        noteViewModel = ViewModelProvider(this, factory)[NoteViewModel::class.java]
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentDetailBinding.inflate(inflater, container, false)
-        return binding.root
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        activity?.onBackPressedDispatcher?.addCallback(this) {
+            println("SFALKFSLK")
+            findNavController().popBackStack()
+        }
+
+
         binding.apply {
-            playAudio.visibility = View.INVISIBLE
+            playAudio.visibility = View.VISIBLE
             cameraImg.background = null
             paintImage.background = null
         }
@@ -78,110 +72,122 @@ class DetailFragment : Fragment() {
             setDisplayShowTitleEnabled(false)
             setDisplayHomeAsUpEnabled(true)
         }
-        binding.toolbar.inflateMenu(R.menu.detailnotemenu)
-        binding.toolbar.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                android.R.id.home -> {
-                    requireActivity().supportFragmentManager.beginTransaction().remove(this)
-                        .commit()
-                    requireActivity().onBackPressed()
-                }
-                R.id.updateBtn -> {
-                    binding.apply {
-                        titleEdited = titleEditText.text.toString()
-                        textEdited = textEditText.text.toString()
-                    }
-                    try {
-                        noteViewModel.update(
-                                Note(
-                                    note.id,
-                                    titleEdited,
-                                    textEdited,
-                                    note.imgFrmGlrUrl,
-                                    note.audioUrl,
-                                    note.paintUrl,
-                                    note.imageById,
-                                    note.colorCard
-                                )
-                                )
-                    } catch (e: SQLiteException) {
-                        Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG).show()
-                    } catch (e: Exception) {
-                        Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG).show()
-                    }
-
-                    requireActivity().supportFragmentManager.beginTransaction().remove(this)
-                        .commit()
-                    requireActivity().onBackPressed()
-                }
-                R.id.deleteBtn -> {
-                    AlertDialog.Builder(requireActivity()).setTitle("Удалить?")
-                        .setPositiveButton("Да") { _: DialogInterface, _: Int ->
-                            try {
-                                noteViewModel.delete(
-                                    Note(
-                                        note.id,
-                                        note.titleNote,
-                                        note.textNote,
-                                        note.imgFrmGlrUrl,
-                                        note.audioUrl,
-                                        note.paintUrl,
-                                        note.imageById,
-                                        note.colorCard
-                                    )
-                                )
-
-                                //TODO{ИСПРАВИТЬ java.lang.UnsupportedOperationException: Delete not supported}
-                                val doc = DocumentFile.fromSingleUri(
-                                    requireActivity(), Uri.parse(note.imgFrmGlrUrl)
-                                )
-                                if (doc != null && note.imgFrmGlrUrl.isNotEmpty()) {
-                                    requireActivity().contentResolver.delete(
-                                        Uri.parse(note.imgFrmGlrUrl), null, null
-                                    )
-                                }
-//                            DocumentFile.fromSingleUri(
-//                                requireActivity(), Uri.parse(note.imgFrmGlrUrl)
-//                            ).apply {
-//                                if (this != null && note.imgFrmGlrUrl.isNotEmpty()) {
+//        binding.toolbar.inflateMenu(R.menu.detailnotemenu)
+//        binding.toolbar.setOnMenuItemClickListener { item ->
+//            when (item.itemId) {
+//                android.R.id.home -> {
+//                    requireActivity().supportFragmentManager.beginTransaction().remove(this)
+//                        .commit()
+//                    requireActivity().onBackPressed()
+//                }
+//
+//                R.id.updateBtn -> {
+//                    binding.apply {
+//                        titleEdited = titleEditText.text.toString()
+//                        textEdited = textEditText.text.toString()
+//                    }
+//                    try {
+//                        noteViewModel.update(
+//                            Note(
+//                                note.id,
+//                                titleEdited,
+//                                textEdited,
+//                                note.imgFrmGlrUrl,
+//                                note.audioUrl,
+//                                note.paintUrl,
+//                                note.imageById,
+//                                note.colorCard
+//                            )
+//                        )
+//                    } catch (e: SQLiteException) {
+//                        Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG).show()
+//                    } catch (e: Exception) {
+//                        Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG).show()
+//                    }
+//
+//                    requireActivity().supportFragmentManager.beginTransaction().remove(this)
+//                        .commit()
+//                    requireActivity().onBackPressed()
+//                }
+//
+//                R.id.deleteBtn -> {
+//                    AlertDialog.Builder(requireActivity()).setTitle("Удалить?")
+//                        .setPositiveButton("Да") { _: DialogInterface, _: Int ->
+//                            try {
+//                                noteViewModel.delete(
+//                                    Note(
+//                                        note.id,
+//                                        note.titleNote,
+//                                        note.textNote,
+//                                        note.imgFrmGlrUrl,
+//                                        note.audioUrl,
+//                                        note.paintUrl,
+//                                        note.imageById,
+//                                        note.colorCard
+//                                    )
+//                                )
+//
+//                                //TODO{ИСПРАВИТЬ java.lang.UnsupportedOperationException: Delete not supported}
+//                                val doc = DocumentFile.fromSingleUri(
+//                                    requireActivity(), Uri.parse(note.imgFrmGlrUrl)
+//                                )
+//                                if (doc != null && note.imgFrmGlrUrl.isNotEmpty()) {
 //                                    requireActivity().contentResolver.delete(
 //                                        Uri.parse(note.imgFrmGlrUrl), null, null
 //                                    )
 //                                }
+////                            DocumentFile.fromSingleUri(
+////                                requireActivity(), Uri.parse(note.imgFrmGlrUrl)
+////                            ).apply {
+////                                if (this != null && note.imgFrmGlrUrl.isNotEmpty()) {
+////                                    requireActivity().contentResolver.delete(
+////                                        Uri.parse(note.imgFrmGlrUrl), null, null
+////                                    )
+////                                }
+////                            }
+//                                DocumentFile.fromSingleUri(
+//                                    requireActivity(),
+//                                    Uri.parse(note.paintUrl)
+//                                )
+//                                    .apply {
+//                                        if (this != null && note.paintUrl.isNotEmpty()) {
+//                                            requireActivity().contentResolver.delete(
+//                                                Uri.parse(
+//                                                    note.paintUrl
+//                                                ), null, null
+//                                            )
+//                                        }
+//                                    }
+//
+//                            } catch (e: SQLiteException) {
+//                                Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG)
+//                                    .show()
+//                            } catch (e: Exception) {
+//                                Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG)
+//                                    .show()
+//                            } finally {
+//                                requireActivity().supportFragmentManager.beginTransaction()
+//                                    .remove(this)
+//                                    .commit()
+//                                requireActivity().onBackPressed()
 //                            }
-                                DocumentFile.fromSingleUri(requireActivity(), Uri.parse(note.paintUrl))
-                                    .apply {
-                                        if (this != null && note.paintUrl.isNotEmpty()) {
-                                            requireActivity().contentResolver.delete(
-                                                Uri.parse(
-                                                    note.paintUrl
-                                                ), null, null
-                                            )
-                                        }
-                                    }
-
-                            } catch (e: SQLiteException) {
-                                Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG).show()
-                            } catch (e: Exception) {
-                                Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG).show()
-                            } finally {
-                                requireActivity().supportFragmentManager.beginTransaction().remove(this)
-                                    .commit()
-                                requireActivity().onBackPressed()
-                            }
-                        }.setNegativeButton("Нет") { _: DialogInterface, _: Int ->
-                            Toast.makeText(
-                                requireActivity(), "Вы выбрали  \"нет\" ", Toast.LENGTH_SHORT
-                            ).show()
-                        }.show()
-                }
-            }
-            true
-        }
+//                        }.setNegativeButton("Нет") { _: DialogInterface, _: Int ->
+//                            Toast.makeText(
+//                                requireActivity(), "Вы выбрали  \"нет\" ", Toast.LENGTH_SHORT
+//                            ).show()
+//                        }.show()
+//                }
+//            }
+//            true
+//        }
 
 
         val idIntent = this.requireArguments().getInt("num")
+
+
         Log.d("id", idIntent.toString())
+
+
         lifecycleScope.launch {
             noteViewModel.getAllNotes().collect {
                 if (it.isNotEmpty()) {
@@ -218,7 +224,7 @@ class DetailFragment : Fragment() {
                             ).into(binding.image)
                     }
                     if (note.colorCard.isNotEmpty()) {
-                        binding.layoutdetail.setBackgroundColor(Color.parseColor(note.colorCard))
+//                        binding.layoutdetail.setBackgroundColor(Color.parseColor(note.colorCard))
                     }
                 }
             }
@@ -282,12 +288,4 @@ class DetailFragment : Fragment() {
         }
         Toast.makeText(activity, "Проигрывается голосовая заметка", Toast.LENGTH_SHORT).show()
     }
-
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
-
 }

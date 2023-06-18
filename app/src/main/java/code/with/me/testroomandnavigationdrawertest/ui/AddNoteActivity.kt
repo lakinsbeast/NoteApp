@@ -123,63 +123,65 @@ class AddNoteActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityAddNoteBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setSupportActionBar(binding.toolbar)
+//        setSupportActionBar(binding.toolbar)
         supportActionBar?.title = "Новая заметка"
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         noteViewModel = ViewModelProvider(this, factory)[NoteViewModel::class.java]
 
-        binding.imageButtonDraw.setOnClickListener {
-            getPaint.launch(Intent(this, PaintActivity::class.java))
-        }
-        binding.imageButtonVoice.setOnClickListener {
-            stateOfAudioRecorder = if (!stateOfAudioRecorder) {
-                audioRec()
-                true
-            } else {
-                stopAudio()
-                false
+        binding.apply {
+            imageButtonDraw.setOnClickListener {
+                getPaint.launch(Intent(this@AddNoteActivity, PaintActivity::class.java))
             }
+            imageButtonVoice.setOnClickListener {
+                stateOfAudioRecorder = if (!stateOfAudioRecorder) {
+                    audioRec()
+                    true
+                } else {
+                    stopAudio()
+                    false
+                }
 
-        }
-        binding.cardcolorpicker.setOnClickListener {
-            if (!isClickedToColorPicker) {
-                binding.colorpickerlayout.visibility = View.VISIBLE
-                isClickedToColorPicker = true
-            } else {
-                binding.colorpickerlayout.visibility = View.INVISIBLE
-                isClickedToColorPicker = false
             }
-        }
-        binding.colorpicker.apply {
-            minValue = 0
-            maxValue = colornames.size - 1
-            displayedValues = colornames
-            descendantFocusability = NumberPicker.FOCUS_BLOCK_DESCENDANTS
-            wrapSelectorWheel = false
-            setOnValueChangedListener { _, _, _ ->
-                binding.colorpickercardView.setCardBackgroundColor(Color.parseColor("#" + color[binding.colorpicker.value]))
-                textSize = 50F
-                binding.layouttocolor.setBackgroundColor(Color.parseColor("#" + color[binding.colorpicker.value]))
-                pickedColor = "#" + color[value]
+            cardcolorpicker.setOnClickListener {
+                if (!isClickedToColorPicker) {
+                    colorpickerlayout.visibility = View.VISIBLE
+                    isClickedToColorPicker = true
+                } else {
+                    colorpickerlayout.visibility = View.INVISIBLE
+                    isClickedToColorPicker = false
+                }
             }
-        }
-        binding.cameraBtn.setOnClickListener {
-            if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
-                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
-            ) {
-                //permission was not enabled
-                val permission =
-                    arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                //show popup to request permission
-                requestPermissions(permission, PERMISSION_CODE)
-            } else {
-                //permission already granter
-                openCamera()
+            colorpicker.apply {
+                minValue = 0
+                maxValue = colornames.size - 1
+                displayedValues = colornames
+                descendantFocusability = NumberPicker.FOCUS_BLOCK_DESCENDANTS
+                wrapSelectorWheel = false
+                setOnValueChangedListener { _, _, _ ->
+                    colorpickercardView.setCardBackgroundColor(Color.parseColor("#" + color[colorpicker.value]))
+                    textSize = 50F
+                    layouttocolor.setBackgroundColor(Color.parseColor("#" + color[colorpicker.value]))
+                    pickedColor = "#" + color[value]
+                }
             }
-        }
-        binding.imageBtn.setOnClickListener {
-            chooseImage()
+            cameraBtn.setOnClickListener {
+                if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
+                    checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
+                ) {
+                    //permission was not enabled
+                    val permission =
+                        arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    //show popup to request permission
+                    requestPermissions(permission, PERMISSION_CODE)
+                } else {
+                    //permission already granter
+                    openCamera()
+                }
+            }
+            imageBtn.setOnClickListener {
+                chooseImage()
+            }
         }
     }
 

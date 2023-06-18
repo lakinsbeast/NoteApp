@@ -1,9 +1,12 @@
 package code.with.me.testroomandnavigationdrawertest.data.di
 
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
+import code.with.me.testroomandnavigationdrawertest.NotesListFragment
 import code.with.me.testroomandnavigationdrawertest.domain.di.RepositoryModule
 import code.with.me.testroomandnavigationdrawertest.domain.di.UseCaseModule
 import code.with.me.testroomandnavigationdrawertest.ui.AddNoteActivity
+import code.with.me.testroomandnavigationdrawertest.ui.AddNoteFragment
+import code.with.me.testroomandnavigationdrawertest.ui.BaseFragment
 import code.with.me.testroomandnavigationdrawertest.ui.DetailFragment
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import code.with.me.testroomandnavigationdrawertest.ui.di.ApplicationModule
@@ -17,6 +20,8 @@ interface AppComponent {
     fun inject(activity: MainActivity)
     fun inject(activity: AddNoteActivity)
     fun inject(fragment: DetailFragment)
+    fun inject(fragment: AddNoteFragment)
     fun inject(application: NotesApplication)
+    fun inject(notesListFragment: NotesListFragment)
 
 }

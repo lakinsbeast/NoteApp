@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingHorizontal="15dp"
+    android:background="@color/background131313"
+    tools:context=".NotesListFragment">
+
+
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="your \n   notes"
+            android:textSize="80sp" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/countText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:gravity="right"
+            android:text="/14"
+            android:textColor="@color/gray"
+            android:textSize="60sp" />
+    </LinearLayout>
+
+    <HorizontalScrollView
+        android:id="@+id/chip_group_scrollable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingVertical="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        android:scrollbars="none">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chip_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:singleLine="true">
+
+            <com.google.android.material.chip.Chip
+                android:layout_width="150dp"
+                android:layout_height="60dp"
+                app:chipStrokeWidth="1dp"
+                android:text="#Work"
+                />
+            <com.google.android.material.chip.Chip
+                android:layout_width="150dp"
+                android:layout_height="60dp"
+                app:chipBackgroundColor="#FF6902"
+                android:text="#Work"
+                />
+            <com.google.android.material.chip.Chip
+                android:layout_width="150dp"
+                android:layout_height="60dp"
+                app:chipStrokeWidth="1dp"
+                android:text="#Work"
+                />
+            <com.google.android.material.chip.Chip
+                android:layout_width="150dp"
+                android:layout_height="60dp"
+                app:chipStrokeWidth="1dp"
+                android:text="#Work"
+                />
+
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chip_group_scrollable" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,32 +1,36 @@
 package code.with.me.testroomandnavigationdrawertest.ui
 
-import android.content.Intent
+import android.app.ActionBar
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.animation.AnimationUtils
-import androidx.activity.viewModels
+import android.widget.ImageView
+import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.navArgs
 import code.with.me.testroomandnavigationdrawertest.*
-import code.with.me.testroomandnavigationdrawertest.data.data_classes.DataClassAdapter
-import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
+import code.with.me.testroomandnavigationdrawertest.data.data_classes.NewNote
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityMainBinding
-import code.with.me.testroomandnavigationdrawertest.ui.dropbox.MasterDropboxSettingsActivity
-import kotlinx.coroutines.launch
+import code.with.me.testroomandnavigationdrawertest.databinding.DbItemsBinding
 import javax.inject.Inject
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    private lateinit var itemsBinding: DbItemsBinding
 
-    private val NotesArray: ArrayList<Note> = ArrayList()
+    private val NewNotesArray: ArrayList<NewNote> = ArrayList()
+    private lateinit var adapter: BaseAdapter<NewNote, DbItemsBinding>
 
     private lateinit var appSettingPrefs: SharedPreferences
     private lateinit var sharedPrefsEdit: SharedPreferences.Editor
@@ -36,115 +40,84 @@ class MainActivity : AppCompatActivity() {
     lateinit var factory: ViewModelProvider.Factory
     private lateinit var noteViewModel: NoteViewModel
 
+
+
+    enum class States {
+
+    }
+    private val navController: NavController
+        get() = Navigation.findNavController(this, R.id.fragment_detail)
+
+    private val listener =
+        NavController.OnDestinationChangedListener { controller, destination, arguments ->
+            when (destination.id) {
+                R.id.detailFragment -> {
+
+                }
+            }
+        }
+
+
+    override fun onResume() {
+        super.onResume()
+        navController.addOnDestinationChangedListener(listener)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        navController.removeOnDestinationChangedListener(listener)
+
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val appComponent = (application as NotesApplication).appComponent
         appComponent.inject(this)
-        appSettingPrefs = getSharedPreferences("AppSettingPrefs", 0).also {
-            sharedPrefsEdit = it.edit()
-            isNightModeOn = it.getBoolean("NightMode", false)
-        }
-//        sharedPrefsEdit = appSettingPrefs.edit()
-//        isNightModeOn = appSettingPrefs.getBoolean("NightMode", false)
+//        appSettingPrefs = getSharedPreferences("AppSettingPrefs", 0).also {
+//            sharedPrefsEdit = it.edit()
+//            isNightModeOn = it.getBoolean("NightMode", false)
+//        }
+//
+//        if (isNightModeOn) {
+//            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+//        } else {
+//            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+//        }
 
-        if (isNightModeOn) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        }
+
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
+
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
-        with(supportActionBar) {
-            this?.setHomeAsUpIndicator(R.drawable.search48px)
-            this?.setDisplayHomeAsUpEnabled(true)
-            this?.setDisplayShowTitleEnabled(false)
+
+        supportActionBar?.apply {
+            setHomeAsUpIndicator(R.drawable.search48px)
+            setDisplayHomeAsUpEnabled(true)
+            setDisplayShowTitleEnabled(false)
             title = "SimpleNote"
-            this?.elevation = 32F
+            elevation = 32F
         }
 
         noteViewModel = ViewModelProvider(this, factory)[NoteViewModel::class.java]
 
-        AnimationUtils.loadAnimation(this, R.anim.detail_background_color_anim).apply {
-            binding.welcomeLayout.startAnimation(this)
-        }
-
-        DatabaseRVAdapter(
-            DataClassAdapter(
-                {
-                    openDetailFragment(it)
-                },
-                NotesArray
-            )
-        ).apply {
-            binding.recyc.adapter = this
-        }
-
         binding.apply {
             fab.setOnClickListener {
-                startActivity(Intent(this@MainActivity, AddNoteActivity::class.java))
-            }
-            recyc.apply {
-                scheduleLayoutAnimation()
-                layoutManager = LinearLayoutManager(this@MainActivity)
-                itemAnimator = null
-            }
-        }
-
-        binding.importnotes.setOnClickListener {
-            startActivity(Intent(this@MainActivity, MasterDropboxSettingsActivity::class.java))
-        }
-
-
-        lifecycleScope.launch {
-            noteViewModel.getAllNotes().collect {
-                if (it.isNotEmpty()) {
-                    NotesArray.clear()
-                    it.forEach {
-                        NotesArray.add(it)
-                        binding.apply {
-                            welcomeLayout.visibility = View.GONE
-                        }
-                        binding.recyc.adapter?.notifyDataSetChanged()
-                        binding.recyc.scheduleLayoutAnimation()
-                    }
-                } else {
-                    binding.apply {
-                        welcomeLayout.visibility = View.VISIBLE
-                    }
+                binding.apply {
+                    fragmentDetail.visibility = View.VISIBLE
                 }
+//                navController.navigate(NotesListFragmentDirections.actionNotesListFragment2ToAddNoteFragment())
+                goToAddNoteFragment()
             }
         }
-        binding.addnewnote.setOnClickListener {
-            startActivity(Intent(this, AddNoteActivity::class.java))
-        }
-        
-
     }
 
-//    fun transformNoteToDataClassAdapter(
-//        note: Note,
-//        dataClassAdapter: DataClassAdapter, clickListener: (Int) -> Unit,
-//    ): DataClassAdapter {
-//        return DataClassAdapter(clickListener, note.titleNote, note.textNote)
-//    }
+    private fun goToAddNoteFragment() {
+        navController.navigate(NotesListFragmentDirections.actionNotesListFragment2ToAddNoteFragment())
+    }
 
     override fun onPause() {
         super.onPause()
         overridePendingTransition(0, 0)
-    }
-
-    private fun openDetailFragment(id: Int) {
-        binding.apply {
-            relativeLayout.visibility = View.INVISIBLE
-            toolbar.visibility = View.INVISIBLE
-        }
-        supportFragmentManager.beginTransaction()
-            .add(R.id.fragment_detail, DetailFragment().apply {
-                arguments = Bundle().apply {
-                    putInt("num", id)
-                }
-            }).addToBackStack(null).commit()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -161,15 +134,16 @@ class MainActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onBackPressed() {
-        if (supportFragmentManager.backStackEntryCount == 0) {
-            this.finish()
-        } else {
-            binding.relativeLayout.visibility = View.VISIBLE
-            binding.toolbar.visibility = View.VISIBLE
-            super.onBackPressed()
-        }
-    }
+//    override fun onBackPressed() {
+//        if (supportFragmentManager.backStackEntryCount == 0) {
+//            this.finish()
+//        } else {
+////            binding.relativeLayout.visibility = View.VISIBLE
+//            binding.toolbar.visibility = View.VISIBLE
+//            binding.fragmentDetail.visibility = View.GONE
+//            super.onBackPressed()
+//        }
+//    }
 
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

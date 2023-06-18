@@ -18,4 +18,5 @@
     <color name="recyclertitletextnight">@color/white</color>
     <color name="recyclertextnight">@color/gray</color>
 
+    <color name="background131313">#131313</color>
 </resources>

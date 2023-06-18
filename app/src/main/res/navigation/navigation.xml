@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/notesListFragment2">
+    <fragment
+        android:id="@+id/notesListFragment2"
+        android:name="code.with.me.testroomandnavigationdrawertest.NotesListFragment"
+        android:label="fragment_notes_list"
+        tools:layout="@layout/fragment_notes_list" >
+        <action
+            android:id="@+id/action_notesListFragment2_to_addNoteFragment"
+            app:destination="@id/addNoteFragment" />
+        <action
+            android:id="@+id/action_notesListFragment2_to_detailFragment"
+            app:destination="@id/detailFragment"
+            app:popUpTo="@id/notesListFragment2">
+        </action>
+    </fragment>
+    <fragment
+        android:id="@+id/addNoteFragment"
+        android:name="code.with.me.testroomandnavigationdrawertest.ui.AddNoteFragment"
+        android:label="AddNoteFragment">
+        <action
+            android:id="@+id/action_addNoteFragment_to_notesListFragment2"
+            app:destination="@id/notesListFragment2"
+            app:popUpTo="@id/notesListFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="code.with.me.testroomandnavigationdrawertest.ui.DetailFragment"
+        android:label="DetailFragment" >
+        <argument
+            android:name="noteId"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </fragment>
+</navigation>

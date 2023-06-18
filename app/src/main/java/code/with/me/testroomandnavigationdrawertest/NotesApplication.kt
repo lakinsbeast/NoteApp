@@ -17,19 +17,12 @@ import kotlinx.coroutines.SupervisorJob
 
 class NotesApplication : Application() {
 
-    companion object {
-
-    }
-
     val appComponent: AppComponent by lazy {
         DaggerAppComponent.builder().applicationModule(ApplicationModule(this))
             .databaseModule(DatabaseModule(this)).useCaseModule(
             UseCaseModule()
         ).build()
     }
-
-    // Нет необходимости отменять эту область, так как она будет уничтожена вместе с процессом
-    val applicationScope = CoroutineScope(SupervisorJob())
 
     override fun onCreate() {
         super.onCreate()
