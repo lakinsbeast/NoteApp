@@ -7,37 +7,6 @@
     android:background="@color/background131313"
     tools:context=".ui.MainActivity">
 
-
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="0dp"
-        android:paddingBottom="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:fontFamily="@font/source_sans_pro_semibold"
-            android:gravity="center"
-            android:text="SimpleNote"
-            android:textColor="@color/white"
-            android:textSize="30sp"
-            tools:layout_editor_absoluteX="131dp"
-            tools:layout_editor_absoluteY="18dp" />
-    </androidx.appcompat.widget.Toolbar>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/white"
-        app:layout_constraintBottom_toBottomOf="@+id/toolbar"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
-
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_detail"
         android:name="androidx.navigation.fragment.NavHostFragment"
@@ -47,7 +16,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/navigation">
 
     </androidx.fragment.app.FragmentContainerView>
@@ -59,19 +28,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
-
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="@dimen/default_margin_top"
-            android:contentDescription="@string/addnewnote"
-            android:src="@drawable/menu_floating_btn"
-            app:backgroundTint="#FF6060"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

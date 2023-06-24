@@ -42,6 +42,7 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
+import javax.inject.Named
 
 
 class AddNoteActivity : AppCompatActivity() {
@@ -113,6 +114,7 @@ class AddNoteActivity : AppCompatActivity() {
     private var pickedColor: String = "#FFFFFFFF"
 
     @Inject
+    @Named("noteVMFactory")
     lateinit var factory: ViewModelProvider.Factory
     private lateinit var noteViewModel: NoteViewModel
 
@@ -341,7 +343,8 @@ class AddNoteActivity : AppCompatActivity() {
                 audioInString,
                 paintInString,
                 imageInString,
-                pickedColor
+                pickedColor,
+                0
             )
             if (binding.titleEdit.text.isEmpty()) {
                 binding.titleEdit.error = "Необходимо ввести хотя бы заголовок"

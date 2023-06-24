@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.DataClassAdapter
-import code.with.me.testroomandnavigationdrawertest.databinding.DbItemsBinding
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 

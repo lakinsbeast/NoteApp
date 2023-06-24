@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="20dp"
+        android:paddingBottom="20dp"
+        android:layout_marginTop="20dp"
+        android:id="@+id/standard_bottom_sheet">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="25sp"
+                android:text="Добавить новую папку"
+                />
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textEdit"
+                android:layout_width="match_parent"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_marginBottom="30dp"
+                android:layout_height="wrap_content">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:background="@drawable/custom_text_input_rounded"
+                    android:gravity="top"
+                    android:textColorHint="@color/white"
+                    android:textColor="@color/white"
+                    android:hint="Название">
+                </com.google.android.material.textfield.TextInputEditText>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/addFolderBtn"
+                android:layout_width="match_parent"
+                android:text="@string/createFolder"
+                android:textColor="@color/white"
+                style="@style/MaterialAddButton"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+    </FrameLayout>
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation"
-    app:startDestination="@id/notesListFragment2">
+    app:startDestination="@id/folderListFragment">
     <fragment
         android:id="@+id/notesListFragment2"
         android:name="code.with.me.testroomandnavigationdrawertest.NotesListFragment"
@@ -36,4 +36,44 @@
             app:argType="integer"
             android:defaultValue="0" />
     </fragment>
+    <fragment
+        android:id="@+id/folderListFragment"
+        android:name="code.with.me.testroomandnavigationdrawertest.FolderListFragment"
+        android:label="fragment_folder_list"
+        tools:layout="@layout/fragment_folder_list" >
+        <action
+            android:id="@+id/action_folderListFragment_to_notesListFragment2"
+            app:destination="@id/notesListFragment2" />
+        <action
+            android:id="@+id/action_folderListFragment_to_addFolderSheet"
+            app:destination="@id/addFolderSheet" />
+        <action
+            android:id="@+id/action_folderListFragment_to_selectFolderDestinationSheet"
+            app:destination="@id/selectFolderDestinationSheet" />
+    </fragment>
+    <dialog
+        android:id="@+id/addFolderSheet"
+        android:name="code.with.me.testroomandnavigationdrawertest.ui.sheet.AddFolderSheet"
+        android:label="AddFolderSheet" />
+    <dialog
+        android:id="@+id/renameFolderSheet"
+        android:name="code.with.me.testroomandnavigationdrawertest.ui.sheet.RenameFolderSheet"
+        android:label="RenameFolderSheet" >
+        <argument
+            android:name="idFolder"
+            app:argType="integer" />
+    </dialog>
+    <dialog
+        android:id="@+id/selectFolderDestinationSheet"
+        android:name="code.with.me.testroomandnavigationdrawertest.ui.sheet.SelectFolderDestinationSheet"
+        android:label="SelectFolderDestinationSheet" >
+        <argument
+            android:name="idFolder"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_selectFolderDestinationSheet_to_renameFolderSheet"
+            app:destination="@id/renameFolderSheet"
+            app:popUpTo="@id/folderListFragment"
+            app:popUpToInclusive="false" />
+    </dialog>
 </navigation>

@@ -3,6 +3,7 @@ package code.with.me.testroomandnavigationdrawertest.data.di
 import android.content.Context
 import androidx.room.Room
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
+import code.with.me.testroomandnavigationdrawertest.data.localDataSource.FolderDAO
 import code.with.me.testroomandnavigationdrawertest.data.localDataSource.NoteDAO
 import code.with.me.testroomandnavigationdrawertest.data.localDataSource.NoteDatabase
 import dagger.Binds
@@ -15,9 +16,13 @@ class DatabaseModule(private val application: NotesApplication) {
 
     @Provides
     @Singleton
-    fun provideDatabase(): NoteDatabase = Room.databaseBuilder(application.applicationContext,NoteDatabase::class.java, "note").build()
+    fun provideDatabase(): NoteDatabase = Room.databaseBuilder(application.applicationContext,NoteDatabase::class.java, "note").fallbackToDestructiveMigration().build()
 
     @Provides
     @Singleton
     fun provideNoteDAO(db: NoteDatabase): NoteDAO = db.noteDao()
+
+    @Provides
+    @Singleton
+    fun provideFolderDAO(db: NoteDatabase): FolderDAO = db.folderDao()
 }

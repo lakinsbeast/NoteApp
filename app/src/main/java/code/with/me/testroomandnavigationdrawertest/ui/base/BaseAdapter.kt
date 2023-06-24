@@ -1,16 +1,14 @@
-package code.with.me.testroomandnavigationdrawertest.ui
+package code.with.me.testroomandnavigationdrawertest.ui.base
 
-import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
-import androidx.viewbinding.ViewBindings
-import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Model
 
-open class BaseAdapter<T : Model, A: ViewBinding>(val binding: A): ListAdapter<T, BaseAdapter.BaseViewHolder<A>>(DiffUtil()) {
+open class BaseAdapter<T : Model, A: ViewBinding>(val binding: A): ListAdapter<T, BaseAdapter.BaseViewHolder<A>>(
+    code.with.me.testroomandnavigationdrawertest.ui.DiffUtil()
+) {
 
     var recycView: RecyclerView? = null
     var clickListener: ((binding: BaseViewHolder<A>) -> Unit)? = null
@@ -26,17 +24,7 @@ open class BaseAdapter<T : Model, A: ViewBinding>(val binding: A): ListAdapter<T
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<A> {
-        var holder = BaseViewHolder(binding)
-        holder.itemView.setOnClickListener {
-            clickListener?.invoke(holder)
-        }
-        onLongClickListener?.let { l ->
-            holder.itemView.setOnLongClickListener {
-                l.invoke(holder)
-                return@setOnLongClickListener true
-            }
-        }
-
+        val holder = BaseViewHolder(binding)
         return holder
     }
 

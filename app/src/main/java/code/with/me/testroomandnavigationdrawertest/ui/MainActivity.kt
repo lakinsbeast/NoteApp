@@ -21,25 +21,26 @@ import androidx.navigation.navArgs
 import code.with.me.testroomandnavigationdrawertest.*
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.NewNote
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityMainBinding
-import code.with.me.testroomandnavigationdrawertest.databinding.DbItemsBinding
+import code.with.me.testroomandnavigationdrawertest.databinding.NoteItemBinding
 import javax.inject.Inject
+import javax.inject.Named
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var itemsBinding: DbItemsBinding
+//    private lateinit var itemsBinding: NoteItemBinding
 
-    private val NewNotesArray: ArrayList<NewNote> = ArrayList()
-    private lateinit var adapter: BaseAdapter<NewNote, DbItemsBinding>
+//    private val NewNotesArray: ArrayList<NewNote> = ArrayList()
+//    private lateinit var adapter: BaseAdapter<NewNote, NoteItemBinding>
 
     private lateinit var appSettingPrefs: SharedPreferences
     private lateinit var sharedPrefsEdit: SharedPreferences.Editor
     private var isNightModeOn: Boolean = false
 
     @Inject
+    @Named("noteVMFactory")
     lateinit var factory: ViewModelProvider.Factory
     private lateinit var noteViewModel: NoteViewModel
-
 
 
     enum class States {
@@ -66,12 +67,12 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         navController.removeOnDestinationChangedListener(listener)
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val appComponent = (application as NotesApplication).appComponent
         appComponent.inject(this)
+
 //        appSettingPrefs = getSharedPreferences("AppSettingPrefs", 0).also {
 //            sharedPrefsEdit = it.edit()
 //            isNightModeOn = it.getBoolean("NightMode", false)
@@ -87,27 +88,28 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
 
-        setContentView(binding.root)
-        setSupportActionBar(binding.toolbar)
 
-        supportActionBar?.apply {
-            setHomeAsUpIndicator(R.drawable.search48px)
-            setDisplayHomeAsUpEnabled(true)
-            setDisplayShowTitleEnabled(false)
-            title = "SimpleNote"
-            elevation = 32F
-        }
+        setContentView(binding.root)
+//        setSupportActionBar(binding.toolbar)
+//
+//        supportActionBar?.apply {
+//            setHomeAsUpIndicator(R.drawable.search48px)
+//            setDisplayHomeAsUpEnabled(true)
+//            setDisplayShowTitleEnabled(false)
+//            title = "SimpleNote"
+//            elevation = 32F
+//        }
 
         noteViewModel = ViewModelProvider(this, factory)[NoteViewModel::class.java]
 
         binding.apply {
-            fab.setOnClickListener {
-                binding.apply {
-                    fragmentDetail.visibility = View.VISIBLE
-                }
-//                navController.navigate(NotesListFragmentDirections.actionNotesListFragment2ToAddNoteFragment())
-                goToAddNoteFragment()
-            }
+//            fab.setOnClickListener {
+//                binding.apply {
+//                    fragmentDetail.visibility = View.VISIBLE
+//                }
+////                navController.navigate(NotesListFragmentDirections.actionNotesListFragment2ToAddNoteFragment())
+//                goToAddNoteFragment()
+//            }
         }
     }
 

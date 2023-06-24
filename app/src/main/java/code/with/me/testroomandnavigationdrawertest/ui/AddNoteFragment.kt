@@ -1,8 +1,6 @@
 package code.with.me.testroomandnavigationdrawertest.ui
 
 import android.Manifest
-import android.Manifest.permission.RECORD_AUDIO
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.sqlite.SQLiteException
@@ -14,24 +12,21 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.NumberPicker
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import code.with.me.testroomandnavigationdrawertest.AlertCreator
+import androidx.navigation.fragment.findNavController
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityAddNoteBinding
+import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.coroutines.launch
@@ -41,6 +36,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
+import javax.inject.Named
 
 
 class AddNoteFragment() : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBinding::inflate) {
@@ -66,6 +62,7 @@ class AddNoteFragment() : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBi
 
 
     @Inject
+    @Named("noteVMFactory")
     lateinit var factory: ViewModelProvider.Factory
     private lateinit var noteViewModel: NoteViewModel
 
@@ -206,7 +203,8 @@ class AddNoteFragment() : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBi
                         audioInString,
                         paintInString,
                         imageInString,
-                        pickedColor
+                        pickedColor,
+                        0
                     )
                     if (binding.titleEdit.text.isEmpty()) {
                         binding.titleEdit.error = "Необходимо ввести хотя бы заголовок"
@@ -218,6 +216,7 @@ class AddNoteFragment() : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBi
                         } catch (e: Exception) {
                             Toast.makeText(activity, e.message, Toast.LENGTH_LONG).show()
                         } finally {
+                            findNavController().popBackStack()
                         }
                     }
                 }

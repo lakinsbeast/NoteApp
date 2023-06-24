@@ -3,7 +3,7 @@ package code.with.me.testroomandnavigationdrawertest.data.data_classes
 import android.view.Display.Mode
 import androidx.room.*
 
-@Entity
+@Entity()
 data class Note(
     @PrimaryKey(autoGenerate = true) val id: Int,
     @ColumnInfo(name = "title") val titleNote: String,
@@ -12,7 +12,8 @@ data class Note(
     @ColumnInfo(name = "audioUrl") val audioUrl: String,
     @ColumnInfo(name = "paintUrl") val paintUrl: String,
     @ColumnInfo(name = "imgFrmGlrUrl") val imgFrmGlrUrl: String,
-    @ColumnInfo(name = "colorCard") val colorCard: String
+    @ColumnInfo(name = "colorCard") val colorCard: String,
+    @ColumnInfo(name = "folderId") val folderId: Int
 ) {
     fun toNewNote(): NewNote {
         return NewNote().apply {
@@ -24,10 +25,13 @@ data class Note(
             paintUrl = this@Note.paintUrl
             imgFrmGlrUrl = this@Note.imgFrmGlrUrl
             colorCard = this@Note.colorCard
+            folderId = this@Note.folderId
         }
     }
 }
-@Entity
+
+//создал модельку для удобного создания адаптера
+@Entity()
 class NewNote: Model() {
     @PrimaryKey(autoGenerate = true) var _id: Int = 0
     @ColumnInfo(name = "title") var titleNote: String = ""
@@ -37,4 +41,5 @@ class NewNote: Model() {
     @ColumnInfo(name = "paintUrl") var paintUrl: String = ""
     @ColumnInfo(name = "imgFrmGlrUrl") var imgFrmGlrUrl: String = ""
     @ColumnInfo(name = "colorCard") var colorCard: String = ""
+    @ColumnInfo(name = "folderId") var folderId: Int = 0
 }

@@ -11,31 +11,32 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.Utils.gone
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.NewNote
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
-import code.with.me.testroomandnavigationdrawertest.databinding.DbItemsBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.FragmentNotesListBinding
-import code.with.me.testroomandnavigationdrawertest.ui.BaseAdapter
-import code.with.me.testroomandnavigationdrawertest.ui.BaseFragment
+import code.with.me.testroomandnavigationdrawertest.databinding.NoteItemBinding
+import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
+import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
 import code.with.me.testroomandnavigationdrawertest.ui.NoteViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Named
 
 class NotesListFragment :
     BaseFragment<FragmentNotesListBinding>(FragmentNotesListBinding::inflate) {
 
-    private lateinit var adapter: BaseAdapter<NewNote, DbItemsBinding>
-    private lateinit var itemsBinding: DbItemsBinding
+    private lateinit var adapter: BaseAdapter<NewNote, NoteItemBinding>
+    private lateinit var itemsBinding: NoteItemBinding
 
     private val NewNotesArray: ArrayList<NewNote> = ArrayList()
 
 
     @Inject
+    @Named("noteVMFactory")
     lateinit var factory: ViewModelProvider.Factory
     private lateinit var noteViewModel: NoteViewModel
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        itemsBinding = DbItemsBinding.inflate(layoutInflater, binding.rv.parent as ViewGroup, false)
+        itemsBinding = NoteItemBinding.inflate(layoutInflater, binding.rv.parent as ViewGroup, false)
 
         binding.apply {
             activity?.let {
@@ -48,18 +49,22 @@ class NotesListFragment :
                 }
             }
 
+            fab.setOnClickListener {
+                goToAddNoteFragment()
+            }
         }
 
         noteViewModel = ViewModelProvider(this, factory)[NoteViewModel::class.java]
+
         initAdapter()
 
         initRecyclerView(binding)
 
         lifecycleScope.launch {
-            noteViewModel.getAllNotes().collect {
-                if (it.isNotEmpty()) {
+            noteViewModel.getAllNotes().collect { notes ->
+                if (notes.isNotEmpty()) {
                     NewNotesArray.clear()
-                    it.forEach {
+                    notes.forEach {
                         NewNotesArray.add(it.toNewNote())
                     }
                     adapter.submitList(NewNotesArray as MutableList<NewNote>)
@@ -69,15 +74,19 @@ class NotesListFragment :
 //                        welcomeLayout.visibility = View.VISIBLE
                     }
                 }
-                changeUiOnRvUpdate(binding, it)
+                changeUiOnRvUpdate(binding, notes)
             }
         }
+    }
+
+    private fun goToAddNoteFragment() {
+        findNavController().navigate(NotesListFragmentDirections.actionNotesListFragment2ToAddNoteFragment())
     }
 
     fun changeUiOnRvUpdate(binding: FragmentNotesListBinding, notes: List<Note>) {
         binding.apply {
             countText.text = "/${notes.size}"
-            chipGroup.gone()
+            chipGroupScrollable.gone()
         }
     }
 
@@ -98,7 +107,7 @@ class NotesListFragment :
 
 
     fun initAdapter() {
-        adapter = object : BaseAdapter<NewNote, DbItemsBinding>(itemsBinding) {
+        adapter = object : BaseAdapter<NewNote, NoteItemBinding>(itemsBinding) {
             private var selected0 = -1
 
             init {
@@ -110,9 +119,9 @@ class NotesListFragment :
 
             override fun onCreateViewHolder(
                 parent: ViewGroup, viewType: Int
-            ): BaseViewHolder<DbItemsBinding> {
+            ): BaseViewHolder<NoteItemBinding> {
                 val binding =
-                    DbItemsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                    NoteItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 val holder = BaseViewHolder(binding)
                 holder.itemView.setOnClickListener {
                     clickListener?.invoke(holder)
@@ -121,7 +130,7 @@ class NotesListFragment :
             }
 
 
-            override fun onBindViewHolder(holder: BaseViewHolder<DbItemsBinding>, position: Int) {
+            override fun onBindViewHolder(holder: BaseViewHolder<NoteItemBinding>, position: Int) {
                 super.onBindViewHolder(holder, position)
 
                 holder.binding.apply {
@@ -131,6 +140,7 @@ class NotesListFragment :
                     posItem.text = posItemText(position)
                 }
             }
+
             fun posItemText(count: Int): String {
                 val count = count + 1
                 return if (count < 10) {

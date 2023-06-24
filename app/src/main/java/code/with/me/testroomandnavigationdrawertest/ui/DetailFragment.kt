@@ -1,35 +1,27 @@
 package code.with.me.testroomandnavigationdrawertest.ui
 
-import android.content.DialogInterface
-import android.database.sqlite.SQLiteException
-import android.graphics.Color
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
-import android.transition.TransitionInflater
 import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.documentfile.provider.DocumentFile
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import code.with.me.testroomandnavigationdrawertest.*
-import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.NoteForDetailFragment
 import code.with.me.testroomandnavigationdrawertest.databinding.FragmentDetailBinding
-import code.with.me.testroomandnavigationdrawertest.databinding.FragmentNotesListBinding
+import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.coroutines.launch
 import java.io.IOException
 import javax.inject.Inject
+import javax.inject.Named
 
 
 class DetailFragment() : BaseFragment<FragmentDetailBinding>(FragmentDetailBinding::inflate) {
@@ -41,6 +33,7 @@ class DetailFragment() : BaseFragment<FragmentDetailBinding>(FragmentDetailBindi
     private var mediaPlayer: MediaPlayer? = null
 
     @Inject
+    @Named("noteVMFactory")
     lateinit var factory: ViewModelProvider.Factory
     private lateinit var noteViewModel: NoteViewModel
 

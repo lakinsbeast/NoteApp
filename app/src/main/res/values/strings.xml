@@ -7,5 +7,8 @@
     <string name="text">Начните ввод</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="addnewnote">AddNewNote</string>
+    <string name="addnewnote">Добавить новую заметку</string>
+    <string name="allFolders">Все папки</string>
+    <string name="createFolder">Создать папку</string>
+    <string name="renameFolder">Изменить название папки</string>
 </resources>
