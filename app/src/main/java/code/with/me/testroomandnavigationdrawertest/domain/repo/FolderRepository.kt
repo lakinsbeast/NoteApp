@@ -7,6 +7,14 @@ import kotlinx.coroutines.flow.Flow
 interface FolderRepository {
     fun getAllFolders(): Flow<List<Folder>>
     fun getNotesInFolder(folderId: Int): Flow<List<Note>>
+    fun getAllFoldersSortByNameASC(): Flow<List<Folder>>
+    fun getAllFoldersSortByNameDESC(): Flow<List<Folder>>
+    fun getAllFoldersLastOpenedNewest(): Flow<List<Folder>>
+    fun getAllFoldersLastOpenedOldest(): Flow<List<Folder>>
+    fun getAllFoldersLastEditedNewest(): Flow<List<Folder>>
+    fun getAllFoldersLastEditedOldest(): Flow<List<Folder>>
+
+    fun getAllFoldersFavorite(): Flow<List<Folder>>
     suspend fun insertFolder(folder: Folder): Long
     suspend fun updateFolder(folder: Folder)
     suspend fun deleteFolder(folder: Folder)

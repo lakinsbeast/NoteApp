@@ -113,9 +113,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun goToAddNoteFragment() {
-        navController.navigate(NotesListFragmentDirections.actionNotesListFragment2ToAddNoteFragment())
-    }
+//    private fun goToAddNoteFragment() {
+//        navController.navigate(NotesListFragmentDirections.actionNotesListFragment2ToAddNoteFragment(
+//
+//        ))
+//    }
 
     override fun onPause() {
         super.onPause()

@@ -5,59 +5,51 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginVertical="1dp"
-    android:background="@color/background131313"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="10dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp">
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/posItem"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:text="01/"
-            android:textColor="@color/gray" />
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginHorizontal="20dp">
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingLeft="20dp">
 
             <TextView
                 android:id="@+id/titleID"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:ellipsize="end"
                 android:fontFamily="@font/neue_montreal_regular"
                 android:maxLines="1"
                 android:text="Title"
                 android:textColor="@color/white"
-                android:textSize="40sp" />
+                android:textSize="20sp" />
 
             <TextView
-                android:id="@+id/textID"
-                android:layout_width="wrap_content"
+                android:id="@+id/dateText"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="2"
                 android:ellipsize="end"
-                android:layout_marginTop="25dp"
-                android:layout_marginBottom="10dp"
                 android:fontFamily="@font/neue_montreal_regular"
                 android:maxLines="1"
-                android:text="text"
-                android:textColor="@color/gray"
-                android:textSize="15sp" />
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@android:color/white" />
+                android:text="Title"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
         </LinearLayout>
     </LinearLayout>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/white" />
 
 </LinearLayout>

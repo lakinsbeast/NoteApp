@@ -11,6 +11,10 @@ interface NoteDAO {
     @Throws(SQLiteException::class)
     fun getListOfNotes(): Flow<List<Note>>
 
+    @Query("SELECT * FROM note WHERE folderId = :id")
+    @Throws(SQLiteException::class)
+    fun getListOfNotes(id: Int): Flow<List<Note>>
+
     @Query("SELECT * FROM note WHERE id IN (:userIds)")
     fun loadAllIds(userIds: IntArray): List<Note>
 
@@ -32,8 +36,11 @@ interface NoteDAO {
     @Throws(SQLiteException::class)
     suspend fun deleteNote(note: Note): Int
 
-//    update nihyua ne working nenvizhu eto govno
+//    update ne working
     @Update
     suspend fun updateNote(note: Note)
+
+    @Query("SELECT * FROM note ORDER BY id DESC LIMIT 1")
+    fun getLastCustomer(): Long
 
 }

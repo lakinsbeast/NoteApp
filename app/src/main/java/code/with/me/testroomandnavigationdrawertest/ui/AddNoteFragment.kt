@@ -4,21 +4,23 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.sqlite.SQLiteException
-import android.graphics.Color
+import android.graphics.Bitmap
 import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.text.Editable
 import android.util.Log
 import android.view.View
-import android.widget.NumberPicker
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -29,17 +31,26 @@ import code.with.me.testroomandnavigationdrawertest.databinding.ActivityAddNoteB
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
+import java.util.Timer
 import javax.inject.Inject
 import javax.inject.Named
+import kotlin.coroutines.CoroutineContext
 
 
-class AddNoteFragment() : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBinding::inflate) {
+class AddNoteFragment() : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBinding::inflate),
+    CoroutineScope {
 
     var currentPermission: TypeOfPermission = TypeOfPermission.EMPTY
     private var stateOfAudioRecorder = false
@@ -49,6 +60,15 @@ class AddNoteFragment() : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBi
     private var audioInString: String = ""
     private var paintInString: String = ""
     private var imageInString: String = ""
+    private var lastCreatedTime: Long = 0L
+    private var lastOpenedTime: Long = 0L
+
+    private var lastSaveID = 0L
+
+    init {
+        lastCreatedTime = System.currentTimeMillis()
+        lastOpenedTime = System.currentTimeMillis()
+    }
 
     private var RECORD_AUDIO: Int = 0
 
@@ -60,6 +80,27 @@ class AddNoteFragment() : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBi
 
     private var isClickedToColorPicker: Boolean = false
 
+    var timer = Timer()
+    var scope = CoroutineScope(Job() + Dispatchers.IO)
+    val DELAY: Long = 1000
+
+    private var pickedColor: String = "#FFFFFFFF"
+
+    private var note: Note = Note(
+        lastSaveID.toInt(),
+        "",
+        "",
+        cameraInString,
+        audioInString,
+        paintInString,
+        imageInString,
+        pickedColor,
+        -1,
+        lastCreatedTime,
+        lastOpenedTime,
+        false,
+        "-1"
+    )
 
     @Inject
     @Named("noteVMFactory")
@@ -67,11 +108,7 @@ class AddNoteFragment() : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBi
     private lateinit var noteViewModel: NoteViewModel
 
     enum class TypeOfPermission {
-        CAMERA,
-        IMAGE_GALLERY,
-        AUDIO,
-        WRITE_EXTERNAL,
-        EMPTY,
+        CAMERA, IMAGE_GALLERY, AUDIO, WRITE_EXTERNAL, EMPTY,
     }
 
     private var color: Array<String> = arrayOf(
@@ -118,7 +155,6 @@ class AddNoteFragment() : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBi
         "Grey",
         "Blue Grey"
     )
-    private var pickedColor: String = "#FFFFFFFF"
 
     var requestt = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
         when (currentPermission) {
@@ -149,6 +185,7 @@ class AddNoteFragment() : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBi
                 imageInString = imageUri.toString()
                 Picasso.get().load(imageUri).resize(300, 450).centerCrop()
                     .transform(RoundedCornersTransformation(36, 32)).into(binding.imageView)
+                saveNote()
             }
         }
     private val getImageFromCamera =
@@ -161,6 +198,7 @@ class AddNoteFragment() : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBi
                     cameraInString = test
                     Picasso.get().load(cameraUri).resize(300, 450).centerCrop()
                         .transform(RoundedCornersTransformation(36, 32)).into(binding.cameraView)
+                    saveNote()
                 }
             }
         }
@@ -171,6 +209,7 @@ class AddNoteFragment() : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBi
                 paintInString = paintBitmap
                 Picasso.get().load(paintBitmap).resize(300, 450).centerCrop()
                     .transform(RoundedCornersTransformation(36, 32)).into(binding.paintImage)
+                saveNote()
             } else {
                 Log.d("actforresult", "actforres не сработал")
             }
@@ -184,41 +223,61 @@ class AddNoteFragment() : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBi
         noteViewModel = ViewModelProvider(this, factory)[NoteViewModel::class.java]
     }
 
+    private fun saveNote() {
+        if (binding.titleEdit.text.toString().isNotEmpty()
+            || binding.textEdit.text.toString().isNotEmpty()
+            || cameraInString.isNotEmpty()
+            || paintInString.isNotEmpty()
+            || imageInString.isNotEmpty()
+        )
+            scope.cancel()
+        scope = CoroutineScope(Job() + Dispatchers.IO)
+        scope.launch {
+            while (true) {
+                delay(150)
+                note = Note(
+                    lastSaveID.toInt(),
+                    binding.titleEdit.text.toString(),
+                    binding.textEdit.text.toString(),
+                    cameraInString,
+                    audioInString,
+                    paintInString,
+                    imageInString,
+                    pickedColor,
+                    arguments?.getInt("idFolder")!!,
+                    lastCreatedTime,
+                    lastOpenedTime,
+                    false,
+                    "-1"
+                )
+                noteViewModel.update(note)
+                break
+            }
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        scope.launch {
+            async {
+                lastSaveID = noteViewModel.getLastCustomer()
+                lastSaveID += 1
+            }.await()
+            launch {
+                noteViewModel.insert(note)
+            }
+        }
         activity?.let { activity ->
             binding.apply {
                 imageButtonDraw.setOnClickListener {
                     getPaint.launch(Intent(activity, PaintActivity::class.java))
                 }
+                titleEdit.addTextChangedListener {
+                    saveNote()
+                }
 
-                addNoteImgBtn.setOnClickListener {
-                    println("asdasda")
-                    val data = Note(
-                        0,
-                        binding.titleEdit.text.toString(),
-                        binding.textEdit.text.toString(),
-                        cameraInString,
-                        audioInString,
-                        paintInString,
-                        imageInString,
-                        pickedColor,
-                        0
-                    )
-                    if (binding.titleEdit.text.isEmpty()) {
-                        binding.titleEdit.error = "Необходимо ввести хотя бы заголовок"
-                    } else {
-                        try {
-                            noteViewModel.insert(data)
-                        } catch (e: SQLiteException) {
-                            Toast.makeText(activity, e.message, Toast.LENGTH_LONG).show()
-                        } catch (e: Exception) {
-                            Toast.makeText(activity, e.message, Toast.LENGTH_LONG).show()
-                        } finally {
-                            findNavController().popBackStack()
-                        }
-                    }
+                textEdit.addTextChangedListener {
+                    saveNote()
                 }
                 imageButtonVoice.setOnClickListener {
                     stateOfAudioRecorder = if (!stateOfAudioRecorder) {
@@ -228,7 +287,6 @@ class AddNoteFragment() : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBi
                         stopAudio()
                         false
                     }
-
                 }
                 cardcolorpicker.setOnClickListener {
                     if (!isClickedToColorPicker) {
@@ -239,29 +297,15 @@ class AddNoteFragment() : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBi
                         isClickedToColorPicker = false
                     }
                 }
-                colorpicker.apply {
-                    minValue = 0
-                    maxValue = colornames.size - 1
-                    displayedValues = colornames
-                    descendantFocusability = NumberPicker.FOCUS_BLOCK_DESCENDANTS
-                    wrapSelectorWheel = false
-                    setOnValueChangedListener { _, _, _ ->
-                        colorpickercardView.setCardBackgroundColor(Color.parseColor("#" + color[colorpicker.value]))
-                        textSize = 50F
-                        layouttocolor.setBackgroundColor(Color.parseColor("#" + color[colorpicker.value]))
-                        pickedColor = "#" + color[value]
-                    }
-                }
                 cameraBtn.setOnClickListener { camera ->
-                    if (activity.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
-                        activity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
+                    if (activity.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED || activity.checkSelfPermission(
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        ) == PackageManager.PERMISSION_DENIED
                     ) {
                         //permission was not enabled
-                        val permission =
-                            arrayOf(
-                                Manifest.permission.CAMERA,
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE
-                            )
+                        val permission = arrayOf(
+                            Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        )
                         //show popup to request permission
                         requestPermissions(permission, PERMISSION_CODE)
                     } else {
@@ -285,6 +329,7 @@ class AddNoteFragment() : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBi
                     release()
                 }
                 binding.imageButtonVoice.setImageResource(R.drawable.ic_baseline_keyboard_voice_24)
+                saveNote()
                 Toast.makeText(it, "Запись голоса завершена", Toast.LENGTH_SHORT).show()
             }
         } catch (e: Exception) {
@@ -297,14 +342,11 @@ class AddNoteFragment() : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBi
     private fun audioRec() {
         activity?.let {
             if (ActivityCompat.checkSelfPermission(
-                    it,
-                    Manifest.permission.RECORD_AUDIO
+                    it, Manifest.permission.RECORD_AUDIO
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
                 ActivityCompat.requestPermissions(
-                    it,
-                    arrayOf(Manifest.permission.RECORD_AUDIO),
-                    RECORD_AUDIO
+                    it, arrayOf(Manifest.permission.RECORD_AUDIO), RECORD_AUDIO
                 )
             } else {
                 fileAudioName = it.externalCacheDir?.absolutePath.toString() + "/$randomNum.3gp"
@@ -321,12 +363,10 @@ class AddNoteFragment() : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBi
                         prepare()
                         start()
                         binding.imageButtonVoice.setImageResource(R.drawable.mic_off48px)
-                        Toast.makeText(it, "Началась запись голоса", Toast.LENGTH_SHORT)
-                            .show()
+                        Toast.makeText(it, "Началась запись голоса", Toast.LENGTH_SHORT).show()
                     } catch (e: IOException) {
                         Log.d("audioException", e.message.toString())
-                        Toast.makeText(it, e.message.toString(), Toast.LENGTH_SHORT)
-                            .show()
+                        Toast.makeText(it, e.message.toString(), Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -339,14 +379,14 @@ class AddNoteFragment() : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBi
 
     private fun openCamera() {
         activity?.let {
-            if (it.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
-                it.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
+            if (it.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED || it.checkSelfPermission(
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_DENIED
             ) {
                 currentPermission = TypeOfPermission.CAMERA
                 requestt.launch(
                     arrayOf(
-                        Manifest.permission.CAMERA,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE
                     )
                 )
                 currentPermission = TypeOfPermission.WRITE_EXTERNAL
@@ -378,4 +418,7 @@ class AddNoteFragment() : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBi
             }
         }
     }
+
+    override val coroutineContext: CoroutineContext
+        get() = Job()
 }

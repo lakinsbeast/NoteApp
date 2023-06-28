@@ -5,43 +5,61 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
-
     android:orientation="vertical"
-    tools:context=".FolderListFragment">
+    tools:context=".FolderListListFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:paddingHorizontal="15dp"
-        android:paddingTop="20dp"
-        android:layout_height="wrap_content">
+        android:layout_height="60dp">
 
-        <com.google.android.material.textview.MaterialTextView
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/allFolders"
-            android:textSize="40sp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="10dp"
+            android:gravity="center">
 
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Name" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/addFolderBtn"
-            style="@style/MaterialAddButton"
-            android:layout_width="70dp"
-            android:layout_height="80dp"
-            android:clickable="false"
-            app:icon="@drawable/brush48px"
-            app:iconSize="35dp"
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/check_mark" />
+        </LinearLayout>
 
-            app:iconTint="@color/white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="81dp"
+            android:gravity="end|center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Date" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/check_mark" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/white" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true" />
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        tools:listitem="@layout/folder_item" />
 
 </LinearLayout>

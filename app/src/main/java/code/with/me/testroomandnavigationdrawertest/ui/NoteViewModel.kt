@@ -21,9 +21,17 @@ class NoteViewModel @Inject constructor(
 
     fun getAllNotes(): Flow<List<Note>> = repoNote.getListOfNotes()
 
+    fun getAllNotes(id: Int): Flow<List<Note>> = repoNote.getListOfNotes(id)
+
     fun insert(note: Note) = viewModelScope.launch {
         repoNote.insertNote(note)
     }
+
+    fun insertOrUpdate(note: Note) = viewModelScope.launch {
+        repoNote.insertOrUpdate(note)
+    }
+
+    fun getLastCustomer() = repoNote.getLastCustomer()
 
     fun delete(note: Note) = viewModelScope.launch {
         repoNote.deleteNote(note)
@@ -35,20 +43,12 @@ class NoteViewModel @Inject constructor(
 }
 
 class NoteViewModelFactory @Inject constructor(
-//    private val deleteNoteUseCase: deleteNoteUseCase,
-//    private val getListOfNotesUseCase: getListOfNotesUseCase,
-//    private val insertNoteUseCase: insertNoteUseCase,
-//    private val updateNoteUseCase: updateNoteUseCase
     private val repo: NoteRepositoryImpl
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(NoteViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return NoteViewModel(
-//                deleteNoteUseCase,
-//                getListOfNotesUseCase,
-//                insertNoteUseCase,
-//                updateNoteUseCase
                 repo
             ) as T
         }

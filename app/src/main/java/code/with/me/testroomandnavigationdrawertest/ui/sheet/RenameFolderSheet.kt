@@ -55,9 +55,17 @@ class RenameFolderSheet :
                     }
                     launch {
                         async {
-                            folderViewModel.insertFolder(Folder(text.toString()).apply {
-                                this.id = args.idFolder
-                            })
+                            folderViewModel.insertFolder(
+                                Folder(
+                                    text.toString(),
+                                    System.currentTimeMillis(),
+                                    System.currentTimeMillis(),
+                                    System.currentTimeMillis(),
+                                    0,
+                                    false
+                                ).apply {
+                                    this.id = args.idFolder
+                                })
                         }.await()
                         withContext(Dispatchers.Main) {
                             findNavController().popBackStack()

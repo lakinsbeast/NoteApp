@@ -1,6 +1,6 @@
 package code.with.me.testroomandnavigationdrawertest.data.di
 
-import code.with.me.testroomandnavigationdrawertest.FolderListFragment
+import code.with.me.testroomandnavigationdrawertest.FolderListListFragment
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.NotesListFragment
 import code.with.me.testroomandnavigationdrawertest.domain.di.RepositoryModule
@@ -8,7 +8,13 @@ import code.with.me.testroomandnavigationdrawertest.domain.di.UseCaseModule
 import code.with.me.testroomandnavigationdrawertest.ui.AddNoteActivity
 import code.with.me.testroomandnavigationdrawertest.ui.AddNoteFragment
 import code.with.me.testroomandnavigationdrawertest.ui.DetailFragment
+import code.with.me.testroomandnavigationdrawertest.ui.FavoriteFoldersListFragment
+import code.with.me.testroomandnavigationdrawertest.ui.HomeFragment
+import code.with.me.testroomandnavigationdrawertest.ui.LastEditedFolderListFragment
+import code.with.me.testroomandnavigationdrawertest.ui.LastViewedFoldersListFragment
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
+import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFolderListFragment
+import code.with.me.testroomandnavigationdrawertest.ui.base.BaseNotesListFragment
 import code.with.me.testroomandnavigationdrawertest.ui.di.ApplicationModule
 import code.with.me.testroomandnavigationdrawertest.ui.di.BindAppModule
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.AddFolderSheet
@@ -25,10 +31,18 @@ interface AppComponent {
     fun inject(fragment: DetailFragment)
     fun inject(fragment: AddNoteFragment)
     fun inject(application: NotesApplication)
+    fun inject(baseFolderListFragment: BaseFolderListFragment)
     fun inject(notesListFragment: NotesListFragment)
-    fun inject(folderListFragment: FolderListFragment)
+    fun inject(folderListFragment: FolderListListFragment)
     fun inject(addFolderSheet: AddFolderSheet)
+    fun inject(baseNotesListFragment: BaseNotesListFragment)
     fun inject(renameFolderSheet: RenameFolderSheet)
+    fun inject(lastViewedFoldersFragment: LastViewedFoldersListFragment)
+
+    fun inject(favoriteFoldersFragment: FavoriteFoldersListFragment)
+
+    fun inject(lastEditedFolderFragment: LastEditedFolderListFragment)
+    fun inject(homeFragment: HomeFragment)
     fun inject(selectFolderDestinationSheet: SelectFolderDestinationSheet)
 
 }

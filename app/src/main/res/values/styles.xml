@@ -13,6 +13,10 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
+    
+    <style name="CustomChip" parent="Widget.MaterialComponents.Chip.Action">
+
+    </style>
 
 
 </resources>

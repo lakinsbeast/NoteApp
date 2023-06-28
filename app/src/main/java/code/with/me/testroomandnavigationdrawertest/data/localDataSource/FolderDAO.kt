@@ -19,6 +19,26 @@ interface FolderDAO {
     @Query("SELECT * FROM note WHERE folderId = :folderId")
     fun getNotesInFolder(folderId: Int): Flow<List<Note>>
 
+    @Query("SELECT * FROM folder ORDER BY name ASC")
+    fun getAllFoldersSortByNameASC(): Flow<List<Folder>>
+
+    @Query("SELECT * FROM folder ORDER BY name DESC")
+    fun getAllFoldersSortByNameDESC(): Flow<List<Folder>>
+
+    @Query("SELECT * FROM folder ORDER BY lastTimestampOpen ASC")
+    fun getAllFoldersLastOpenedNewest(): Flow<List<Folder>>
+
+    @Query("SELECT * FROM folder ORDER BY lastTimestampOpen DESC")
+    fun getAllFoldersLastOpenedOldest(): Flow<List<Folder>>
+
+    @Query("SELECT * FROM folder ORDER BY lastTimestampEdit ASC")
+    fun getAllFoldersLastEditedNewest(): Flow<List<Folder>>
+
+    @Query("SELECT * FROM folder ORDER BY lastTimestampEdit DESC")
+    fun getAllFoldersLastEditedOldest(): Flow<List<Folder>>
+
+    @Query("SELECT * FROM folder WHERE isFavorite = 1 ORDER BY name ASC")
+    fun getAllFoldersFavorite(): Flow<List<Folder>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFolder(folder: Folder): Long

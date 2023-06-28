@@ -9,7 +9,13 @@ interface NoteRepository {
 
     suspend fun insertNote(note: Note)
 
+    suspend fun insertOrUpdate(note: Note)
+
     suspend fun deleteNote(note: Note): Int
 
     suspend fun updateNote(note: Note)
+
+    fun getLastCustomer(): Long
+
+    fun getListOfNotes(id: Int): Flow<List<Note>>
 }

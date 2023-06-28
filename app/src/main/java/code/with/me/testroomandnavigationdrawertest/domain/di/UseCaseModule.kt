@@ -2,12 +2,14 @@ package code.with.me.testroomandnavigationdrawertest.domain.di
 
 import code.with.me.testroomandnavigationdrawertest.data.repos.FolderRepositoryImpl
 import code.with.me.testroomandnavigationdrawertest.data.repos.NoteRepositoryImpl
+import code.with.me.testroomandnavigationdrawertest.data.repos.FolderFolderTagRepositoryImpl
 import code.with.me.testroomandnavigationdrawertest.domain.noteUseCases.deleteNoteUseCase
 import code.with.me.testroomandnavigationdrawertest.domain.noteUseCases.getListOfNotesUseCase
 import code.with.me.testroomandnavigationdrawertest.domain.noteUseCases.insertNoteUseCase
 import code.with.me.testroomandnavigationdrawertest.domain.noteUseCases.updateNoteUseCase
 import code.with.me.testroomandnavigationdrawertest.domain.repo.FolderRepository
 import code.with.me.testroomandnavigationdrawertest.domain.repo.NoteRepository
+import code.with.me.testroomandnavigationdrawertest.domain.repo.FolderTagRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -24,6 +26,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindFolderRepositoryModule(folderRepositoryImpl: FolderRepositoryImpl): FolderRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindTagRepositoryModule(folderTagRepositoryImpl: FolderFolderTagRepositoryImpl): FolderTagRepository
 }
 
 @Module

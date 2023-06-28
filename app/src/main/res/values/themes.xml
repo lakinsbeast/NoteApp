@@ -38,6 +38,8 @@
         <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
     </style>
 
+
+
     <style name="MaterialAddButton" parent="Widget.MaterialComponents.Button">
         <item name="backgroundTint">@color/transparent</item>
         <item name="rippleColor">@color/transparent</item>

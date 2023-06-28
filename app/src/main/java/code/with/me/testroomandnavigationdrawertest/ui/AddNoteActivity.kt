@@ -26,7 +26,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import code.with.me.testroomandnavigationdrawertest.*
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
@@ -335,31 +334,35 @@ class AddNoteActivity : AppCompatActivity() {
             finish()
         }
         if (item.itemId == R.id.saveBtn) {
-            val data = Note(
-                0,
-                binding.titleEdit.text.toString(),
-                binding.textEdit.text.toString(),
-                cameraInString,
-                audioInString,
-                paintInString,
-                imageInString,
-                pickedColor,
-                0
-            )
-            if (binding.titleEdit.text.isEmpty()) {
-                binding.titleEdit.error = "Необходимо ввести хотя бы заголовок"
-            } else {
-                try {
-                    noteViewModel.insert(data)
-                } catch (e: SQLiteException) {
-                    Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
-                } catch (e: Exception) {
-                    Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
-                } finally {
-                    startActivity(Intent(this, MainActivity::class.java))
-                    finish()
-                }
-            }
+//            val data = Note(
+//                0,
+//                "binding.titleEdit.text.toString()",
+//                binding.textEdit.text.toString(),
+//                cameraInString,
+//                audioInString,
+//                paintInString,
+//                imageInString,
+//                pickedColor,
+//                0,
+//                System.currentTimeMillis(),
+//                System.currentTimeMillis(),
+//                0,
+//                false
+//            )
+//            if (binding.titleEdit.text.isEmpty()) {
+//                binding.titleEdit.error = "Необходимо ввести хотя бы заголовок"
+//            } else {
+//                try {
+//                    noteViewModel.insert(data)
+//                } catch (e: SQLiteException) {
+//                    Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
+//                } catch (e: Exception) {
+//                    Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
+//                } finally {
+//                    startActivity(Intent(this, MainActivity::class.java))
+//                    finish()
+//                }
+//            }
         }
         return super.onOptionsItemSelected(item)
     }

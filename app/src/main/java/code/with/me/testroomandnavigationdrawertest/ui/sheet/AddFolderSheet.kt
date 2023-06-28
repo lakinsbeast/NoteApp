@@ -22,7 +22,8 @@ import javax.inject.Inject
 import javax.inject.Named
 import kotlin.coroutines.CoroutineContext
 
-class AddFolderSheet: BaseSheet<AddFolderBottomSheetBinding>(AddFolderBottomSheetBinding::inflate), CoroutineScope {
+class AddFolderSheet : BaseSheet<AddFolderBottomSheetBinding>(AddFolderBottomSheetBinding::inflate),
+    CoroutineScope {
     private val TAG = "AddFolderSheet"
 
     @Inject
@@ -34,6 +35,7 @@ class AddFolderSheet: BaseSheet<AddFolderBottomSheetBinding>(AddFolderBottomShee
         super.onCreate(savedInstanceState)
 
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activity?.let {
@@ -53,7 +55,16 @@ class AddFolderSheet: BaseSheet<AddFolderBottomSheetBinding>(AddFolderBottomShee
                         return@setOnClickListener
                     }
                     launch {
-                        folderViewModel.insertFolder(Folder(text.toString()))
+                        folderViewModel.insertFolder(
+                            Folder(
+                                text.toString(),
+                                System.currentTimeMillis(),
+                                System.currentTimeMillis(),
+                                System.currentTimeMillis(),
+                                0,
+                                false
+                            )
+                        )
                     }
                     findNavController().popBackStack()
                 }

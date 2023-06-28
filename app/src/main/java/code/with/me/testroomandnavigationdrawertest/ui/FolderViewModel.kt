@@ -1,12 +1,9 @@
 package code.with.me.testroomandnavigationdrawertest.ui
 
-import android.icu.text.CaseMap.Fold
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Folder
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
-import code.with.me.testroomandnavigationdrawertest.data.repos.FolderRepositoryImpl
-import code.with.me.testroomandnavigationdrawertest.data.repos.NoteRepositoryImpl
 import code.with.me.testroomandnavigationdrawertest.domain.repo.FolderRepository
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseViewModel
 import kotlinx.coroutines.flow.Flow
@@ -18,9 +15,26 @@ class FolderViewModel @Inject constructor(
 ) : BaseViewModel() {
     fun getAllFolders(): Flow<List<Folder>> = repo.getAllFolders()
     fun getNotesInFolder(folderId: Int): Flow<List<Note>> = repo.getNotesInFolder(folderId)
+
+    fun getAllFoldersSortByNameASC(): Flow<List<Folder>> = repo.getAllFoldersSortByNameASC()
+
+    fun getAllFoldersSortByNameDESC(): Flow<List<Folder>> =
+        repo.getAllFoldersSortByNameDESC()
+
+    fun getAllFoldersLastOpenedNewest(): Flow<List<Folder>> = repo.getAllFoldersLastOpenedNewest()
+
+    fun getAllFoldersLastOpenedOldest(): Flow<List<Folder>> = repo.getAllFoldersLastOpenedOldest()
+
+    fun getAllFoldersLastEditedNewest(): Flow<List<Folder>> = repo.getAllFoldersLastEditedNewest()
+
+    fun getAllFoldersLastEditedOldest(): Flow<List<Folder>> = repo.getAllFoldersLastEditedOldest()
+
+    fun getAllFoldersFavorite(): Flow<List<Folder>> = repo.getAllFoldersFavorite()
+
     suspend fun insertFolder(folder: Folder): Long = repo.insertFolder(folder)
     suspend fun updateFolder(folder: Folder) = repo.updateFolder(folder)
     suspend fun deleteFolder(folder: Folder) = repo.deleteFolder(folder)
+
 }
 
 class FolderViewModelFactory @Inject constructor(
