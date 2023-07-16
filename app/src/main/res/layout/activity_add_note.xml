@@ -2,61 +2,32 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:id="@+id/layouttocolor"
-    android:background="@color/background131313"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <include
+        android:id="@+id/include1"
+        layout="@layout/divider_line" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/photoList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/titleEdit"
         app:layout_constraintEnd_toEndOf="parent"
-        app:title="@string/addnewnote"
-        app:titleCentered="true"
+        android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-    </com.google.android.material.appbar.MaterialToolbar>
+        app:layout_constraintTop_toBottomOf="@+id/include1"
+        tools:listitem="@layout/photo_item" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/relativeLayout2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar">
-
-        <ImageView
-            android:id="@+id/camera_view"
-            android:layout_width="300px"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:id="@+id/image_view"
-            android:layout_width="300px"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toStartOf="@+id/camera_view"
-            app:layout_constraintHorizontal_bias="0.808"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:id="@+id/paintImage"
-            android:layout_width="300px"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <EditText
         android:id="@+id/titleEdit"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:ems="10"
         android:background="@android:color/transparent"
+        android:ems="10"
         android:hint="@string/title"
         android:inputType="textPersonName"
         android:paddingLeft="10dp"
@@ -64,8 +35,7 @@
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@id/toolbar"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout2" />
+        app:layout_constraintTop_toBottomOf="@+id/photoList" />
 
     <EditText
         android:id="@+id/textEdit"
@@ -86,17 +56,19 @@
 
     <LinearLayout
         android:id="@+id/colorpickerlayout"
-        android:visibility="invisible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@+id/textEdit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
+
         <androidx.cardview.widget.CardView
             android:id="@+id/colorpickercardView"
             android:layout_width="100dp"
-            android:layout_height="50dp"/>
+            android:layout_height="50dp" />
+
         <NumberPicker
             android:id="@+id/colorpicker"
             android:layout_width="100dp"
@@ -111,57 +83,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <com.google.android.material.bottomappbar.BottomAppBar
-            android:id="@+id/bottom_app_bar"
-            app:contentInsetStart="0dp"
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_navigation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:backgroundTint="@color/black">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <ImageButton
-                    android:id="@+id/image_btn"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/image_camera_btn" />
-
-                <ImageButton
-                    android:id="@+id/camera_btn"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/camera_btn" />
-
-                <ImageButton
-                    android:id="@+id/imageButtonVoice"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_baseline_keyboard_voice_24" />
-
-                <ImageButton
-                    android:id="@+id/imageButtonDraw"
-                    android:layout_width="57dp"
-                    android:layout_height="60dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/color_lens_btn" />
-                <ImageButton
-                    android:id="@+id/cardcolorpicker"
-                    android:layout_width="57dp"
-                    android:layout_height="60dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/format_paint48px" />
-            </LinearLayout>
-        </com.google.android.material.bottomappbar.BottomAppBar>
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="bottom"
+            android:layout_marginHorizontal="70dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/all_rounded_corners"
+            app:elevation="16dp"
+            app:labelVisibilityMode="labeled"
+            app:menu="@menu/detailnotemenu" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,16 +7,21 @@
     <style name="Widget.Theme.testRoomAndNavigationDrawerTest.ButtonBar.Fullscreen" parent="">
         <item name="android:background">@color/black_overlay</item>
         <item name="android:buttonBarStyle">?android:attr/buttonBarStyle</item>
-
     </style>
+
     <style name="Theme.AppCompat.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
-    
-    <style name="CustomChip" parent="Widget.MaterialComponents.Chip.Action">
 
+    <style name="DividerLine">
+        <item name="android:layout_width">50dp</item>
+        <item name="android:layout_height">10dp</item>
+        <item name="android:background">@color/black</item>
     </style>
 
+    <style name="RoundedAllCorners">
+        <item name="background">@drawable/all_rounded_corners</item>
+    </style>
 
 </resources>

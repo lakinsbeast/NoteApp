@@ -6,6 +6,7 @@ import code.with.me.testroomandnavigationdrawertest.data.localDataSource.FolderD
 import code.with.me.testroomandnavigationdrawertest.data.localDataSource.NoteDAO
 import code.with.me.testroomandnavigationdrawertest.data.localDataSource.NoteDatabase
 import code.with.me.testroomandnavigationdrawertest.data.localDataSource.FolderTagDAO
+import code.with.me.testroomandnavigationdrawertest.data.localDataSource.NoteTagDAO
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -15,7 +16,9 @@ class DatabaseModule(private val application: NotesApplication) {
 
     @Provides
     @Singleton
-    fun provideDatabase(): NoteDatabase = Room.databaseBuilder(application.applicationContext,NoteDatabase::class.java, "note").fallbackToDestructiveMigration().build()
+    fun provideDatabase(): NoteDatabase =
+        Room.databaseBuilder(application.applicationContext, NoteDatabase::class.java, "note")
+            .fallbackToDestructiveMigration().build()
 
     @Provides
     @Singleton
@@ -27,5 +30,9 @@ class DatabaseModule(private val application: NotesApplication) {
 
     @Provides
     @Singleton
-    fun provideTagDAO(db: NoteDatabase): FolderTagDAO = db.tagDAO()
+    fun provideTagDAO(db: NoteDatabase): FolderTagDAO = db.folderTagDAO()
+
+    @Provides
+    @Singleton
+    fun provideNoteTagDAO(db: NoteDatabase): NoteTagDAO = db.noteTagDAO()
 }

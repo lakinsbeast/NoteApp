@@ -1,6 +1,7 @@
 package code.with.me.testroomandnavigationdrawertest.ui
 
 import android.app.ActionBar
+import android.app.Activity
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.Gravity
@@ -26,6 +27,7 @@ import javax.inject.Inject
 import javax.inject.Named
 
 
+
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 //    private lateinit var itemsBinding: NoteItemBinding
@@ -37,15 +39,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sharedPrefsEdit: SharedPreferences.Editor
     private var isNightModeOn: Boolean = false
 
-    @Inject
-    @Named("noteVMFactory")
-    lateinit var factory: ViewModelProvider.Factory
-    private lateinit var noteViewModel: NoteViewModel
+//    @Inject
+//    @Named("noteVMFactory")
+//    lateinit var factory: ViewModelProvider.Factory
+//    private lateinit var noteViewModel: NoteViewModel
 
-
-    enum class States {
-
-    }
     private val navController: NavController
         get() = Navigation.findNavController(this, R.id.fragment_detail)
 
@@ -100,7 +98,7 @@ class MainActivity : AppCompatActivity() {
 //            elevation = 32F
 //        }
 
-        noteViewModel = ViewModelProvider(this, factory)[NoteViewModel::class.java]
+//        noteViewModel = ViewModelProvider(this, factory)[NoteViewModel::class.java]
 
         binding.apply {
 //            fab.setOnClickListener {
@@ -124,19 +122,19 @@ class MainActivity : AppCompatActivity() {
         overridePendingTransition(0, 0)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.mainactivitymenu, menu)
-        if (isNightModeOn) {
-            menu?.getItem(0)?.icon =
-                ContextCompat
-                    .getDrawable(this, R.drawable.light_mode48px)
-        } else {
-            menu?.getItem(0)?.icon =
-                ContextCompat
-                    .getDrawable(this, R.drawable.dark_mode48px)
-        }
-        return super.onCreateOptionsMenu(menu)
-    }
+//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+//        menuInflater.inflate(R.menu.mainactivitymenu, menu)
+//        if (isNightModeOn) {
+//            menu?.getItem(0)?.icon =
+//                ContextCompat
+//                    .getDrawable(this, R.drawable.light_mode48px)
+//        } else {
+//            menu?.getItem(0)?.icon =
+//                ContextCompat
+//                    .getDrawable(this, R.drawable.dark_mode48px)
+//        }
+//        return super.onCreateOptionsMenu(menu)
+//    }
 
 //    override fun onBackPressed() {
 //        if (supportFragmentManager.backStackEntryCount == 0) {
@@ -150,18 +148,18 @@ class MainActivity : AppCompatActivity() {
 //    }
 
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.nightMode) {
-            if (isNightModeOn) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                sharedPrefsEdit.putBoolean("NightMode", false)
-                sharedPrefsEdit.apply()
-            } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                sharedPrefsEdit.putBoolean("NightMode", true)
-                sharedPrefsEdit.apply()
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        if (item.itemId == R.id.nightMode) {
+//            if (isNightModeOn) {
+//                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+//                sharedPrefsEdit.putBoolean("NightMode", false)
+//                sharedPrefsEdit.apply()
+//            } else {
+//                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+//                sharedPrefsEdit.putBoolean("NightMode", true)
+//                sharedPrefsEdit.apply()
+//            }
+//        }
+//        return super.onOptionsItemSelected(item)
+//    }
 }

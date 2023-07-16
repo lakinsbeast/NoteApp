@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -31,7 +32,7 @@
             app:icon="@drawable/circle"
             app:iconSize="35dp"
 
-            app:iconTint="@color/white"
+            app:iconTint="@color/black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -41,7 +42,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@android:color/white" />
+        android:background="@android:color/black" />
 
     <HorizontalScrollView
         android:id="@+id/chip_group_scrollable"
@@ -66,13 +67,16 @@
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
+        android:backgroundTint="@color/white"
+        app:tabTextColor="@color/black"
+        app:tabIndicatorColor="@color/black"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@android:color/white" />
+        android:background="@android:color/black" />
 
 
     <androidx.viewpager2.widget.ViewPager2

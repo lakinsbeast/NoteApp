@@ -33,7 +33,13 @@ class FolderRepositoryImpl @Inject constructor(
     override fun getAllFoldersLastEditedOldest(): Flow<List<Folder>> =
         fDao.getAllFoldersLastEditedOldest()
 
-    override fun getAllFoldersFavorite(): Flow<List<Folder>> = fDao.getAllFoldersFavorite()
+    override fun updateLastOpenedFolder(time: Long, folderId: Int) = fDao.updateLastOpenedFolder(time, folderId)
+
+    override suspend fun getAllFoldersFavorite(): Flow<List<Folder>> = fDao.getAllFoldersFavorite()
+
+    override fun getFolderByTag(tag: String): Flow<List<Folder>> = fDao.getFolderByTag(tag)
+
+
 
     override suspend fun insertFolder(folder: Folder): Long = fDao.insertFolder(folder)
 

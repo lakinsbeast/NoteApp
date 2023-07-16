@@ -12,8 +12,13 @@ import code.with.me.testroomandnavigationdrawertest.NotesListFragmentDirections
 import code.with.me.testroomandnavigationdrawertest.Utils.gone
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.NewNote
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
+import code.with.me.testroomandnavigationdrawertest.databinding.FragmentFolderListBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.FragmentNotesListBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.NoteItemBinding
+import code.with.me.testroomandnavigationdrawertest.ui.FolderHomeFragment
+import code.with.me.testroomandnavigationdrawertest.ui.FolderViewModel
+import code.with.me.testroomandnavigationdrawertest.ui.NoteHomeFragment
+import code.with.me.testroomandnavigationdrawertest.ui.NoteTagViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.NoteViewModel
 import javax.inject.Inject
 import javax.inject.Named
@@ -21,7 +26,6 @@ import javax.inject.Named
 abstract class BaseNotesListFragment : BaseFragment<FragmentNotesListBinding>(
     FragmentNotesListBinding::inflate
 ) {
-
     lateinit var adapter: BaseAdapter<NewNote, NoteItemBinding>
     private lateinit var itemsBinding: NoteItemBinding
 
@@ -33,73 +37,53 @@ abstract class BaseNotesListFragment : BaseFragment<FragmentNotesListBinding>(
     lateinit var noteViewModel: NoteViewModel
 
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val appComponent = (requireActivity().application as NotesApplication).appComponent
+        appComponent.inject(this)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        idFolder = arguments?.getInt("idFolder") ?: 0
-        println("idFolder: $idFolder")
-        itemsBinding =
-            NoteItemBinding.inflate(layoutInflater, binding.rv.parent as ViewGroup, false)
-
-        binding.apply {
-            activity?.let {
-                val appComponent = (it.application as NotesApplication).appComponent
-                appComponent.inject(this@BaseNotesListFragment)
-                rv.apply {
-                    layoutManager = LinearLayoutManager(it)
-                }
-            }
-
-            fab.setOnClickListener {
-                goToAddNoteFragment()
-            }
-        }
-
-        noteViewModel = ViewModelProvider(this, factory)[NoteViewModel::class.java]
-
+        initViewModel()
+        initAdapterBinding()
+        initAppComponent()
         initAdapter()
-
         initRecyclerView(binding)
     }
 
-    private fun goToAddNoteFragment() {
-        findNavController().navigate(
-            NotesListFragmentDirections.actionNotesListFragment2ToAddNoteFragment(
-                idFolder
-            )
-        )
+    private fun initAppComponent() {
+        val appComponent = (activity?.application as NotesApplication).appComponent
+        appComponent.inject(this@BaseNotesListFragment)
     }
 
-    fun changeUiOnRvUpdate(binding: FragmentNotesListBinding, notes: List<Note>) {
-        binding.apply {
-            countText.text = "/${notes.size}"
-            chipGroupScrollable.gone()
-        }
+    private fun initAdapterBinding() {
+        itemsBinding =
+            NoteItemBinding.inflate(layoutInflater, binding.rv.parent as ViewGroup, false)
     }
 
-    private fun openDetailFragment(id: Int) {
-        findNavController().navigate(
-            NotesListFragmentDirections.actionNotesListFragment2ToDetailFragment(
-                id
-            )
-        )
+    private fun initViewModel() {
+        noteViewModel = ViewModelProvider(this, factory)[NoteViewModel::class.java]
     }
 
     private fun initRecyclerView(binding: FragmentNotesListBinding) {
         binding.apply {
             rv.adapter = adapter
             rv.setHasFixedSize(false)
+            rv.layoutManager = LinearLayoutManager(requireActivity())
         }
     }
 
-
-    fun initAdapter() {
+    private fun initAdapter() {
         adapter = object : BaseAdapter<NewNote, NoteItemBinding>(itemsBinding) {
             private var selected0 = -1
 
             init {
                 clickListener = {
                     selected0 = it.layoutPosition
-                    openDetailFragment(selected0)
+                    val item = getItem(it.layoutPosition) as NewNote
+                    println("item id: ${item.id} item _id: ${item._id} text: ${item.textNote}")
+                    openDetailFragment(item._id)
                 }
             }
 
@@ -128,6 +112,11 @@ abstract class BaseNotesListFragment : BaseFragment<FragmentNotesListBinding>(
                         printText()
                     }
                 }
+            }
+
+            private fun openDetailFragment(id: Int) {
+                val noteHomeFragment = parentFragment as? NoteHomeFragment
+                noteHomeFragment?.navigateToNotesListFragment(id)
             }
 
             fun cutText(text: String): String {

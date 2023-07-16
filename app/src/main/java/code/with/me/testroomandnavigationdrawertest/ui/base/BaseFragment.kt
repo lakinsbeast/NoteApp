@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
+import code.with.me.testroomandnavigationdrawertest.Utils.findActivity
 
 abstract class BaseFragment<VB: ViewBinding>(val get: ((LayoutInflater, ViewGroup?, Boolean) -> VB)): Fragment() {
 
@@ -15,6 +16,8 @@ abstract class BaseFragment<VB: ViewBinding>(val get: ((LayoutInflater, ViewGrou
     fun createToolBar() {
         binding.root
     }
+
+    fun activity() = findActivity(requireContext())
 
     override fun onCreateView(
         inflater: LayoutInflater,

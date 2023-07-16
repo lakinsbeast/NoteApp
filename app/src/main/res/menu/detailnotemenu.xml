@@ -2,13 +2,23 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/updateBtn"
-        android:icon="@drawable/update_arrow"
-        android:title="update"
-        app:showAsAction="always"/>
+        android:id="@+id/imageBtn"
+        android:icon="@drawable/image_camera_btn"
+        android:title="Image"
+        app:showAsAction="collapseActionView" />
     <item
-        android:id="@+id/deleteBtn"
-        android:icon="@drawable/delete_icon"
-        android:title="delete"
-        app:showAsAction="always"/>
+        android:id="@+id/camera_btn"
+        android:icon="@drawable/camera_btn"
+        android:title="Camera"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/imageButtonVoice"
+        android:icon="@drawable/ic_baseline_keyboard_voice_24"
+        android:title="Mic"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/imageButtonDraw"
+        android:icon="@drawable/color_lens_btn"
+        android:title="Draw"
+        app:showAsAction="always" />
 </menu>

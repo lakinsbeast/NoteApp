@@ -1,7 +1,14 @@
 package code.with.me.testroomandnavigationdrawertest
 
 import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Context
+import android.os.Bundle
+import android.view.View
+import android.widget.ImageButton
+import android.widget.TextView
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentManager
 
 object AlertCreator {
     inline fun createCameraGivePermissionDialog(
@@ -15,5 +22,51 @@ object AlertCreator {
             }.setNegativeButton("Нет") { _, _ ->
                 isGiven.invoke(false)
             }
+    }
+
+    inline fun createAddFolderMenu(
+        context: Context,
+        crossinline onNewTagClick: () -> Unit,
+        crossinline onNewFolderClick: () -> Unit
+    ) {
+        Dialog(context).apply {
+            setContentView(R.layout.dialog_fragment_folder_add)
+            window?.setBackgroundDrawable(null)
+            window?.findViewById<TextView>(R.id.newTagTextView)?.apply {
+                setOnClickListener {
+                    onNewTagClick.invoke()
+                    dismiss()
+                }
+            }
+            window?.findViewById<TextView>(R.id.newFolderTextView)?.apply {
+                setOnClickListener {
+                    onNewFolderClick.invoke()
+                    dismiss()
+                }
+            }
+        }.show()
+    }
+
+    inline fun createAddNoteMenu(
+        context: Context,
+        crossinline onNewTagClick: () -> Unit,
+        crossinline onNewNoteClick: () -> Unit
+    ) {
+        Dialog(context).apply {
+            setContentView(R.layout.dialog_fragment_note_add)
+            window?.setBackgroundDrawable(null)
+            window?.findViewById<TextView>(R.id.newTagTextView)?.apply {
+                setOnClickListener {
+                    onNewTagClick.invoke()
+                    dismiss()
+                }
+            }
+            window?.findViewById<TextView>(R.id.newFolderTextView)?.apply {
+                setOnClickListener {
+                    onNewNoteClick.invoke()
+                    dismiss()
+                }
+            }
+        }.show()
     }
 }

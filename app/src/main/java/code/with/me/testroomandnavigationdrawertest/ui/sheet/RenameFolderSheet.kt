@@ -61,7 +61,7 @@ class RenameFolderSheet :
                                     System.currentTimeMillis(),
                                     System.currentTimeMillis(),
                                     System.currentTimeMillis(),
-                                    0,
+                                    "",
                                     false
                                 ).apply {
                                     this.id = args.idFolder
@@ -77,9 +77,6 @@ class RenameFolderSheet :
         }
     }
 
-    fun showSheet(fragmentManager: FragmentManager) {
-        super.showSheet(fragmentManager, TAG)
-    }
 
     override fun onDestroy() {
         super.onDestroy()

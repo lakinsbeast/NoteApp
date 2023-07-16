@@ -29,7 +29,12 @@ class FolderViewModel @Inject constructor(
 
     fun getAllFoldersLastEditedOldest(): Flow<List<Folder>> = repo.getAllFoldersLastEditedOldest()
 
-    fun getAllFoldersFavorite(): Flow<List<Folder>> = repo.getAllFoldersFavorite()
+    suspend fun getAllFoldersFavorite(): Flow<List<Folder>> = repo.getAllFoldersFavorite()
+
+    fun getFolderByTag(tag: String): Flow<List<Folder>> = repo.getFolderByTag(tag)
+
+    fun updateLastOpenedFolder(time: Long, folderId: Int) =
+        repo.updateLastOpenedFolder(time, folderId)
 
     suspend fun insertFolder(folder: Folder): Long = repo.insertFolder(folder)
     suspend fun updateFolder(folder: Folder) = repo.updateFolder(folder)

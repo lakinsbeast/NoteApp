@@ -8,23 +8,20 @@ import code.with.me.testroomandnavigationdrawertest.ui.base.BaseViewModel
 import java.lang.IllegalArgumentException
 import javax.inject.Inject
 
-class TagViewModel @Inject constructor(
+class FolderTagViewModel @Inject constructor(
     private val repo: FolderTagRepository
 ) : BaseViewModel() {
-
     fun getAllTags() = repo.getAllTags()
-
     suspend fun insertTag(folderTag: FolderTag) = repo.insertTag(folderTag)
-
 }
 
-class TagViewModelFactory @Inject constructor(
+class FolderTagViewModelFactory @Inject constructor(
     private val repo: FolderTagRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(TagViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(FolderTagViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return TagViewModel(
+            return FolderTagViewModel(
                 repo
             ) as T
         }

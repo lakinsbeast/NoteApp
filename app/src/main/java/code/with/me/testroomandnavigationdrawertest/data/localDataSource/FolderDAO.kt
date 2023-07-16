@@ -40,6 +40,12 @@ interface FolderDAO {
     @Query("SELECT * FROM folder WHERE isFavorite = 1 ORDER BY name ASC")
     fun getAllFoldersFavorite(): Flow<List<Folder>>
 
+    @Query("UPDATE folder SET lastTimestampOpen = :time WHERE id = :folderId")
+    fun updateLastOpenedFolder(time: Long, folderId: Int)
+
+    @Query("SELECT * FROM folder WHERE tags LIKE :tag")
+    fun getFolderByTag(tag: String): Flow<List<Folder>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFolder(folder: Folder): Long
 

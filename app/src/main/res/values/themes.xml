@@ -19,7 +19,7 @@
     <style name="AppTheme" parent="Theme.MaterialComponents">
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryDark">@color/purple_700</item>
-        <item name="colorAccent">@color/background131313</item>
+        <item name="colorAccent">@color/black</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_700</item>
@@ -31,21 +31,26 @@
         <item name="android:windowContentTransitions">true</item>
 
         <!--        TextColor-->
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">@color/black</item>
 
         <item name="fontFamily">@font/neue_montreal_regular</item>
-        
+
         <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
     </style>
 
 
-
     <style name="MaterialAddButton" parent="Widget.MaterialComponents.Button">
-        <item name="backgroundTint">@color/transparent</item>
+        <item name="backgroundTint">@color/white</item>
         <item name="rippleColor">@color/transparent</item>
-        <item name="strokeColor">@color/white</item>
+        <item name="strokeColor">@color/black</item>
         <item name="strokeWidth">1dp</item>
         <item name="cornerRadius">10dp</item>
+    </style>
+
+    <style name="CustomChip" parent="Widget.MaterialComponents.ChipGroup">
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="chipStrokeColor">@color/black</item>
+        <item name="chipCornerRadius">5dp</item>
     </style>
 
     <style name="AppBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
@@ -56,6 +61,12 @@
         <item name="android:background">@drawable/rounded_bottom_sheet_dialog</item>
     </style>
 
+    <style name="RoundedMaterialCardView" parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">20dp</item>
+        <item name="cardElevation">0dp</item>
+        <item name="cardUseCompatPadding">false</item>
+        <item name="android:background">@null</item>
+    </style>
 
 
 
@@ -76,6 +87,8 @@
         <item name="fullscreenBackgroundColor">@color/light_blue_600</item>
         <item name="fullscreenTextColor">@color/light_blue_A200</item>
     </style>
+
+
 
 
 </resources>

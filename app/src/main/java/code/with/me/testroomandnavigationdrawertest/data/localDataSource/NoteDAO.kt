@@ -36,7 +36,7 @@ interface NoteDAO {
     @Throws(SQLiteException::class)
     suspend fun deleteNote(note: Note): Int
 
-//    update ne working
+    //    update ne working
     @Update
     suspend fun updateNote(note: Note)
 

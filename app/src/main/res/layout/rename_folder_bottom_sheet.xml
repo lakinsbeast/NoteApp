@@ -2,12 +2,14 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
+
+   <include layout="@layout/divider_line"/>
 
     <FrameLayout
         android:id="@+id/standard_bottom_sheet"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="20dp"
         android:paddingBottom="20dp">
@@ -37,8 +39,8 @@
                     android:background="@drawable/custom_text_input_rounded"
                     android:gravity="top"
                     android:hint="Название"
-                    android:textColorHint="@color/white"
-                    android:textColor="@color/white"/>
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.button.MaterialButton
@@ -47,7 +49,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/renameFolder"
-                android:textColor="@color/white" />
+                android:textColor="@color/black" />
         </LinearLayout>
     </FrameLayout>
 

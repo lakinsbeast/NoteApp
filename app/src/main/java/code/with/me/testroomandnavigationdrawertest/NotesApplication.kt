@@ -15,6 +15,9 @@ import code.with.me.testroomandnavigationdrawertest.ui.di.ApplicationModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 
+
+
+
 class NotesApplication : Application() {
 
     val appComponent: AppComponent by lazy {

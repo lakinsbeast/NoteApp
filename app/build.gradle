@@ -4,6 +4,8 @@ plugins {
     id "org.jetbrains.kotlin.kapt"
     id 'kotlin-kapt'
     id "androidx.navigation.safeargs.kotlin"
+    id 'com.google.devtools.ksp'
+    id 'kotlinx-serialization'
 }
 
 android {
@@ -49,12 +51,14 @@ android {
 }
 
 ext {
-    room_version = '2.5.0'
-    viewmodel_version = '2.5.1'
+    room_version = '2.5.2'
+    viewmodel_version = '2.6.1'
     retrofit_version = '2.9.0'
-    irshulx_editor_version = '2.0.0'
+    audiovisualizer_version = '2.2.5'
 }
 dependencies {
+    implementation "io.github.gautamchibde:audiovisualizer:${audiovisualizer_version}"
+
 
     //naviagtion
     def nav_version = "2.6.0"
@@ -62,13 +66,13 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
     //dagger 2
-    implementation 'com.google.dagger:dagger:2.45'
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.45'
-    kapt 'com.google.dagger:dagger-compiler:2.45'
+    implementation 'com.google.dagger:dagger:2.46.1'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.46.1'
+    kapt 'com.google.dagger:dagger-compiler:2.46.1'
 
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0-RC")
-    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
+    implementation('org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1')
+    implementation('com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0')
 
 
     //data store
@@ -78,12 +82,12 @@ dependencies {
     //room
     implementation "androidx.room:room-runtime:${room_version}"
     implementation "androidx.room:room-ktx:${room_version}"
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
-    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.6.0'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.6.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
 //    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.8.0'
-    kapt "androidx.room:room-compiler:${room_version}"
+    ksp "androidx.room:room-compiler:${room_version}"
 
 
     //colorpicker-quadflask
@@ -102,19 +106,23 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:${viewmodel_version}"
 
     //?? by viewModels
-    implementation 'androidx.fragment:fragment-ktx:1.5.5'
+    implementation 'androidx.fragment:fragment-ktx:1.6.0'
 
     //gson
-    implementation 'com.google.code.gson:gson:2.9.0'
+    implementation 'com.google.code.gson:gson:2.10.1'
 
     //moshi
-    implementation 'com.squareup.moshi:moshi:1.13.0'
+    implementation 'com.squareup.moshi:moshi:1.15.0'
 
     //swiperrflayt
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
     //picasso
-    implementation 'com.squareup.picasso:picasso:2.8'
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
+    //glide
+    implementation 'com.github.bumptech.glide:glide:4.15.1'
+
 
     //DoodleCanvasLib
     implementation "com.github.Luciferx86:DoodleCanvasLibrary:0.1.0-alpha3"
@@ -125,9 +133,9 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-gson:${retrofit_version}"
 
     //gms
-    implementation 'com.google.android.gms:play-services-auth:20.4.1'
+    implementation 'com.google.android.gms:play-services-auth:20.6.0'
 
-    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
 //    implementation group: 'com.google.android.material', name: 'material', version: '1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'

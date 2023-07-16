@@ -14,9 +14,11 @@ interface FolderRepository {
     fun getAllFoldersLastEditedNewest(): Flow<List<Folder>>
     fun getAllFoldersLastEditedOldest(): Flow<List<Folder>>
 
-    fun getAllFoldersFavorite(): Flow<List<Folder>>
+    fun updateLastOpenedFolder(time: Long, folderId: Int)
+    suspend fun getAllFoldersFavorite(): Flow<List<Folder>>
     suspend fun insertFolder(folder: Folder): Long
     suspend fun updateFolder(folder: Folder)
     suspend fun deleteFolder(folder: Folder)
 
+    fun getFolderByTag(tag: String): Flow<List<Folder>>
 }

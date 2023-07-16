@@ -11,4 +11,7 @@
     <string name="allFolders">Все папки</string>
     <string name="createFolder">Создать папку</string>
     <string name="renameFolder">Изменить название папки</string>
+    <string name="createTag">Создать метку</string>
+    <string name="cancel">Отмена</string>
+    <string name="audioRecordRunning">Идет запись аудио</string>
 </resources>

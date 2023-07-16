@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.FolderListFragmentDirections
@@ -13,11 +14,16 @@ import code.with.me.testroomandnavigationdrawertest.data.data_classes.Folder
 import code.with.me.testroomandnavigationdrawertest.databinding.FolderItemBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.FragmentFolderListBinding
 import code.with.me.testroomandnavigationdrawertest.ui.FolderViewModel
-import code.with.me.testroomandnavigationdrawertest.ui.HomeFragment
+import code.with.me.testroomandnavigationdrawertest.ui.FolderHomeFragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Named
 
-abstract class BaseFolderListFragment: BaseFragment<FragmentFolderListBinding>(FragmentFolderListBinding::inflate) {
+abstract class BaseFolderListFragment :
+    BaseFragment<FragmentFolderListBinding>(FragmentFolderListBinding::inflate) {
 
 
     lateinit var adapter: BaseAdapter<Folder, FolderItemBinding>
@@ -41,20 +47,9 @@ abstract class BaseFolderListFragment: BaseFragment<FragmentFolderListBinding>(F
             appComponent.inject(this@BaseFolderListFragment)
         }
 
-
-
         folderViewModel = ViewModelProvider(this, folderVmFactory)[FolderViewModel::class.java]
         initAdapter()
         initRecyclerView(binding)
-
-//        lifecycleScope.launch {
-//            folderViewModel.getAllFolders().collect() {
-//                listOfFolders.clear()
-//                listOfFolders = it.toMutableList()
-//                adapter.submitList(listOfFolders)
-//                adapter.notifyDataSetChanged()
-//            }
-//        }
     }
 
 
@@ -73,16 +68,14 @@ abstract class BaseFolderListFragment: BaseFragment<FragmentFolderListBinding>(F
             init {
                 clickListener = {
                     selected0 = it.layoutPosition
-                    openDetailFragment(selected0)
+                    val item = getItem(it.layoutPosition) as Folder
+                    openDetailFragment(item.id)
                 }
                 onLongClickListener = {
                     selected0 = it.layoutPosition
                     val item = getItem(it.layoutPosition) as Folder
-                    findNavController().navigate(
-                        FolderListFragmentDirections.actionFolderListFragmentToSelectFolderDestinationSheet(
-                            item.id
-                        )
-                    )
+                    val folderHomeFragment = parentFragment as? FolderHomeFragment
+                    folderHomeFragment?.navigateToSelectFolderDestintationSheet(item.id)
                 }
             }
 
@@ -118,10 +111,17 @@ abstract class BaseFolderListFragment: BaseFragment<FragmentFolderListBinding>(F
     }
 
     private fun openDetailFragment(id: Int) {
-        println("currentDestination: ${findNavController().currentDestination} ")
-        val homeFragment = parentFragment as? HomeFragment
-        homeFragment?.navigateToNotesListFragment(id)
-
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                async {
+                    folderViewModel.updateLastOpenedFolder(System.currentTimeMillis(), id)
+                }.await()
+                withContext(Dispatchers.Main) {
+                    val folderHomeFragment = parentFragment as? FolderHomeFragment
+                    folderHomeFragment?.navigateToNotesListFragment(id)
+                }
+            }
+        }
     }
 
 }

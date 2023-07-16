@@ -1,5 +1,6 @@
 package code.with.me.testroomandnavigationdrawertest.data.data_classes
 
+import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -11,6 +12,6 @@ class Folder(
     val lastTimestampCreate: Long,
     val lastTimestampEdit: Long,
     val lastTimestampOpen: Long,
-    val tagId: Int,
+    val tags: String,
     val isFavorite: Boolean
 ) : Model()
