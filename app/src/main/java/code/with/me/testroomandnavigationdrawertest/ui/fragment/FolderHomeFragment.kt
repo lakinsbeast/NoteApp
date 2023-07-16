@@ -1,4 +1,4 @@
-package code.with.me.testroomandnavigationdrawertest.ui
+package code.with.me.testroomandnavigationdrawertest.ui.fragment
 
 import android.content.res.ColorStateList
 import android.os.Bundle
@@ -11,7 +11,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import code.with.me.testroomandnavigationdrawertest.AlertCreator
-import code.with.me.testroomandnavigationdrawertest.FolderListFragment
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.Utils.gone
@@ -19,12 +18,13 @@ import code.with.me.testroomandnavigationdrawertest.Utils.launchAfterTimer
 import code.with.me.testroomandnavigationdrawertest.Utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.FolderTag
 import code.with.me.testroomandnavigationdrawertest.databinding.HomeFragmentBinding
+import code.with.me.testroomandnavigationdrawertest.ui.FolderHomeFragmentDirections
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderTagViewModel
 import com.google.android.material.chip.Chip
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
-import java.util.ArrayList
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -45,16 +45,74 @@ class FolderHomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initAppComponent()
+        initViewModel()
+        initFragmentList()
+        initViews()
+        initClickListeners()
+        initFragmentAdapterState()
+        initTabLayoutMediator()
+    }
 
-        activity?.let {
-            val appComponent = (it.application as NotesApplication).appComponent
-            appComponent.inject(this@FolderHomeFragment)
+    private fun initTabLayoutMediator() {
+        TabLayoutMediator(tabLayout, viewPager) { tab, pos ->
+            when (pos) {
+                0 -> tab.text = "All folders"
+                1 -> tab.text = "Last viewed"
+                2 -> tab.text = "Last edited"
+                3 -> tab.text = "Favorite"
+            }
+        }.attach()
+    }
+
+    private fun initFragmentAdapterState() {
+        object : FragmentStateAdapter(this) {
+            override fun getItemCount(): Int = fragmentList.size
+
+            override fun createFragment(position: Int): Fragment {
+                return fragmentList[position]
+            }
+        }.apply {
+            viewPager.adapter = this
         }
+    }
+
+    private fun initClickListeners() {
+        binding.apply {
+            addFolderBtn.setOnClickListener {
+                AlertCreator.createAddFolderMenu(requireContext(),
+                    {
+                        findNavController().navigate(FolderHomeFragmentDirections.actionHomeFragmentToAddFolderTagSheetMenu())
+                    },
+                    {
+                        findNavController().navigate(
+                            FolderHomeFragmentDirections.actionHomeFragmentToAddFolderSheet(
+                                listOfFolderTags.toTypedArray()
+                            )
+                        )
+                    })
+
+            }
+        }
+    }
+
+    private fun initViews() {
+        this@FolderHomeFragment.viewPager = binding.viewPager
+        this@FolderHomeFragment.tabLayout = binding.tabLayout
+    }
+
+    private fun initFragmentList() {
+        fragmentList.apply {
+            clear()
+            add(FolderListFragment())
+            add(LastViewedFoldersListFragment())
+            add(LastEditedFolderListFragment())
+            add(FavoriteFoldersListFragment())
+        }
+    }
+
+    private fun initViewModel() {
         folderTagViewModel = ViewModelProvider(this, tagVmFactory)[FolderTagViewModel::class.java]
-
-        viewPager = binding.viewPager
-        tabLayout = binding.tabLayout
-
         lifecycleScope.launch {
             folderTagViewModel.getAllTags().collect() {
                 listOfFolderTags.clear()
@@ -105,49 +163,13 @@ class FolderHomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding
                 }
             }
         }
+    }
 
-        fragmentList.apply {
-            clear()
-            add(FolderListFragment())
-            add(LastViewedFoldersListFragment())
-            add(LastEditedFolderListFragment())
-            add(FavoriteFoldersListFragment())
+    private fun initAppComponent() {
+        activity?.let {
+            val appComponent = (it.application as NotesApplication).appComponent
+            appComponent.inject(this@FolderHomeFragment)
         }
-
-        binding.apply {
-            addFolderBtn.setOnClickListener {
-                AlertCreator.createAddFolderMenu(requireContext(),
-                    {
-                        findNavController().navigate(FolderHomeFragmentDirections.actionHomeFragmentToAddFolderTagSheetMenu())
-                    }, {
-                        findNavController().navigate(
-                            FolderHomeFragmentDirections.actionHomeFragmentToAddFolderSheet(
-                                listOfFolderTags.toTypedArray()
-                            )
-                        )
-                    })
-
-            }
-        }
-
-        object : FragmentStateAdapter(this) {
-            override fun getItemCount(): Int = fragmentList.size
-
-            override fun createFragment(position: Int): Fragment {
-                return fragmentList[position]
-            }
-        }.apply {
-            viewPager.adapter = this
-        }
-
-        TabLayoutMediator(tabLayout, viewPager) { tab, pos ->
-            when (pos) {
-                0 -> tab.text = "All folders"
-                1 -> tab.text = "Last viewed"
-                2 -> tab.text = "Last edited"
-                3 -> tab.text = "Favorite"
-            }
-        }.attach()
     }
 
     fun navigateToNotesListFragment(folderId: Int) {

@@ -1,4 +1,4 @@
-package code.with.me.testroomandnavigationdrawertest.ui
+package code.with.me.testroomandnavigationdrawertest.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

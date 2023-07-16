@@ -29,10 +29,10 @@ import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityAddNoteBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.PhotoItemBinding
-import code.with.me.testroomandnavigationdrawertest.ui.NoteState
-import code.with.me.testroomandnavigationdrawertest.ui.NoteViewModel
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteState
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.PaintActivity
-import code.with.me.testroomandnavigationdrawertest.ui.UserActionNote
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.UserActionNote
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
 import kotlinx.coroutines.CoroutineScope

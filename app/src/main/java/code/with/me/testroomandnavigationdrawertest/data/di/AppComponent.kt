@@ -1,17 +1,16 @@
 package code.with.me.testroomandnavigationdrawertest.data.di
 
-import code.with.me.testroomandnavigationdrawertest.FolderListFragment
+import code.with.me.testroomandnavigationdrawertest.ui.fragment.FolderListFragment
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
-import code.with.me.testroomandnavigationdrawertest.NotesListFragment
+import code.with.me.testroomandnavigationdrawertest.ui.fragment.NotesListFragment
 import code.with.me.testroomandnavigationdrawertest.domain.di.RepositoryModule
-import code.with.me.testroomandnavigationdrawertest.domain.di.UseCaseModule
 import code.with.me.testroomandnavigationdrawertest.ui.AddNoteActivity
-import code.with.me.testroomandnavigationdrawertest.ui.FavoriteFoldersListFragment
-import code.with.me.testroomandnavigationdrawertest.ui.FolderHomeFragment
-import code.with.me.testroomandnavigationdrawertest.ui.LastEditedFolderListFragment
-import code.with.me.testroomandnavigationdrawertest.ui.LastViewedFoldersListFragment
+import code.with.me.testroomandnavigationdrawertest.ui.fragment.FavoriteFoldersListFragment
+import code.with.me.testroomandnavigationdrawertest.ui.fragment.FolderHomeFragment
+import code.with.me.testroomandnavigationdrawertest.ui.fragment.LastEditedFolderListFragment
+import code.with.me.testroomandnavigationdrawertest.ui.fragment.LastViewedFoldersListFragment
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
-import code.with.me.testroomandnavigationdrawertest.ui.NoteHomeFragment
+import code.with.me.testroomandnavigationdrawertest.ui.fragment.NoteHomeFragment
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFolderListFragment
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseNotesListFragment
 import code.with.me.testroomandnavigationdrawertest.ui.di.ApplicationModule
@@ -27,11 +26,10 @@ import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [ApplicationModule::class, DatabaseModule::class, UseCaseModule::class, RepositoryModule::class, BindAppModule::class])
+@Component(modules = [ApplicationModule::class, DatabaseModule::class, RepositoryModule::class, BindAppModule::class])
 interface AppComponent {
     fun inject(activity: MainActivity)
     fun inject(activity: AddNoteActivity)
-    fun inject(fragment: DetailFragment)
     fun inject(application: NotesApplication)
     fun inject(viewANoteSheet: ViewANoteSheet)
     fun inject(baseFolderListFragment: BaseFolderListFragment)

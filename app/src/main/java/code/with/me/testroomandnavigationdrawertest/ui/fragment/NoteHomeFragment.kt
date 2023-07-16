@@ -1,4 +1,4 @@
-package code.with.me.testroomandnavigationdrawertest.ui
+package code.with.me.testroomandnavigationdrawertest.ui.fragment
 
 import android.os.Bundle
 import android.view.View
@@ -9,19 +9,15 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import code.with.me.testroomandnavigationdrawertest.AlertCreator
-import code.with.me.testroomandnavigationdrawertest.FolderListFragment
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
-import code.with.me.testroomandnavigationdrawertest.NotesListFragment
-import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.Utils.gone
 import code.with.me.testroomandnavigationdrawertest.Utils.visible
-import code.with.me.testroomandnavigationdrawertest.data.data_classes.FolderTag
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.NoteTag
 import code.with.me.testroomandnavigationdrawertest.databinding.FolderHomeFragmentBinding
-import code.with.me.testroomandnavigationdrawertest.databinding.FragmentNotesListBinding
-import code.with.me.testroomandnavigationdrawertest.databinding.HomeFragmentBinding
+import code.with.me.testroomandnavigationdrawertest.ui.NoteHomeFragmentDirections
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteTagViewModel
 import com.google.android.material.chip.Chip
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -41,7 +37,6 @@ class NoteHomeFragment :
 
     private var idFolder by Delegates.notNull<Int>()
 
-
     @Inject
     @Named("noteTagVMFactory")
     lateinit var noteVmFactory: ViewModelProvider.Factory
@@ -49,26 +44,34 @@ class NoteHomeFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initAppComponent()
+        initViewModel()
+        initViewPager()
+        initTabLayout()
+        initClickListeners()
+    }
+
+    private fun initAppComponent() {
         activity?.let {
             val appComponent = (it.application as NotesApplication).appComponent
             appComponent.inject(this@NoteHomeFragment)
         }
-        noteTagViewModel = ViewModelProvider(this, noteVmFactory)[NoteTagViewModel::class.java]
+    }
 
-        idFolder = arguments?.getInt("idFolder") ?: 0
-        viewPager = binding.viewPager
-        tabLayout = binding.tabLayout
+    private fun initViewModel() {
+        noteTagViewModel =
+            ViewModelProvider(this, noteVmFactory).get(NoteTagViewModel::class.java)
 
         lifecycleScope.launch {
-            noteTagViewModel.getAllTags().collect() {
+            noteTagViewModel.getAllTags().collect { tags ->
                 listOfFolderTags.clear()
-                listOfFolderTags = it.toMutableList()
-                if (it.isNotEmpty()) {
+                listOfFolderTags.addAll(tags)
+                if (tags.isNotEmpty()) {
                     binding.chipGroup.removeAllViews()
                     binding.chipGroup.visible()
-                    it.forEach {
+                    tags.forEach { tag ->
                         val chip = Chip(binding.chipGroup.context)
-                        chip.text = it.name
+                        chip.text = tag.name
                         chip.isClickable = true
                         chip.isCheckable = false
                         binding.chipGroup.addView(chip)
@@ -78,61 +81,68 @@ class NoteHomeFragment :
                 }
             }
         }
+    }
+
+    private fun initViewPager() {
+        idFolder = arguments?.getInt("idFolder") ?: 0
+        viewPager = binding.viewPager
 
         fragmentList.apply {
             clear()
-            add(NotesListFragment().apply {
-                arguments = Bundle().apply {
-                    putInt("idFolder", this@NoteHomeFragment.idFolder)
+            add(
+                NotesListFragment().apply {
+                    arguments = Bundle().apply {
+                        putInt("idFolder", this@NoteHomeFragment.idFolder)
+                    }
                 }
-            })
+            )
         }
 
-        binding.apply {
-            fab.setOnClickListener {
-                AlertCreator.createAddNoteMenu(requireContext(),
-                    {
-                        findNavController().navigate(NoteHomeFragmentDirections.actionNoteHomeFragmentToAddNoteTagSheetMenu())
-                    }, {
-                        findNavController().navigate(
-                            NoteHomeFragmentDirections.actionNoteHomeFragmentToMakeANoteSheet(
-                                arguments?.getInt("idFolder") ?: 0
-                            )
-                        )
-                    })
-            }
-        }
-
-        object : FragmentStateAdapter(this) {
+        viewPager.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount(): Int = fragmentList.size
 
             override fun createFragment(position: Int): Fragment {
                 return fragmentList[position]
             }
-        }.apply {
-            viewPager.adapter = this
         }
+    }
+
+    private fun initTabLayout() {
+        tabLayout = binding.tabLayout
 
         TabLayoutMediator(tabLayout, viewPager) { tab, pos ->
             when (pos) {
                 0 -> tab.text = "Все заметки"
                 1 -> tab.text = "Последнее просмотренное"
-                2 -> tab.text = "Последнее изменненое"
+                2 -> tab.text = "Последнее изменено"
                 3 -> tab.text = "Избранное"
             }
         }.attach()
-
     }
 
-    fun changeUiOnRvUpdate(binding: FolderHomeFragmentBinding, notes: List<Note>) {
-        binding.apply {
-            chipGroupScrollable.gone()
+    private fun initClickListeners() {
+        binding.fab.setOnClickListener {
+            AlertCreator.createAddNoteMenu(requireContext(),
+                {
+                    findNavController().navigate(NoteHomeFragmentDirections.actionNoteHomeFragmentToAddNoteTagSheetMenu())
+                },
+                {
+                    findNavController().navigate(
+                        NoteHomeFragmentDirections.actionNoteHomeFragmentToMakeANoteSheet(
+                            arguments?.getInt("idFolder") ?: 0
+                        )
+                    )
+                })
         }
     }
 
-    fun navigateToNotesListFragment(id: Int) {
-        val action = NoteHomeFragmentDirections.actionNoteHomeFragmentToViewANoteSheet(id)
-        findNavController().navigate(action)
+    fun changeUiOnRvUpdate(binding: FolderHomeFragmentBinding, notes: List<Note>) {
+        binding.chipGroupScrollable.gone()
     }
 
+    fun navigateToNotesListFragment(id: Int) {
+        val action =
+            NoteHomeFragmentDirections.actionNoteHomeFragmentToViewANoteSheet(id)
+        findNavController().navigate(action)
+    }
 }

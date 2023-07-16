@@ -27,7 +27,6 @@ import javax.inject.Inject
 import javax.inject.Named
 
 
-
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 //    private lateinit var itemsBinding: NoteItemBinding
@@ -50,9 +49,7 @@ class MainActivity : AppCompatActivity() {
     private val listener =
         NavController.OnDestinationChangedListener { controller, destination, arguments ->
             when (destination.id) {
-                R.id.detailFragment -> {
 
-                }
             }
         }
 

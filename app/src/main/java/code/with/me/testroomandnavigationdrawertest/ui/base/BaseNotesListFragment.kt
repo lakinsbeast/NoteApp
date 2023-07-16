@@ -5,21 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
-import code.with.me.testroomandnavigationdrawertest.NotesListFragmentDirections
-import code.with.me.testroomandnavigationdrawertest.Utils.gone
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.NewNote
-import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
-import code.with.me.testroomandnavigationdrawertest.databinding.FragmentFolderListBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.FragmentNotesListBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.NoteItemBinding
-import code.with.me.testroomandnavigationdrawertest.ui.FolderHomeFragment
-import code.with.me.testroomandnavigationdrawertest.ui.FolderViewModel
-import code.with.me.testroomandnavigationdrawertest.ui.NoteHomeFragment
-import code.with.me.testroomandnavigationdrawertest.ui.NoteTagViewModel
-import code.with.me.testroomandnavigationdrawertest.ui.NoteViewModel
+import code.with.me.testroomandnavigationdrawertest.ui.fragment.NoteHomeFragment
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
 import javax.inject.Inject
 import javax.inject.Named
 

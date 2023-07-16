@@ -8,14 +8,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.Utils.getDate
-import code.with.me.testroomandnavigationdrawertest.Utils.gone
-import code.with.me.testroomandnavigationdrawertest.Utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 import code.with.me.testroomandnavigationdrawertest.databinding.PhotoItemBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.ViewNoteDetailSheetBinding
-import code.with.me.testroomandnavigationdrawertest.ui.NoteState
-import code.with.me.testroomandnavigationdrawertest.ui.NoteViewModel
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteState
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
 import com.bumptech.glide.Glide
@@ -60,14 +58,6 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
         }
 
     }
-
-//    private fun showProgressBar(show: Boolean) {
-//        if (show) {
-//            binding.progressBar.visible()
-//        } else {
-//            binding.progressBar.gone()
-//        }
-//    }
 
     private fun handleViewState(state: NoteState) {
         when (state) {

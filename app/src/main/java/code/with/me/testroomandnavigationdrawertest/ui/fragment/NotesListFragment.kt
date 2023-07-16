@@ -1,4 +1,4 @@
-package code.with.me.testroomandnavigationdrawertest
+package code.with.me.testroomandnavigationdrawertest.ui.fragment
 
 import android.os.Bundle
 import android.view.View
@@ -7,7 +7,7 @@ import code.with.me.testroomandnavigationdrawertest.Utils.gone
 import code.with.me.testroomandnavigationdrawertest.Utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.NewNote
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
-import code.with.me.testroomandnavigationdrawertest.ui.NoteState
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteState
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseNotesListFragment
 import kotlinx.coroutines.launch
 

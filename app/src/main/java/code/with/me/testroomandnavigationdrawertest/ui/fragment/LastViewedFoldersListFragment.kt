@@ -1,4 +1,4 @@
-package code.with.me.testroomandnavigationdrawertest.ui
+package code.with.me.testroomandnavigationdrawertest.ui.fragment
 
 import android.os.Bundle
 import android.view.View

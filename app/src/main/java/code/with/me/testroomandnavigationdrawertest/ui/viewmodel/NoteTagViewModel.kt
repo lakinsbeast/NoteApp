@@ -1,10 +1,8 @@
-package code.with.me.testroomandnavigationdrawertest.ui
+package code.with.me.testroomandnavigationdrawertest.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import code.with.me.testroomandnavigationdrawertest.data.data_classes.FolderTag
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.NoteTag
-import code.with.me.testroomandnavigationdrawertest.domain.repo.FolderTagRepository
 import code.with.me.testroomandnavigationdrawertest.domain.repo.NoteTagRepository
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseViewModel
 import java.lang.IllegalArgumentException

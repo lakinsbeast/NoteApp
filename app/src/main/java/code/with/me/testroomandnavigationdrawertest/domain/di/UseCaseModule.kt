@@ -4,10 +4,6 @@ import code.with.me.testroomandnavigationdrawertest.data.repos.FolderRepositoryI
 import code.with.me.testroomandnavigationdrawertest.data.repos.NoteRepositoryImpl
 import code.with.me.testroomandnavigationdrawertest.data.repos.FolderTagRepositoryImpl
 import code.with.me.testroomandnavigationdrawertest.data.repos.NoteTagRepositoryImpl
-import code.with.me.testroomandnavigationdrawertest.domain.noteUseCases.deleteNoteUseCase
-import code.with.me.testroomandnavigationdrawertest.domain.noteUseCases.getListOfNotesUseCase
-import code.with.me.testroomandnavigationdrawertest.domain.noteUseCases.insertNoteUseCase
-import code.with.me.testroomandnavigationdrawertest.domain.noteUseCases.updateNoteUseCase
 import code.with.me.testroomandnavigationdrawertest.domain.repo.FolderRepository
 import code.with.me.testroomandnavigationdrawertest.domain.repo.NoteRepository
 import code.with.me.testroomandnavigationdrawertest.domain.repo.FolderTagRepository
@@ -18,7 +14,7 @@ import dagger.Provides
 import javax.inject.Singleton
 
 
-@Module(includes = [UseCaseModule::class])
+@Module()
 abstract class RepositoryModule {
 
     @Binds
@@ -36,25 +32,4 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindNoteTagRepositoryModule(noteTagRepositoryImpl: NoteTagRepositoryImpl): NoteTagRepository
-}
-
-@Module
-class UseCaseModule {
-
-    @Provides
-    fun provideDeleteNoteUseCase(noteRepository: NoteRepository): deleteNoteUseCase =
-        deleteNoteUseCase(noteRepository)
-
-    @Provides
-    fun provideGetListOfNotesUseCase(noteRepository: NoteRepository): getListOfNotesUseCase =
-        getListOfNotesUseCase(noteRepository)
-
-    @Provides
-    fun provideInsertNoteUseCase(noteRepository: NoteRepository): insertNoteUseCase =
-        insertNoteUseCase(noteRepository)
-
-    @Provides
-    fun provideUpdateNoteUseCase(noteRepository: NoteRepository): updateNoteUseCase =
-        updateNoteUseCase(noteRepository)
-
 }

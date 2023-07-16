@@ -6,7 +6,7 @@
     app:startDestination="@id/homeFragment">
     <fragment
         android:id="@+id/notesListFragment2"
-        android:name="code.with.me.testroomandnavigationdrawertest.NotesListFragment"
+        android:name="code.with.me.testroomandnavigationdrawertest.ui.fragment.NotesListFragment"
         android:label="fragment_notes_list"
         tools:layout="@layout/fragment_notes_list" >
         <argument
@@ -18,7 +18,7 @@
     </fragment>
     <fragment
         android:id="@+id/folderListFragment"
-        android:name="code.with.me.testroomandnavigationdrawertest.FolderListFragment"
+        android:name="code.with.me.testroomandnavigationdrawertest.ui.fragment.FolderListFragment"
         android:label="fragment_folder_list"
         tools:layout="@layout/fragment_folder_list" >
         <action
@@ -62,7 +62,7 @@
     </dialog>
     <fragment
         android:id="@+id/homeFragment"
-        android:name="code.with.me.testroomandnavigationdrawertest.ui.FolderHomeFragment"
+        android:name="code.with.me.testroomandnavigationdrawertest.ui.fragment.FolderHomeFragment"
         android:label="HomeFragment" >
         <action
             android:id="@+id/action_homeFragment_to_folderListFragment"
@@ -85,19 +85,19 @@
     </fragment>
     <fragment
         android:id="@+id/lastViewedFoldersFragment"
-        android:name="code.with.me.testroomandnavigationdrawertest.ui.LastViewedFoldersListFragment"
+        android:name="code.with.me.testroomandnavigationdrawertest.ui.fragment.LastViewedFoldersListFragment"
         android:label="LastViewedFoldersFragment" />
     <fragment
         android:id="@+id/lastEditedFolderFragment"
-        android:name="code.with.me.testroomandnavigationdrawertest.ui.LastEditedFolderListFragment"
+        android:name="code.with.me.testroomandnavigationdrawertest.ui.fragment.LastEditedFolderListFragment"
         android:label="LastEditedFolderFragment" />
     <fragment
         android:id="@+id/favoriteFoldersFragment"
-        android:name="code.with.me.testroomandnavigationdrawertest.ui.FavoriteFoldersListFragment"
+        android:name="code.with.me.testroomandnavigationdrawertest.ui.fragment.FavoriteFoldersListFragment"
         android:label="FavoriteFoldersFragment" />
     <fragment
         android:id="@+id/noteHomeFragment"
-        android:name="code.with.me.testroomandnavigationdrawertest.ui.NoteHomeFragment"
+        android:name="code.with.me.testroomandnavigationdrawertest.ui.fragment.NoteHomeFragment"
         android:label="NoteHomeFragment" >
         <argument
             android:name="idFolder"

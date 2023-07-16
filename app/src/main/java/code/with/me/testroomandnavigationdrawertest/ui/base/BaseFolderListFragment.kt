@@ -6,15 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import code.with.me.testroomandnavigationdrawertest.FolderListFragmentDirections
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Folder
 import code.with.me.testroomandnavigationdrawertest.databinding.FolderItemBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.FragmentFolderListBinding
-import code.with.me.testroomandnavigationdrawertest.ui.FolderViewModel
-import code.with.me.testroomandnavigationdrawertest.ui.FolderHomeFragment
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderViewModel
+import code.with.me.testroomandnavigationdrawertest.ui.fragment.FolderHomeFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
