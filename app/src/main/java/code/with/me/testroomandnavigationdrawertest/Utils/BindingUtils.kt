@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.LayerDrawable
 import android.os.Build
+import android.os.SystemClock
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -61,6 +62,7 @@ fun BottomNavigationView.setRoundedCorners(radius: Float) {
         background = backgroundDrawable
     }
 }
+
 fun BottomNavigationView.setCheckable(boolean: Boolean = false) {
     menu.forEachIndexed { index, item ->
         menu[index].setCheckable(boolean)
@@ -89,6 +91,18 @@ fun ProgressBar.setCenterGravity(view: View) {
     }
 }
 
+fun View.safeClickListener(delay: Long = 500L, action: () -> Unit) {
+    this.setOnClickListener(object : View.OnClickListener {
+        private var lastClickTime: Long = 0
+
+        override fun onClick(v: View) {
+            if (SystemClock.elapsedRealtime() - lastClickTime < delay) return
+            else action()
+
+            lastClickTime = SystemClock.elapsedRealtime()
+        }
+    })
+}
 
 fun getViewGroup(view: View): ViewGroup? {
     try {

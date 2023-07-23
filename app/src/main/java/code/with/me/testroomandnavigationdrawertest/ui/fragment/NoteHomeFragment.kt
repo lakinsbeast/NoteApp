@@ -15,7 +15,6 @@ import code.with.me.testroomandnavigationdrawertest.Utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.NoteTag
 import code.with.me.testroomandnavigationdrawertest.databinding.FolderHomeFragmentBinding
-import code.with.me.testroomandnavigationdrawertest.ui.NoteHomeFragmentDirections
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteTagViewModel
 import com.google.android.material.chip.Chip

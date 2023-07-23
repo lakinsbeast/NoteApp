@@ -4,8 +4,8 @@
     android:id="@+id/RecycleCardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="1dp"
-    android:background="@color/white"
+
+    android:background="@drawable/custom_ripple"
     android:orientation="vertical">
 
     <LinearLayout
@@ -45,7 +45,15 @@
                 android:text="Title"
                 android:textColor="@color/black"
                 android:textSize="20sp" />
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/menu_btn"
+                android:layout_width="40dp"
+                android:layout_height="60dp"
+                android:layout_weight="0"
+                android:src="@drawable/three_dots_vertical" />
         </LinearLayout>
+
     </LinearLayout>
 
     <View

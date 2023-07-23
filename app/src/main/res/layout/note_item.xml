@@ -4,8 +4,7 @@
     android:id="@+id/RecycleCardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="1dp"
-    android:background="@color/white"
+    android:background="@drawable/custom_ripple"
     android:orientation="vertical">
 
     <View
@@ -13,12 +12,11 @@
         android:layout_height="1dp"
         android:background="@android:color/black" />
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="10dp"
-        android:paddingVertical="25dp">
+        android:paddingVertical="5dp">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/posItem"
@@ -54,16 +52,18 @@
                 android:textColor="@color/gray"
                 android:textSize="15sp" />
         </LinearLayout>
+
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_gravity="end"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center">
+
             <ImageView
                 android:id="@+id/menu_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_gravity="end|center"
-                android:src="@drawable/three_dots_vertical"/>
+                android:src="@drawable/three_dots_vertical" />
         </FrameLayout>
     </LinearLayout>
 

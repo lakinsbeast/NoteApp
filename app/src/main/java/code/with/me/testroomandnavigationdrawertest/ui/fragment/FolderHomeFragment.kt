@@ -18,7 +18,6 @@ import code.with.me.testroomandnavigationdrawertest.Utils.launchAfterTimer
 import code.with.me.testroomandnavigationdrawertest.Utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.FolderTag
 import code.with.me.testroomandnavigationdrawertest.databinding.HomeFragmentBinding
-import code.with.me.testroomandnavigationdrawertest.ui.FolderHomeFragmentDirections
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderTagViewModel
 import com.google.android.material.chip.Chip

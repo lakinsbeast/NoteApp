@@ -24,7 +24,7 @@
             android:name=".ui.dropbox.MasterDropboxSettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.PaintActivity"
+            android:name=".ui.PaintSheet"
             android:exported="false" />
         <activity
             android:name=".ui.AddNoteActivity"

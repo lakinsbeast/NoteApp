@@ -1,5 +1,7 @@
 package code.with.me.testroomandnavigationdrawertest.ui.base
 
+import android.content.res.ColorStateList
+import android.graphics.drawable.RippleDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +10,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
+import code.with.me.testroomandnavigationdrawertest.R
+import code.with.me.testroomandnavigationdrawertest.Utils.safeClickListener
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Folder
 import code.with.me.testroomandnavigationdrawertest.databinding.FolderItemBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.FragmentFolderListBinding
@@ -83,13 +87,7 @@ abstract class BaseFolderListFragment :
                 val binding =
                     FolderItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 val holder = BaseViewHolder(binding)
-                holder.itemView.setOnClickListener {
-                    clickListener?.invoke(holder)
-                }
-                holder.itemView.setOnLongClickListener {
-                    onLongClickListener?.invoke(holder)
-                    return@setOnLongClickListener true
-                }
+                initCreateClickListeners(holder)
                 return holder
             }
 
@@ -103,6 +101,29 @@ abstract class BaseFolderListFragment :
                 holder.binding.apply {
                     val item = getItem(position)
                     titleID.text = item.name
+                    initBindClickListeners(holder)
+                }
+            }
+
+            fun initCreateClickListeners(holder: BaseViewHolder<FolderItemBinding>) {
+                holder.itemView.setOnClickListener {
+                    clickListener?.invoke(holder)
+                }
+                holder.itemView.setOnLongClickListener {
+                    onLongClickListener?.invoke(holder)
+                    return@setOnLongClickListener true
+                }
+            }
+
+            fun initBindClickListeners(holder: BaseViewHolder<FolderItemBinding>) {
+                holder.apply {
+                    binding.apply {
+                        menuBtn.safeClickListener {
+                            val item = getItem(holder.layoutPosition) as Folder
+                            val folderHomeFragment = parentFragment as? FolderHomeFragment
+                            folderHomeFragment?.navigateToSelectFolderDestintationSheet(item.id)
+                        }
+                    }
                 }
             }
         }

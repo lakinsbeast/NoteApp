@@ -19,6 +19,7 @@ import androidx.core.content.FileProvider
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
@@ -31,7 +32,7 @@ import code.with.me.testroomandnavigationdrawertest.databinding.ActivityAddNoteB
 import code.with.me.testroomandnavigationdrawertest.databinding.PhotoItemBinding
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteState
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
-import code.with.me.testroomandnavigationdrawertest.ui.PaintActivity
+import code.with.me.testroomandnavigationdrawertest.ui.PaintSheet
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.UserActionNote
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
@@ -139,7 +140,12 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
     }
 
     private inline fun onGetDrawSelected(get: () -> Unit) {
-        getPaint.launch(Intent(activity, PaintActivity::class.java))
+        openPaintSheet()
+        getPaint.launch(Intent(activity, PaintSheet::class.java))
+    }
+
+    private fun openPaintSheet() {
+        findNavController().navigate(MakeANoteSheetDirections.actionMakeANoteSheetToPaintSheet())
     }
 
 
@@ -191,7 +197,9 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
         }
     private val getPaint =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            println("it: ${it.data}")
             val paintBitmap = it.data?.extras?.getString("pathBitmap")
+            println("paintBitMap: $paintBitmap")
             if (paintBitmap != null) {
                 paintInString = paintBitmap
                 listOfPhotos.add(PhotoModel(paintInString))
@@ -252,7 +260,7 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
                 }
 
                 is UserActionNote.GetDraw -> {
-
+                    openPaintSheet()
                 }
 
                 is UserActionNote.SaveNoteToDB<*> -> {
