@@ -11,6 +11,7 @@ import kotlinx.coroutines.withContext
 
 private var scope = CoroutineScope(Dispatchers.Main + Job())
 
+//todo надо изменить, дичь какая-то
 fun launchAfterTimer(time: Long, block: () -> Unit) {
     scope.cancel()
     scope = CoroutineScope(Dispatchers.Main + Job())

@@ -17,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -24,6 +25,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.Utils.getDisplayMetrics
+import code.with.me.testroomandnavigationdrawertest.Utils.providerName
 import code.with.me.testroomandnavigationdrawertest.Utils.setCheckable
 import code.with.me.testroomandnavigationdrawertest.Utils.setRoundedCorners
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
@@ -32,10 +34,10 @@ import code.with.me.testroomandnavigationdrawertest.databinding.ActivityAddNoteB
 import code.with.me.testroomandnavigationdrawertest.databinding.PhotoItemBinding
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteState
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
-import code.with.me.testroomandnavigationdrawertest.ui.PaintSheet
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.UserActionNote
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
+import com.bumptech.glide.Glide
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -56,9 +58,7 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
     override val coroutineContext: CoroutineContext
         get() = Job()
 
-    var currentPermission: TypeOfPermission = TypeOfPermission.EMPTY
-    private var stateOfAudioRecorder = false
-    private val PERMISSION_CODE = 1000
+    private var currentPermission: TypeOfPermission = TypeOfPermission.EMPTY
     private var cameraUri: Uri? = null
     private var cameraInString: String = ""
     private var audioInString: String = ""
@@ -119,31 +119,6 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
     private var cameraSelected: (String) -> Unit = {}
     private var micSelected: (String) -> Unit = {}
 
-    private inline fun onGetImageSelected(crossinline get: (String) -> Unit) {
-        chooseImage()
-        imageSelected = {
-            get.invoke(it)
-        }
-    }
-
-    private inline fun onGetCameraSelected(crossinline get: (String) -> Unit) {
-        openCamera()
-        cameraSelected = {
-            get.invoke(it)
-        }
-    }
-
-    private inline fun onGetMicSelected(crossinline get: (String) -> Unit) {
-        micSelected = {
-            get.invoke(it)
-        }
-    }
-
-    private inline fun onGetDrawSelected(get: () -> Unit) {
-        openPaintSheet()
-        getPaint.launch(Intent(activity, PaintSheet::class.java))
-    }
-
     private fun openPaintSheet() {
         findNavController().navigate(MakeANoteSheetDirections.actionMakeANoteSheetToPaintSheet())
     }
@@ -167,6 +142,7 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
                 else -> {}
             }
         }
+
     private val getImageFromGallery =
         registerForActivityResult(ActivityResultContracts.OpenDocument()) { imageUri ->
             if (imageUri != null) {
@@ -181,6 +157,7 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
                 saveNote()
             }
         }
+
     private val getImageFromCamera =
         registerForActivityResult(ActivityResultContracts.TakePicture()) {
             if (it) {
@@ -195,20 +172,11 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
                 }
             }
         }
-    private val getPaint =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            println("it: ${it.data}")
-            val paintBitmap = it.data?.extras?.getString("pathBitmap")
-            println("paintBitMap: $paintBitmap")
-            if (paintBitmap != null) {
-                paintInString = paintBitmap
-                listOfPhotos.add(PhotoModel(paintInString))
-                adapter.submitList(listOfPhotos)
-                saveNote()
-            } else {
-                throw java.lang.Exception("Не удалось получить данные paintActivity")
-            }
-        }
+
+    companion object {
+        const val paintResultKey = "paintResultKey"
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -216,6 +184,23 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
         appComponent.inject(this)
         noteViewModel = ViewModelProvider(this, factory)[NoteViewModel::class.java]
         setFullScreenSheet()
+        listenPaintSheetResult()
+    }
+
+    private fun listenPaintSheetResult() {
+        setFragmentResultListener(paintResultKey) { requestKey: String, bundle: Bundle ->
+            val paintBitmap = bundle.getString("pathBitmap")
+            println("pathBitmap: ${paintBitmap}")
+            println("requestKey: ${requestKey}")
+            if (paintBitmap != null) {
+                paintInString = paintBitmap
+                listOfPhotos.add(PhotoModel(paintInString))
+                adapter.submitList(listOfPhotos)
+                saveNote()
+            } else {
+                //            throw java.lang.Exception("Не удалось получить данные paintActivity")
+            }
+        }
     }
 
     private fun saveNote() {
@@ -270,36 +255,9 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
         }
     }
 
-    private fun handleViewState(state: NoteState) {
-        binding.apply {
-            when (state) {
-                is NoteState.Loading -> {
-                    println("LOADING!")
-                }
-
-                is NoteState.Result<*> -> {
-                    println("LOADING!")
-                }
-
-                is NoteState.EmptyResult -> {
-
-                }
-
-                is NoteState.Error<*> -> {
-
-                }
-            }
-        }
-    }
-
     private fun sendViewAction(action: UserActionNote) {
         noteViewModel.processUserActions(action)
     }
-
-//    private fun sendStateAction(action: NoteState) {
-//        noteViewModel.processNoteStates(action)
-//    }
-
 
     private fun initTextChangeListeners() {
         binding.apply {
@@ -324,18 +282,13 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
                 noteViewModel.insert(note)
             }
         }
-        noteViewModel.state.observe(this) { state ->
-            handleViewState(state)
-        }
         noteViewModel.userActionState.observe(this) { state ->
             handleUserActionState(state)
         }
     }
 
     private fun initSheetCallbacks() {
-        onSlide = {
-//            println("onSLide: $it")
-        }
+        onSlide = {}
         onStateChanged = {
             when (it) {
                 4 -> {
@@ -353,35 +306,22 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
         binding.bottomNavigation.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.imageBtn -> {
-                    println("first!")
                     sendViewAction(UserActionNote.GetImage)
-//                    onGetImageSelected {
-//                        println("second!")
-//                    }
                     true
                 }
 
                 R.id.camera_btn -> {
                     sendViewAction(UserActionNote.GetCamera)
-//                    onGetCameraSelected {
-//
-//                    }
                     true
                 }
 
                 R.id.imageButtonVoice -> {
                     sendViewAction(UserActionNote.GetMicrophone)
-//                    onGetMicSelected {
-//
-//                    }
                     true
                 }
 
                 R.id.imageButtonDraw -> {
                     sendViewAction(UserActionNote.GetDraw)
-//                    onGetDrawSelected {
-//
-//                    }
                     true
                 }
 
@@ -469,7 +409,7 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
         }
     }
 
-    fun chooseImage() {
+    private fun chooseImage() {
         getImageFromGallery.launch(arrayOf("image/*"))
     }
 
@@ -506,7 +446,7 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
             }
             cameraUri = FileProvider.getUriForFile(
                 it,
-                "code.with.me.testroomandnavigationdrawertest.ui.AddNoteActivity.provider",
+                providerName,
                 imageFile
             )
             lifecycleScope.launch {
@@ -515,7 +455,7 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
         }
     }
 
-    fun initAdapter() {
+    private fun initAdapter() {
         adapter = object : BaseAdapter<PhotoModel, PhotoItemBinding>(photoItem) {
             private var selected0 = -1
 
@@ -555,7 +495,7 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
 
                 holder.binding.apply {
                     val item = getItem(position)
-                    this.image.setImageURI(Uri.parse(item.path))
+                    Glide.with(this@MakeANoteSheet).load(item.path).into(image)
                 }
             }
         }.apply {

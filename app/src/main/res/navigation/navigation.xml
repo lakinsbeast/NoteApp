@@ -145,7 +145,7 @@
     </dialog>
     <dialog
         android:id="@+id/paintSheet"
-        android:name="code.with.me.testroomandnavigationdrawertest.ui.PaintSheet"
+        android:name="code.with.me.testroomandnavigationdrawertest.ui.sheet.PaintSheet"
         android:label="activity_paint"
         tools:layout="@layout/activity_paint" />
 </navigation>

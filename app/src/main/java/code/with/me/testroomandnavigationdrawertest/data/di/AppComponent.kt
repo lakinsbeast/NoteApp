@@ -4,7 +4,6 @@ import code.with.me.testroomandnavigationdrawertest.ui.fragment.FolderListFragme
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.ui.fragment.NotesListFragment
 import code.with.me.testroomandnavigationdrawertest.domain.di.RepositoryModule
-import code.with.me.testroomandnavigationdrawertest.ui.AddNoteActivity
 import code.with.me.testroomandnavigationdrawertest.ui.fragment.FavoriteFoldersListFragment
 import code.with.me.testroomandnavigationdrawertest.ui.fragment.FolderHomeFragment
 import code.with.me.testroomandnavigationdrawertest.ui.fragment.LastEditedFolderListFragment
@@ -29,7 +28,6 @@ import javax.inject.Singleton
 @Component(modules = [ApplicationModule::class, DatabaseModule::class, RepositoryModule::class, BindAppModule::class])
 interface AppComponent {
     fun inject(activity: MainActivity)
-    fun inject(activity: AddNoteActivity)
     fun inject(application: NotesApplication)
     fun inject(viewANoteSheet: ViewANoteSheet)
     fun inject(baseFolderListFragment: BaseFolderListFragment)

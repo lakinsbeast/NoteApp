@@ -2,14 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.ACTION_OPEN_DOCUMENT" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.INTERNET" /> <!-- <uses-permission android:name="android.permission.GET_ACCOUNTS" android:maxSdkVersion="25"/> -->
-    <!-- <uses-permission android:name="android.permission.USE_CREDENTIALS" android:maxSdkVersion="22" /> -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <uses-feature android:name="android.hardware.camera" />
 
     <application
@@ -20,16 +22,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".ui.dropbox.MasterDropboxSettingsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.PaintSheet"
-            android:exported="false" />
-        <activity
-            android:name=".ui.AddNoteActivity"
-            android:exported="false"
-            android:launchMode="singleInstance" />
         <activity
             android:name=".ui.MainActivity"
             android:exported="true"
@@ -43,7 +35,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="code.with.me.testroomandnavigationdrawertest.ui.AddNoteActivity.provider"
+            android:authorities="code.with.me.testroomandnavigationdrawertest.ui.MainActivity.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

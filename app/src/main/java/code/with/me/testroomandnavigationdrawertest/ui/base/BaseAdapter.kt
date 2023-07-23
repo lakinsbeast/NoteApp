@@ -6,9 +6,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Model
 
-open class BaseAdapter<T : Model, A: ViewBinding>(val binding: A): ListAdapter<T, BaseAdapter.BaseViewHolder<A>>(
-    code.with.me.testroomandnavigationdrawertest.ui.DiffUtil()
-) {
+open class BaseAdapter<T : Model, A : ViewBinding>(val binding: A) :
+    ListAdapter<T, BaseAdapter.BaseViewHolder<A>>(
+        code.with.me.testroomandnavigationdrawertest.ui.DiffUtil()
+    ) {
 
     var recycView: RecyclerView? = null
     var clickListener: ((binding: BaseViewHolder<A>) -> Unit)? = null
@@ -17,15 +18,14 @@ open class BaseAdapter<T : Model, A: ViewBinding>(val binding: A): ListAdapter<T
     class BaseViewHolder<T : ViewBinding>(val binding: T) :
         RecyclerView.ViewHolder(binding.root) {
 
-        }
+    }
 
     override fun submitList(list: MutableList<T>?) {
         super.submitList(list)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<A> {
-        val holder = BaseViewHolder(binding)
-        return holder
+        return BaseViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder<A>, position: Int) {
