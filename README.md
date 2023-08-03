@@ -1,6 +1,6 @@
 <h1 align="center">NotesApp</h1>
 <h1 align="center">The application has been completely rewritten, everything written at the bottom is no longer valid!</h1>
-<h1 align="center">MVI/MVVM, coroutines, retrofit</h1>
+<h1 align="center">MVI/MVVM, coroutines, room</h1>
 <h1 align="center">
   <img src="https://github.com/lakinsbeast/NoteApp/blob/master/2595177958027.gif" alt="animated" width="388" height="690"/>
 </h1>
