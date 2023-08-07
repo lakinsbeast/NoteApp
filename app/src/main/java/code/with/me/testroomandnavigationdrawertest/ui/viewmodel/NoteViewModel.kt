@@ -15,6 +15,8 @@ class NoteViewModel @Inject constructor(
     private val repoNote: NoteRepository
 ) : ViewModel() {
 
+    //MVI реализовал не самым лучшим способом, можно было создать
+    //BaseViewModel<MviState, MviActions> и сделать проще
 
     private val _state = MutableLiveData<NoteState>(NoteState.Loading)
     private val _userActionsState = MutableLiveData<UserActionNote>()
@@ -24,34 +26,36 @@ class NoteViewModel @Inject constructor(
         get() = _userActionsState
 
     private fun setState(state: NoteState) {
-        _state.value = state
+        _state.postValue(state)
     }
 
-    fun getAllNotes(id: Int) {
-        val notesFlow = repoNote.getListOfNotes(id)
-        viewModelScope.launch {
-            notesFlow.collect { notes ->
-                _state.value = NoteState.Result(notes)
+
+    fun getAllNotes(id: Int) = viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
+        try {
+            repoNote.getListOfNotes(id).collect() { notes ->
+                setState(NoteState.Result(notes))
             }
+        } catch (e: Exception) {
+            println("error: $e")
+            setState(NoteState.Error(e.localizedMessage))
         }
-
     }
+
 
     fun getNoteById(id: Int) {
         viewModelScope.launch {
             try {
                 setState(NoteState.Loading)
-                val note = withContext(Dispatchers.IO) {
-                    repoNote.getNoteById(id)
+                withContext(Dispatchers.IO.limitedParallelism(1)) {
+                    setState(NoteState.Result(repoNote.getNoteById(id)))
                 }
-                setState(NoteState.Result(note))
             } catch (e: Exception) {
                 setState(NoteState.Error(e.localizedMessage))
             }
         }
     }
 
-    fun insert(note: Note) = viewModelScope.launch {
+    fun insert(note: Note) = viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
         repoNote.insertNote(note)
     }
 
@@ -88,8 +92,8 @@ class NoteViewModel @Inject constructor(
                 _userActionsState.value = UserActionNote.GetDraw
             }
 
-            is UserActionNote.SaveNoteToDB<*> -> {
-
+            is UserActionNote.SavedNoteToDB -> {
+                _userActionsState.value = UserActionNote.SavedNoteToDB
             }
         }
     }
@@ -124,6 +128,7 @@ class NoteViewModel @Inject constructor(
                     customData
                 )
                 repoNote.updateNote(note)
+                processUserActions(UserActionNote.SavedNoteToDB)
             }
         }
     }
@@ -138,7 +143,7 @@ sealed class NoteState {
 }
 
 sealed class UserActionNote {
-    class SaveNoteToDB<T>(val data: T) : UserActionNote()
+    data object SavedNoteToDB : UserActionNote()
     data object GetImage : UserActionNote()
     data object GetCamera : UserActionNote()
     data object GetMicrophone : UserActionNote()

@@ -17,6 +17,7 @@ import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
 import com.bumptech.glide.Glide
+import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -73,14 +74,21 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
                     titleText.text = note.titleNote
                     text.text = note.textNote
                     adapter.submitList(ArrayList(note.listOfImages))
-                    setStateExpanded()
+                    adapter.notifyDataSetChanged()
                 }
                 showProgressBar(false)
             }
 
             is NoteState.Error<*> -> {
-                println("ERROR in ${this.javaClass.simpleName} error: ${state.error}")
                 showProgressBar(false)
+                dialog?.window?.decorView?.let { window ->
+                    Snackbar.make(
+                        window, //binding.root is not work :(
+                        state.error.toString(),
+                        Snackbar.LENGTH_LONG
+                    ).show()
+                }
+                println("ERROR in ${this.javaClass.simpleName} error: ${state.error}")
             }
 
             is NoteState.EmptyResult -> {
@@ -111,9 +119,8 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
                 val binding =
                     PhotoItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 val holder = BaseViewHolder(binding)
-                holder.itemView.setOnClickListener {
-                    clickListener?.invoke(holder)
-                }
+                //Почему-то pinch to zoom не работает даже с библиотеками
+//                holder.itemView.setOnTouchListener(context?.let { ImageMatrixTouchHandler(it) })
                 holder.itemView.setOnLongClickListener {
                     onLongClickListener?.invoke(holder)
                     return@setOnLongClickListener true

@@ -1,6 +1,7 @@
 package code.with.me.testroomandnavigationdrawertest.ui.sheet
 
 import android.Manifest
+import android.animation.ValueAnimator
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaRecorder
@@ -32,11 +33,10 @@ import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityAddNoteBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.PhotoItemBinding
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteState
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.UserActionNote
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.UserActionNote
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -53,10 +53,7 @@ import javax.inject.Named
 import kotlin.coroutines.CoroutineContext
 
 
-class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding::inflate),
-    CoroutineScope {
-    override val coroutineContext: CoroutineContext
-        get() = Job()
+class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding::inflate) {
 
     private var currentPermission: TypeOfPermission = TypeOfPermission.EMPTY
     private var cameraUri: Uri? = null
@@ -154,6 +151,7 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
                 imageSelected.invoke(imageInString)
                 listOfPhotos.add(PhotoModel(imageInString))
                 adapter.submitList(listOfPhotos)
+                adapter.notifyDataSetChanged()
                 saveNote()
             }
         }
@@ -168,6 +166,7 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
                     cameraSelected.invoke(cameraInString)
                     listOfPhotos.add(PhotoModel(cameraInString))
                     adapter.submitList(listOfPhotos)
+                    adapter.notifyDataSetChanged()
                     saveNote()
                 }
             }
@@ -182,7 +181,7 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
         super.onCreate(savedInstanceState)
         val appComponent = (requireActivity().application as NotesApplication).appComponent
         appComponent.inject(this)
-        noteViewModel = ViewModelProvider(this, factory)[NoteViewModel::class.java]
+        noteViewModel = ViewModelProvider(requireActivity(), factory)[NoteViewModel::class.java]
         setFullScreenSheet()
         listenPaintSheetResult()
     }
@@ -196,9 +195,10 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
                 paintInString = paintBitmap
                 listOfPhotos.add(PhotoModel(paintInString))
                 adapter.submitList(listOfPhotos)
+                adapter.notifyDataSetChanged()
                 saveNote()
             } else {
-                //            throw java.lang.Exception("Не удалось получить данные paintActivity")
+                throw java.lang.Exception("Не удалось получить данные paintActivity")
             }
         }
     }
@@ -227,32 +227,32 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
         initSheetCallbacks()
         initViewModel()
         initTextChangeListeners()
+        setBottomMarginBottomNav((getDisplayMetrics(activity()).heightPixels / 2) - 200)
     }
 
     private fun handleUserActionState(state: UserActionNote) {
-        binding.apply {
-            when (state) {
-                is UserActionNote.GetImage -> {
-                    chooseImage()
-                }
+        when (state) {
+            is UserActionNote.GetImage -> {
+                chooseImage()
+            }
 
-                is UserActionNote.GetCamera -> {
-                    openCamera()
-                }
+            is UserActionNote.GetCamera -> {
+                openCamera()
+            }
 
-                is UserActionNote.GetMicrophone -> {
-                    println("GetCamera!")
-                }
+            is UserActionNote.GetMicrophone -> {
+                println("GetCamera!")
+            }
 
-                is UserActionNote.GetDraw -> {
-                    openPaintSheet()
-                }
+            is UserActionNote.GetDraw -> {
+                openPaintSheet()
+            }
 
-                is UserActionNote.SaveNoteToDB<*> -> {
-
-                }
+            is UserActionNote.SavedNoteToDB -> {
+                println("${javaClass.simpleName} is UserActionNote.SavedNoteToDB")
             }
         }
+
     }
 
     private fun sendViewAction(action: UserActionNote) {
@@ -282,21 +282,25 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
                 noteViewModel.insert(note)
             }
         }
-        noteViewModel.userActionState.observe(this) { state ->
+        noteViewModel.userActionState.observe(viewLifecycleOwner) { state ->
             handleUserActionState(state)
         }
     }
 
     private fun initSheetCallbacks() {
-        onSlide = {}
-        onStateChanged = {
-            when (it) {
-                4 -> {
-                    setBottomNavHalfScreen(it)
-                }
+        onSlide = {
+//            println("onSlide: $it")
+        }
+        onStateChanged = { newState, oldState ->
+            if (newState != oldState) {
+                when (newState) {
+                    6 -> {
+                        setBottomNavHalfScreen(newState)
+                    }
 
-                3 -> {
-                    setBottomNavFullScreen(it)
+                    3 -> {
+                        setBottomNavFullScreen(newState)
+                    }
                 }
             }
         }
@@ -337,23 +341,38 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
             PhotoItemBinding.inflate(layoutInflater, binding.photoList.parent as ViewGroup, false)
         binding.bottomNavigation.setRoundedCorners(32f)
         binding.bottomNavigation.setCheckable()
-
     }
 
     private fun setBottomNavFullScreen(state: Int) {
-        val layParams =
-            binding.bottomNavigation.layoutParams as ViewGroup.MarginLayoutParams
-        layParams.bottomMargin = 40
-        binding.bottomNavigation.layoutParams = layParams
+        println("state: $state")
+        val animator =
+            ValueAnimator.ofInt((getDisplayMetrics(activity()).heightPixels / 2) - 200, 40)
+        animator.duration = 100
+        animator.addUpdateListener {
+            val animatedValue = animator.animatedValue as Int
+            setBottomMarginBottomNav(animatedValue)
+        }
+        animator.start()
         behavior?.state = state
     }
 
     private fun setBottomNavHalfScreen(state: Int) {
+        val animator =
+            ValueAnimator.ofInt(40, (getDisplayMetrics(activity()).heightPixels / 2) - 200)
+        animator.duration = 100
+        animator.addUpdateListener {
+            val animatedValue = animator.animatedValue as Int
+            setBottomMarginBottomNav(animatedValue)
+        }
+        animator.start()
+        behavior?.state = state
+    }
+
+    private fun setBottomMarginBottomNav(animatedValue: Int) {
         val layParams =
             binding.bottomNavigation.layoutParams as ViewGroup.MarginLayoutParams
-        layParams.bottomMargin = (getDisplayMetrics(activity()).heightPixels / 2) + 40
+        layParams.bottomMargin = animatedValue
         binding.bottomNavigation.layoutParams = layParams
-        behavior?.state = state
     }
 
 

@@ -1,6 +1,9 @@
 package code.with.me.testroomandnavigationdrawertest.ui.base
 
+import android.R
 import android.os.Bundle
+import android.transition.Transition
+import android.transition.TransitionInflater
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +17,7 @@ import code.with.me.testroomandnavigationdrawertest.ui.fragment.NoteHomeFragment
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
 import javax.inject.Inject
 import javax.inject.Named
+
 
 abstract class BaseNotesListFragment : BaseFragment<FragmentNotesListBinding>(
     FragmentNotesListBinding::inflate
@@ -44,6 +48,7 @@ abstract class BaseNotesListFragment : BaseFragment<FragmentNotesListBinding>(
         initRecyclerView(binding)
     }
 
+
     private fun initAppComponent() {
         val appComponent = (activity?.application as NotesApplication).appComponent
         appComponent.inject(this@BaseNotesListFragment)
@@ -55,7 +60,7 @@ abstract class BaseNotesListFragment : BaseFragment<FragmentNotesListBinding>(
     }
 
     private fun initViewModel() {
-        noteViewModel = ViewModelProvider(this, factory)[NoteViewModel::class.java]
+        noteViewModel = ViewModelProvider(requireActivity(), factory)[NoteViewModel::class.java]
     }
 
     private fun initRecyclerView(binding: FragmentNotesListBinding) {
@@ -74,7 +79,6 @@ abstract class BaseNotesListFragment : BaseFragment<FragmentNotesListBinding>(
                 clickListener = {
                     selected0 = it.layoutPosition
                     val item = getItem(it.layoutPosition) as NewNote
-                    println("item id: ${item.id} item _id: ${item._id} text: ${item.textNote}")
                     openDetailFragment(item._id)
                 }
             }
@@ -96,10 +100,9 @@ abstract class BaseNotesListFragment : BaseFragment<FragmentNotesListBinding>(
                 super.onBindViewHolder(holder, position)
 
                 holder.binding.apply {
-                    val item = getItem(position)
+                    val item = getItem(holder.adapterPosition)
                     titleID.text = cutText(item.titleNote)
                     textID.text = cutText(item.textNote)
-                    posItem.text = posItemText(position)
                     menuBtn.setOnClickListener {
                         printText()
                     }

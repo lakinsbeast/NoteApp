@@ -21,7 +21,7 @@ fun launchAfterTimer(time: Long, block: () -> Unit) {
     }
 }
 
-suspend fun CoroutineScope.mainScope(block: () -> Unit) {
+suspend fun CoroutineScope.mainScope(block: suspend () -> Unit) {
     withContext(Dispatchers.Main) {
         block()
     }

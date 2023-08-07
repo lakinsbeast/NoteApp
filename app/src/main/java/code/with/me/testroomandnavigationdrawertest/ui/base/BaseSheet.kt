@@ -31,7 +31,7 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
     val binding get() = _binding!!
 
     var onSlide: ((Float) -> Unit) = {}
-    var onStateChanged: ((Int) -> Unit) = {}
+    var onStateChanged: ((Int, Int) -> Unit) = { oldState, newState -> }
 
     lateinit var progressBar: ProgressBar
 
@@ -42,6 +42,7 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        peekHeight = getDisplayMetrics(activity()).heightPixels
         _binding = get.invoke(inflater, container, false)
         return binding.root
     }
@@ -60,28 +61,29 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
         addViewsToSheet()
 
         behavior = BottomSheetBehavior.from(view.parent as FrameLayout)
+        if (fullScreen) {
+            setSheetToFullScreen(view)
+        }
         behavior?.let { behavior ->
-            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
             behavior.isHideable = canHide
+            behavior.skipCollapsed = true
+            behavior.isFitToContents = false
+            behavior.halfExpandedRatio = 0.6f
             behavior.addBottomSheetCallback(object :
                 BottomSheetBehavior.BottomSheetCallback() {
+                private var oldState: Int = BottomSheetBehavior.STATE_HALF_EXPANDED
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
-                    println("state: $newState")
-                    onStateChanged.invoke(newState)
+                    onStateChanged.invoke(newState, oldState)
+                    if (newState != BottomSheetBehavior.STATE_DRAGGING && newState != BottomSheetBehavior.STATE_SETTLING) {
+                        oldState = newState
+                    }
                 }
 
                 override fun onSlide(bottomSheet: View, slideOffset: Float) {
                     onSlide.invoke(slideOffset)
-                    if (slideOffset < 0.5f) {
-                        behavior.setPeekHeight(getDisplayMetrics(activity()).heightPixels / 2, true)
-                    } else {
-                        behavior.setPeekHeight(getDisplayMetrics(activity()).heightPixels, true)
-                    }
                 }
             })
-        }
-        if (fullScreen) {
-            setSheetToFullScreen(view)
         }
     }
 

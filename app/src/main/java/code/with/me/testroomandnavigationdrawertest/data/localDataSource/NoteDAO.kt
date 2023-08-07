@@ -22,6 +22,7 @@ interface NoteDAO {
     fun findByTitle(title: String, text: String): Note
 
     @Query("SELECT * FROM note WHERE id=:id ")
+    @Throws(SQLiteException::class)
     fun getNoteById(id: Int): Note
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -11,14 +11,13 @@ open class BaseAdapter<T : Model, A : ViewBinding>(val binding: A) :
         code.with.me.testroomandnavigationdrawertest.ui.DiffUtil()
     ) {
 
-    var recycView: RecyclerView? = null
+
+    private var recycView: RecyclerView? = null
     var clickListener: ((binding: BaseViewHolder<A>) -> Unit)? = null
     var onLongClickListener: ((binding: BaseViewHolder<A>) -> Unit)? = null
 
     class BaseViewHolder<T : ViewBinding>(val binding: T) :
-        RecyclerView.ViewHolder(binding.root) {
-
-    }
+        RecyclerView.ViewHolder(binding.root)
 
     override fun submitList(list: MutableList<T>?) {
         super.submitList(list)
@@ -41,5 +40,6 @@ open class BaseAdapter<T : Model, A : ViewBinding>(val binding: A) :
         super.onDetachedFromRecyclerView(recyclerView)
         recycView = null
     }
+
 
 }

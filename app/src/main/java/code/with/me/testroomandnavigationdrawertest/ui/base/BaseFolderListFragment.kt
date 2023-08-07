@@ -3,12 +3,15 @@ package code.with.me.testroomandnavigationdrawertest.ui.base
 import android.content.res.ColorStateList
 import android.graphics.drawable.RippleDrawable
 import android.os.Bundle
+import android.transition.Transition
+import android.transition.TransitionInflater
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.transition.Slide
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.Utils.safeClickListener
@@ -52,6 +55,16 @@ abstract class BaseFolderListFragment :
         folderViewModel = ViewModelProvider(this, folderVmFactory)[FolderViewModel::class.java]
         initAdapter()
         initRecyclerView(binding)
+        setupWindowAnimations()
+
+    }
+
+    private fun setupWindowAnimations() {
+        val slide = android.transition.Slide()
+        slide.duration = 1000
+//        val fade: Transition =
+//            TransitionInflater.from(activity).inflateTransition(android.R.transition.explode)
+        activity?.window?.exitTransition = slide
     }
 
 

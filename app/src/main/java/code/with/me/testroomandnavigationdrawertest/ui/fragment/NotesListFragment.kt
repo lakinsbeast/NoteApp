@@ -3,12 +3,15 @@ package code.with.me.testroomandnavigationdrawertest.ui.fragment
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import code.with.me.testroomandnavigationdrawertest.Utils.gone
 import code.with.me.testroomandnavigationdrawertest.Utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.NewNote
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteState
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseNotesListFragment
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.UserActionNote
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
 class NotesListFragment :
@@ -16,7 +19,10 @@ class NotesListFragment :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        idFolder = arguments?.getInt("idFolder") ?: 0
+        idFolder = arguments?.getInt("idFolder") ?: -1
+        if (idFolder == -1) {
+            findNavController().popBackStack()
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -25,7 +31,23 @@ class NotesListFragment :
             noteViewModel.state.observe(viewLifecycleOwner) { state ->
                 handleViewState(state)
             }
+            noteViewModel.userActionState.observe(viewLifecycleOwner) { state ->
+                println("state issss: $state")
+                handleUserActionState(state)
+            }
             noteViewModel.getAllNotes(idFolder)
+        }
+    }
+
+    private fun handleUserActionState(state: UserActionNote) {
+        binding.apply {
+            when (state) {
+                is UserActionNote.SavedNoteToDB -> {
+
+                }
+
+                else -> {}
+            }
         }
     }
 
@@ -50,11 +72,13 @@ class NotesListFragment :
                     note.add(it.toNewNote())
                 }
                 adapter.submitList(note)
+                adapter.notifyDataSetChanged()
                 showProgressBar(false)
             }
 
             is NoteState.Error<*> -> {
                 showProgressBar(false)
+                Snackbar.make(binding.root, state.error.toString(), Snackbar.LENGTH_LONG).show()
                 println("ERROR in ${this.javaClass.simpleName} error: ${state.error}")
             }
 

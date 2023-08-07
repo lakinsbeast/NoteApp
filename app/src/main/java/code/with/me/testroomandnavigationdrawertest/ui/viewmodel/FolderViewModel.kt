@@ -1,5 +1,7 @@
 package code.with.me.testroomandnavigationdrawertest.ui.viewmodel
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Folder
@@ -13,6 +15,15 @@ import javax.inject.Inject
 class FolderViewModel @Inject constructor(
     private val repo: FolderRepository
 ) : BaseViewModel() {
+
+    private val _state = MutableLiveData<FolderVMState>(FolderVMState.Loading)
+    val state: LiveData<FolderVMState>
+        get() = _state
+
+    private fun setState(state: FolderVMState) {
+        _state.postValue(state)
+    }
+
     fun getAllFolders(): Flow<List<Folder>> = repo.getAllFolders()
     fun getNotesInFolder(folderId: Int): Flow<List<Note>> = repo.getNotesInFolder(folderId)
 
@@ -40,6 +51,13 @@ class FolderViewModel @Inject constructor(
     suspend fun updateFolder(folder: Folder) = repo.updateFolder(folder)
     suspend fun deleteFolder(folder: Folder) = repo.deleteFolder(folder)
 
+}
+
+sealed class FolderVMState {
+    data object Loading : FolderVMState()
+    class Result<T>(val data: T) : FolderVMState()
+    data object EmptyResult : FolderVMState()
+    class Error<T>(val error: T) : FolderVMState()
 }
 
 class FolderViewModelFactory @Inject constructor(

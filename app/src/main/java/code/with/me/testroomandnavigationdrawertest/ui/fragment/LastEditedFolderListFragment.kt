@@ -19,6 +19,7 @@ class LastEditedFolderListFragment :
                 listOfFolders.clear()
                 listOfFolders = it.toMutableList()
                 adapter.submitList(listOfFolders)
+                adapter.notifyDataSetChanged()
             }
         }
     }

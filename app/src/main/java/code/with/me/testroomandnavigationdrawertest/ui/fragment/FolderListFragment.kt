@@ -20,6 +20,7 @@ class FolderListFragment :
                 listOfFolders.clear()
                 listOfFolders = it.toMutableList()
                 adapter.submitList(listOfFolders)
+                adapter.notifyDataSetChanged()
             }
         }
 
@@ -34,6 +35,7 @@ class FolderListFragment :
                     listOfFolders.clear()
                     listOfFolders = it.toMutableList()
                     adapter.submitList(listOfFolders)
+                    adapter.notifyDataSetChanged()
                 }
             }
         } else {
@@ -42,6 +44,7 @@ class FolderListFragment :
                     listOfFolders.clear()
                     listOfFolders = it.toMutableList()
                     adapter.submitList(listOfFolders)
+                    adapter.notifyDataSetChanged()
                 }
             }
         }

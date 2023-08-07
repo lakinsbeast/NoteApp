@@ -7,7 +7,9 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navOptions
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import code.with.me.testroomandnavigationdrawertest.AlertCreator
@@ -173,7 +175,9 @@ class FolderHomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding
 
     fun navigateToNotesListFragment(folderId: Int) {
         val action = FolderHomeFragmentDirections.actionHomeFragmentToNoteHomeFragment(folderId)
-        findNavController().navigate(action)
+        findNavController().navigate(
+            action
+        )
     }
 
     fun navigateToSelectFolderDestintationSheet(idFolder: Int) {

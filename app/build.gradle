@@ -57,8 +57,10 @@ ext {
     audiovisualizer_version = '2.2.5'
 }
 dependencies {
-    implementation "io.github.gautamchibde:audiovisualizer:${audiovisualizer_version}"
 
+    implementation "com.bogdwellers:pinchtozoom:0.1"
+
+    implementation "io.github.gautamchibde:audiovisualizer:${audiovisualizer_version}"
 
     //naviagtion
     def nav_version = "2.6.0"
