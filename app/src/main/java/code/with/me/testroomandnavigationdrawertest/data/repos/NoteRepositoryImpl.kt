@@ -21,4 +21,5 @@ class NoteRepositoryImpl @Inject constructor(private val noteDAO: NoteDAO) : Not
     override fun getLastCustomer(): Long = noteDAO.getLastCustomer()
     override fun getListOfNotes(id: Int): Flow<List<Note>> = noteDAO.getListOfNotes(id)
 
+
 }

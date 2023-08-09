@@ -417,7 +417,6 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
                     try {
                         prepare()
                         start()
-//                        binding.imageButtonVoice.setImageResource(R.drawable.mic_off48px)
                         Toast.makeText(it, "Началась запись голоса", Toast.LENGTH_SHORT).show()
                     } catch (e: IOException) {
                         Log.d("audioException", e.message.toString())

@@ -19,4 +19,5 @@ interface NoteRepository {
     fun getLastCustomer(): Long
 
     fun getListOfNotes(id: Int): Flow<List<Note>>
+
 }

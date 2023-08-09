@@ -29,6 +29,16 @@ class NoteViewModel @Inject constructor(
         _state.postValue(state)
     }
 
+    fun getAllNotes() = viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
+        try {
+            repoNote.getListOfNotes().collect() { notes ->
+                setState(NoteState.Result(notes))
+            }
+        } catch (e: Exception) {
+            println("error: $e")
+            setState(NoteState.Error(e.localizedMessage))
+        }
+    }
 
     fun getAllNotes(id: Int) = viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
         try {

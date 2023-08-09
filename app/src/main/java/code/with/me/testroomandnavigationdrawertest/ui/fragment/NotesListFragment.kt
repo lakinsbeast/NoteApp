@@ -20,9 +20,9 @@ class NotesListFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         idFolder = arguments?.getInt("idFolder") ?: -1
-        if (idFolder == -1) {
-            findNavController().popBackStack()
-        }
+//        if (idFolder == -1) {
+//            findNavController().popBackStack()
+//        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -35,7 +35,11 @@ class NotesListFragment :
                 println("state issss: $state")
                 handleUserActionState(state)
             }
-            noteViewModel.getAllNotes(idFolder)
+            if (idFolder == -1) {
+                noteViewModel.getAllNotes()
+            } else {
+                noteViewModel.getAllNotes(idFolder)
+            }
         }
     }
 

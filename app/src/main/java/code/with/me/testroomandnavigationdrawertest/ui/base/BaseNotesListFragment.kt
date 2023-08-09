@@ -13,6 +13,7 @@ import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.NewNote
 import code.with.me.testroomandnavigationdrawertest.databinding.FragmentNotesListBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.NoteItemBinding
+import code.with.me.testroomandnavigationdrawertest.ui.fragment.MainScreenFragment
 import code.with.me.testroomandnavigationdrawertest.ui.fragment.NoteHomeFragment
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
 import javax.inject.Inject
@@ -110,8 +111,17 @@ abstract class BaseNotesListFragment : BaseFragment<FragmentNotesListBinding>(
             }
 
             private fun openDetailFragment(id: Int) {
-                val noteHomeFragment = parentFragment as? NoteHomeFragment
-                noteHomeFragment?.navigateToNotesListFragment(id)
+//                val noteHomeFragment =
+//                    activity?.supportFragmentManager?.findFragmentByTag("NotesListFragment")
+                println("before")
+                for (fragment in activity?.supportFragmentManager?.fragments!!) {
+                    println("fragment: ${fragment.javaClass.simpleName}")
+                    if (fragment is MainScreenFragment) {
+                        fragment.navigateToViewANoteSheet(id)
+                        break
+                    }
+                }
+
             }
 
             fun cutText(text: String): String {

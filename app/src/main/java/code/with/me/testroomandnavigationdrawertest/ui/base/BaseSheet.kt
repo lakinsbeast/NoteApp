@@ -26,14 +26,14 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
 
     var behavior: BottomSheetBehavior<FrameLayout>? = null
     private var fullScreen: Boolean = false
-    var peekHeight: Int = 1100
+    private var peekHeight: Int = 1100
     private var canHide = true
     val binding get() = _binding!!
 
     var onSlide: ((Float) -> Unit) = {}
     var onStateChanged: ((Int, Int) -> Unit) = { oldState, newState -> }
 
-    lateinit var progressBar: ProgressBar
+    private lateinit var progressBar: ProgressBar
 
     private var state: Int = BottomSheetBehavior.STATE_EXPANDED
 

@@ -14,6 +14,7 @@ import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModelFactory
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderTagViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderTagViewModelFactory
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MainScreenViewModelFactory
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -42,6 +43,11 @@ abstract class BindAppModule {
     @Singleton
     @Named("noteTagVMFactory")
     abstract fun bindNoteTagVMFactory(factory: NoteTagViewModelFactory): ViewModelProvider.Factory
+
+    @Binds
+    @Singleton
+    @Named("mainScreenVMFactory")
+    abstract fun bindMainScreenVMFactory(factory: MainScreenViewModelFactory): ViewModelProvider.Factory
 }
 
 @Module

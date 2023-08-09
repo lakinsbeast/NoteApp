@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation"
-    app:startDestination="@id/homeFragment">
+    app:startDestination="@id/mainScreenFragment">
     <fragment
         android:id="@+id/notesListFragment2"
         android:name="code.with.me.testroomandnavigationdrawertest.ui.fragment.NotesListFragment"
@@ -148,4 +148,12 @@
         android:name="code.with.me.testroomandnavigationdrawertest.ui.sheet.PaintSheet"
         android:label="activity_paint"
         tools:layout="@layout/activity_paint" />
+    <fragment
+        android:id="@+id/mainScreenFragment"
+        android:name="code.with.me.testroomandnavigationdrawertest.ui.fragment.MainScreenFragment"
+        android:label="MainScreenFragment" >
+        <action
+            android:id="@+id/action_mainScreenFragment_to_viewANoteSheet"
+            app:destination="@id/viewANoteSheet" />
+    </fragment>
 </navigation>
