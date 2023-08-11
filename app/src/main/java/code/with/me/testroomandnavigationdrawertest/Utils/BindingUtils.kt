@@ -4,10 +4,10 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.LayerDrawable
+import android.graphics.drawable.StateListDrawable
 import android.os.Build
 import android.os.SystemClock
 import android.view.Gravity
@@ -17,16 +17,18 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.forEach
+import androidx.core.content.ContextCompat
 import androidx.core.view.forEachIndexed
 import androidx.core.view.get
 import code.with.me.testroomandnavigationdrawertest.R
+
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.chip.Chip
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 
 fun View.visible() {
@@ -151,12 +153,12 @@ fun Button.setConfirmButton() {
     setTextColor(resources.getColor(R.color.black, null))
 }
 
-fun Chip.setChipDesign() {
-
-}
 
 fun Chip.setChipSelectedDesign() {
     setChipBackgroundColorResource(R.color.white)
+    val transparentCheckedIcon = ContextCompat.getDrawable(context, R.drawable.check_mark)
+    transparentCheckedIcon?.setTint(Color.BLACK)
+    checkedIcon = ContextCompat.getDrawable(context, R.drawable.check_mark)
     setTextColor(Color.BLACK)
 }
 

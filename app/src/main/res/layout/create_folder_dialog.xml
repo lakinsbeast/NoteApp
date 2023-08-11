@@ -27,6 +27,7 @@
         android:gravity="start"
         android:hint="@string/write_folder_name"
         android:maxLines="1"
+        android:textColorHighlight="@color/gray"
         android:textCursorDrawable="@null"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -80,12 +81,14 @@
             android:text="🏥 Здоровье" />
     </com.google.android.material.chip.ChipGroup>
 
-    <androidx.appcompat.widget.SwitchCompat
+    <Switch
         android:id="@+id/isFavoriteSwitch"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Favorite"
+        android:text="@string/favorite_folder"
         android:textSize="20sp"
+        android:thumb="@drawable/custom_switch_thumb"
+        android:track="@drawable/custom_switch_track"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/chipGroup" />

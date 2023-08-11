@@ -23,6 +23,7 @@ import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.MakeANoteSheet.Companion.paintResultKey
 import com.flask.colorpicker.ColorPickerView
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -40,6 +41,8 @@ class PaintSheet : BaseSheet<ActivityPaintBinding>(ActivityPaintBinding::inflate
         super.onViewCreated(view, savedInstanceState)
         setUpClickListeners()
         setUpPaint()
+        behavior?.state = BottomSheetBehavior.STATE_EXPANDED
+        behavior?.isDraggable = false
     }
 
     private fun setUpClickListeners() {
@@ -50,6 +53,16 @@ class PaintSheet : BaseSheet<ActivityPaintBinding>(ActivityPaintBinding::inflate
         setUpUndoButton()
         setUpPaintButton()
         setUpSaveButton()
+        binding.paintCanvas.setOnTouchListener { v, event ->
+            println("binding.root touched")
+            behavior?.isDraggable = false
+            false
+        }
+        binding.layout.setOnTouchListener { v, event ->
+            println("binding.layout touched")
+            behavior?.isDraggable = true
+            true
+        }
     }
 
     private fun setUpSaveButton() {
@@ -95,7 +108,6 @@ class PaintSheet : BaseSheet<ActivityPaintBinding>(ActivityPaintBinding::inflate
                     this.putString("pathBitmap", drawuri.toString())
                 }
                 setFragmentResult(paintResultKey, resultIntent)
-                findNavController().popBackStack()
             } catch (e: Exception) {
                 println("Error in ${javaClass.simpleName} error is ${e}")
                 Toast.makeText(context, "Ошибка: ${e.localizedMessage}", Toast.LENGTH_LONG).show()

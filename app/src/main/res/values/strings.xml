@@ -23,4 +23,5 @@
     <string name="cancel">Отмена</string>
     <string name="audioRecordRunning">Идет запись аудио</string>
     <string name="write_folder_name">Введите название папки</string>
+    <string name="favorite_folder">Избранная папка</string>
 </resources>

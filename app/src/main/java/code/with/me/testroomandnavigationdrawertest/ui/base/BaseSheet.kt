@@ -1,11 +1,17 @@
 package code.with.me.testroomandnavigationdrawertest.ui.base
 
 import android.app.AlertDialog
+import android.app.Dialog
+import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -15,7 +21,9 @@ import code.with.me.testroomandnavigationdrawertest.Utils.findActivity
 import code.with.me.testroomandnavigationdrawertest.Utils.getDisplayMetrics
 import code.with.me.testroomandnavigationdrawertest.Utils.gone
 import code.with.me.testroomandnavigationdrawertest.Utils.setCenterGravity
+import code.with.me.testroomandnavigationdrawertest.Utils.setRoundedCornersView
 import code.with.me.testroomandnavigationdrawertest.Utils.visible
+import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
@@ -55,8 +63,18 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
         }
     }
 
+    private fun setUpDialogWindow() {
+        dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            dialog?.window?.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
+            dialog?.window?.attributes?.blurBehindRadius = 10
+            dialog?.window?.setBackgroundBlurRadius(10)
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setUpDialogWindow()
         initProgressBar()
         addViewsToSheet()
 

@@ -29,14 +29,17 @@ import code.with.me.testroomandnavigationdrawertest.Utils.getDisplayMetrics
 import code.with.me.testroomandnavigationdrawertest.Utils.providerName
 import code.with.me.testroomandnavigationdrawertest.Utils.setCheckable
 import code.with.me.testroomandnavigationdrawertest.Utils.setRoundedCorners
+import code.with.me.testroomandnavigationdrawertest.Utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityAddNoteBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.PhotoItemBinding
+import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.MakeANoteSheet
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.MakeANoteSheetDirections
+import code.with.me.testroomandnavigationdrawertest.ui.sheet.PaintSheet
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.UserActionNote
 import com.bumptech.glide.Glide
@@ -119,7 +122,9 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
 
 
     private fun openPaintSheet() {
-        findNavController().navigate(MakeANoteSheetDirections.actionMakeANoteSheetToPaintSheet())
+        val paintSheet = PaintSheet()
+        (activity as MainActivity).sheetController.showSheet(paintSheet)
+//        findNavController().navigate(MakeANoteSheetDirections.actionMakeANoteSheetToPaintSheet())
     }
 
 
@@ -150,6 +155,8 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
                     Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                 )
                 imageInString = imageUri.toString()
+                binding.coverImage.visible()
+                Glide.with(this).load(imageUri).into(binding.coverImage)
                 imageSelected.invoke(imageInString)
                 listOfPhotos.add(PhotoModel(imageInString))
                 adapter.submitList(listOfPhotos)
