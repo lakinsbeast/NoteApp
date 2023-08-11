@@ -2,9 +2,14 @@ package code.with.me.testroomandnavigationdrawertest.ui.fragment
 
 import android.os.Bundle
 import android.view.View
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import code.with.me.testroomandnavigationdrawertest.Utils.gone
+import code.with.me.testroomandnavigationdrawertest.Utils.println
 import code.with.me.testroomandnavigationdrawertest.Utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.NewNote
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
@@ -32,7 +37,6 @@ class NotesListFragment :
                 handleViewState(state)
             }
             noteViewModel.userActionState.observe(viewLifecycleOwner) { state ->
-                println("state issss: $state")
                 handleUserActionState(state)
             }
             if (idFolder == -1) {
@@ -42,6 +46,7 @@ class NotesListFragment :
             }
         }
     }
+
 
     private fun handleUserActionState(state: UserActionNote) {
         binding.apply {

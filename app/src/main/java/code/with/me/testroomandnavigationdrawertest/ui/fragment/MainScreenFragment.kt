@@ -2,39 +2,30 @@ package code.with.me.testroomandnavigationdrawertest.ui.fragment
 
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.forEachIndexed
 import androidx.core.view.get
-import androidx.core.view.size
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.Utils.gone
-import code.with.me.testroomandnavigationdrawertest.Utils.println
+import code.with.me.testroomandnavigationdrawertest.Utils.launchAfterTimerMain
 import code.with.me.testroomandnavigationdrawertest.Utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Folder
-import code.with.me.testroomandnavigationdrawertest.data.data_classes.NewNote
-import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.databinding.MainScreenFragmentBinding
-import code.with.me.testroomandnavigationdrawertest.databinding.NoteItemBinding
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
-import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
+import code.with.me.testroomandnavigationdrawertest.ui.dialog.CreateFolderDialog
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.AddFolderSheet
-import code.with.me.testroomandnavigationdrawertest.ui.sheet.MakeANoteSheet
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.ViewANoteSheet
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MainScreenViewModel
 import com.google.android.material.chip.Chip
-import com.google.android.material.shape.ShapeAppearanceModel
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Named
 import com.google.android.material.R as MR
@@ -56,27 +47,24 @@ class MainScreenFragment :
         super.onCreate(savedInstanceState)
         initAppComponent()
         initViewModel()
-//        listenViewModel()
-//        openNotesListFragment()
-//        initClickListeners()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        initAppComponent()
-//        initViewModel()
         listenViewModel()
-        openNotesListFragment()
         initClickListeners()
+        openNotesListFragment()
     }
 
     private fun initClickListeners() {
         binding.apply {
             makeNoteBtn.setOnClickListener {
-                openMakeNoteSheet()
+//                openMakeNoteSheet()
+                openMakeNoteFragment()
             }
             makeFolderBtn.setOnClickListener {
-                openMakeFolderSheet()
+//                openMakeFolderSheet()
+                CreateFolderDialog(requireContext()).show()
             }
         }
     }
@@ -91,8 +79,8 @@ class MainScreenFragment :
     private fun listenViewModel() {
         lifecycleScope.launch {
             mainScreenViewModel.getAllFolders().collect() {
-                println("getAllFolders: workd!")
-                binding.chipGroup.removeAllViews()
+                println("getAllFolders size: ${it.size}")
+                binding.chipGroup.removeAllViewsInLayout()
                 val chip = Chip(
                     binding.chipGroup.context,
                     null,
@@ -167,6 +155,7 @@ class MainScreenFragment :
                 (binding.chipGroup[index] as Chip).unsetSelected()
             }
             selectedChip = this.id
+            println("selectedChip: $selectedChip")
             (binding.chipGroup[selectedChip - 1] as Chip).setSelected()
         }
     }
@@ -182,17 +171,20 @@ class MainScreenFragment :
         notesListFragment.arguments = bundle
         (activity as MainActivity).fragmentController.replaceFragment(
             notesListFragment,
-            R.id.fragment_container
+            fragmentLay = R.id.fragment_container,
+            clearBackStack = true
         )
         showProgressBar(false)
     }
 
-    private fun openMakeNoteSheet() {
-        val sheet = MakeANoteSheet()
+    private fun openMakeNoteFragment() {
+        val fragment = MakeNoteFragment()
         val bundle = Bundle()
         bundle.putInt("idFolder", selectedChipFolderId)
-        sheet.arguments = bundle
-        (activity as MainActivity).sheetController.showSheet(sheet)
+        fragment.arguments = bundle
+        (activity as MainActivity).fragmentController.openFragment(
+            fragment
+        )
     }
 
     private fun openMakeFolderSheet() {
@@ -216,7 +208,10 @@ class MainScreenFragment :
 
     private fun initViewModel() {
         mainScreenViewModel =
-            ViewModelProvider(this, mainScreenVMFactory)[MainScreenViewModel::class.java]
+            ViewModelProvider(
+                this,
+                mainScreenVMFactory
+            )[MainScreenViewModel::class.java]
     }
 
     fun navigateToViewANoteSheet(id: Int) {

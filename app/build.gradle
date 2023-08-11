@@ -55,6 +55,7 @@ ext {
     viewmodel_version = '2.6.1'
     retrofit_version = '2.9.0'
     audiovisualizer_version = '2.2.5'
+    nav_version = "2.6.0"
 }
 dependencies {
 
@@ -63,7 +64,6 @@ dependencies {
     implementation "io.github.gautamchibde:audiovisualizer:${audiovisualizer_version}"
 
     //naviagtion
-    def nav_version = "2.6.0"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
@@ -95,14 +95,11 @@ dependencies {
     //colorpicker-quadflask
     implementation 'com.github.QuadFlask:colorpicker:0.0.15'
 
-    //viewmodels
-    implementation "androidx.lifecycle:lifecycle-viewmodel:${viewmodel_version}"
+    //viewmodels && viewmodelscope
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${viewmodel_version}"
 
     implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:${viewmodel_version}"
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-
-    //viewmodelscope
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${viewmodel_version}"
 
     //lifecyclescope
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:${viewmodel_version}"

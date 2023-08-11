@@ -1,11 +1,17 @@
 package code.with.me.testroomandnavigationdrawertest.ui.viewmodel
 
 import androidx.lifecycle.*
+import code.with.me.testroomandnavigationdrawertest.Utils.println
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 //import code.with.me.testroomandnavigationdrawertest.data.repos.NoteRepository
 import code.with.me.testroomandnavigationdrawertest.domain.repo.NoteRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.IllegalArgumentException
@@ -18,6 +24,8 @@ class NoteViewModel @Inject constructor(
     //MVI реализовал не самым лучшим способом, можно было создать
     //BaseViewModel<MviState, MviActions> и сделать проще
 
+    //upd: i dont like this ☹️
+
     private val _state = MutableLiveData<NoteState>(NoteState.Loading)
     private val _userActionsState = MutableLiveData<UserActionNote>()
     val state: LiveData<NoteState>
@@ -29,26 +37,51 @@ class NoteViewModel @Inject constructor(
         _state.postValue(state)
     }
 
-    fun getAllNotes() = viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
-        try {
-            repoNote.getListOfNotes().collect() { notes ->
-                setState(NoteState.Result(notes))
-            }
-        } catch (e: Exception) {
-            println("error: $e")
-            setState(NoteState.Error(e.localizedMessage))
-        }
+    private lateinit var jobGetNote: Job
+
+    override fun onCleared() {
+        "before oncleared".println()
+        super.onCleared()
+        "after oncleared".println()
     }
 
-    fun getAllNotes(id: Int) = viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
-        try {
-            repoNote.getListOfNotes(id).collect() { notes ->
-                setState(NoteState.Result(notes))
-            }
-        } catch (e: Exception) {
-            println("error: $e")
-            setState(NoteState.Error(e.localizedMessage))
+    fun getAllNotes(): Job {
+        //после смены фрагмента в mainscreen продолжались доставаться данные
+        //из обеих flow с айди и без, принято решение сделать так:
+        if (::jobGetNote.isInitialized) {
+            jobGetNote.cancel()
         }
+        jobGetNote = viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
+            try {
+                repoNote.getListOfNotes().collect() { notes ->
+                    setState(NoteState.Result(notes))
+                }
+            } catch (e: Exception) {
+                if (e !is CancellationException) {
+                    setState(NoteState.Error(e.localizedMessage))
+                }
+            }
+
+        }
+        return jobGetNote
+    }
+
+    fun getAllNotes(id: Int): Job {
+        if (::jobGetNote.isInitialized) {
+            jobGetNote.cancel()
+        }
+        jobGetNote = viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
+            try {
+                repoNote.getListOfNotes(id).collect() { notes ->
+                    setState(NoteState.Result(notes))
+                }
+            } catch (e: Exception) {
+                if (e !is CancellationException) {
+                    setState(NoteState.Error(e.localizedMessage))
+                }
+            }
+        }
+        return jobGetNote
     }
 
 

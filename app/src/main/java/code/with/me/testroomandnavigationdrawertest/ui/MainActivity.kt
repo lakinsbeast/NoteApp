@@ -1,13 +1,10 @@
 package code.with.me.testroomandnavigationdrawertest.ui
 
-import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import code.with.me.testroomandnavigationdrawertest.*
-import code.with.me.testroomandnavigationdrawertest.Utils.findActivity
-import code.with.me.testroomandnavigationdrawertest.Utils.launchAfterTimer
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityMainBinding
 import code.with.me.testroomandnavigationdrawertest.ui.fragment.MainScreenFragment
 

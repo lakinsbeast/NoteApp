@@ -7,16 +7,14 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.navOptions
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import code.with.me.testroomandnavigationdrawertest.AlertCreator
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.Utils.gone
-import code.with.me.testroomandnavigationdrawertest.Utils.launchAfterTimer
+import code.with.me.testroomandnavigationdrawertest.Utils.launchAfterTimerMain
 import code.with.me.testroomandnavigationdrawertest.Utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.FolderTag
 import code.with.me.testroomandnavigationdrawertest.databinding.HomeFragmentBinding
@@ -148,7 +146,7 @@ class FolderHomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding
                                 checkedChips.add(it.id)
                                 chip.setChipBackgroundColorResource(R.color.gray)
                             }
-                            launchAfterTimer(500) {
+                            launchAfterTimerMain(500) {
                                 val folderListFragment = fragmentList[0] as? FolderListFragment
                                 folderListFragment?.updateRecyclerViewData(
                                     checkedChips.joinToString(

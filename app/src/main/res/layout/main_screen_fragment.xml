@@ -42,11 +42,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/chip_group"
+                <HorizontalScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:singleLine="true"></com.google.android.material.chip.ChipGroup>
+                    android:layout_height="wrap_content">
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chip_group"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:singleLine="true"></com.google.android.material.chip.ChipGroup>
+                </HorizontalScrollView>
             </RelativeLayout>
         </LinearLayout>
 

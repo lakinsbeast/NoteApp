@@ -5,7 +5,6 @@ import android.widget.Toast
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
-import java.lang.Exception
 
 class FragmentController(val activity: MainActivity, private val fragmentLayout: Int) {
 
@@ -29,6 +28,7 @@ class FragmentController(val activity: MainActivity, private val fragmentLayout:
      **/
     fun openFragment(
         fragment: Fragment,
+        deleteLast: Boolean = false,
         fragmentLay: Int = fragmentLayout,
         addToBackStack: Boolean = true,
         clearBackStack: Boolean = false
@@ -38,14 +38,23 @@ class FragmentController(val activity: MainActivity, private val fragmentLayout:
                 activity.supportFragmentManager.popBackStack()
             }
         }
-        println("openFragment: ${fragment.javaClass.simpleName}")
-        activity.supportFragmentManager.beginTransaction()
-            .add(fragmentLay, fragment, fragment.javaClass.simpleName)
-            .addToBackStack(if (addToBackStack) fragment.javaClass.simpleName else null).commit()
+        activity.supportFragmentManager.let { manager ->
+            if (deleteLast) {
+                try {
+                    manager.popBackStack()
+                } catch (_: Exception) {
+                }
+            }
+            manager.beginTransaction()
+                .add(fragmentLay, fragment, fragment.javaClass.simpleName)
+                .addToBackStack(if (addToBackStack) fragment.javaClass.simpleName else null)
+                .commit()
+        }
     }
 
     fun replaceFragment(
         fragment: Fragment,
+        deleteLast: Boolean = false,
         fragmentLay: Int = fragmentLayout,
         addToBackStack: Boolean = true,
         clearBackStack: Boolean = false
@@ -55,10 +64,18 @@ class FragmentController(val activity: MainActivity, private val fragmentLayout:
                 activity.supportFragmentManager.popBackStack()
             }
         }
-        println("openFragment: ${fragment.javaClass.simpleName}")
-        activity.supportFragmentManager.beginTransaction()
-            .replace(fragmentLay, fragment, fragment.javaClass.simpleName)
-            .addToBackStack(if (addToBackStack) fragment.javaClass.simpleName else null).commit()
+        activity.supportFragmentManager.let { manager ->
+            if (deleteLast) {
+                try {
+                    manager.popBackStack()
+                } catch (_: Exception) {
+                }
+            }
+            manager.beginTransaction()
+                .replace(fragmentLay, fragment, fragment.javaClass.simpleName)
+                .addToBackStack(if (addToBackStack) fragment.javaClass.simpleName else null)
+                .commit()
+        }
     }
 
     fun closeFragment(

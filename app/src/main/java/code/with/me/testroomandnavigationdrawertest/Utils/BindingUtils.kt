@@ -1,8 +1,10 @@
 package code.with.me.testroomandnavigationdrawertest.Utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.LayerDrawable
@@ -11,6 +13,7 @@ import android.os.SystemClock
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -20,6 +23,7 @@ import androidx.core.view.get
 import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.chip.Chip
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
@@ -41,6 +45,29 @@ fun findActivity(context: Context): MainActivity {
     return context as MainActivity
 }
 
+
+fun View.setRoundedCornersView(radius: Float, color: Int = Color.BLACK, strokeColor: Int? = null) {
+    val backgroundDrawable = GradientDrawable().apply {
+        cornerRadii = floatArrayOf(radius, radius, radius, radius, radius, radius, radius, radius)
+    }
+
+    background = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        val shapeAppearanceModel = ShapeAppearanceModel.builder()
+            .setAllCorners(CornerFamily.ROUNDED, radius)
+            .build()
+
+        val shapeDrawable = MaterialShapeDrawable(shapeAppearanceModel)
+        shapeDrawable.fillColor = ColorStateList.valueOf(color)
+        if (strokeColor != null) {
+            shapeDrawable.setStroke(5f, ColorStateList.valueOf(strokeColor))
+        }
+
+        val layerDrawable = LayerDrawable(arrayOf(shapeDrawable))
+        layerDrawable
+    } else {
+        backgroundDrawable
+    }
+}
 
 fun BottomNavigationView.setRoundedCorners(radius: Float) {
     val backgroundDrawable = GradientDrawable().apply {
@@ -65,7 +92,7 @@ fun BottomNavigationView.setRoundedCorners(radius: Float) {
 
 fun BottomNavigationView.setCheckable(boolean: Boolean = false) {
     menu.forEachIndexed { index, item ->
-        menu[index].setCheckable(boolean)
+        menu[index].isCheckable = boolean
     }
 }
 
@@ -113,3 +140,28 @@ fun getViewGroup(view: View): ViewGroup? {
     return null
 }
 
+fun Button.setCancelButton() {
+    //У gradient drawable неправильно работает setStroke с кнопками, он не позволяет установить цвет обводки
+    this.setRoundedCornersView(32f, Color.BLACK, Color.WHITE)
+    setTextColor(resources.getColor(R.color.white, null))
+}
+
+fun Button.setConfirmButton() {
+    this.setRoundedCornersView(32f, Color.WHITE)
+    setTextColor(resources.getColor(R.color.black, null))
+}
+
+fun Chip.setChipDesign() {
+
+}
+
+fun Chip.setChipSelectedDesign() {
+    setChipBackgroundColorResource(R.color.white)
+    setTextColor(Color.BLACK)
+}
+
+@SuppressLint("ResourceType")
+fun Chip.setChipUnSelectedDesign() {
+    setChipBackgroundColorResource(R.color.black)
+    setTextColor(Color.WHITE)
+}

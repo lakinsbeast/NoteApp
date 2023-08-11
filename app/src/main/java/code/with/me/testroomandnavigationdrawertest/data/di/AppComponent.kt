@@ -14,7 +14,9 @@ import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFolderListFragme
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseNotesListFragment
 import code.with.me.testroomandnavigationdrawertest.ui.di.ApplicationModule
 import code.with.me.testroomandnavigationdrawertest.ui.di.BindAppModule
+import code.with.me.testroomandnavigationdrawertest.ui.dialog.CreateFolderDialog
 import code.with.me.testroomandnavigationdrawertest.ui.fragment.MainScreenFragment
+import code.with.me.testroomandnavigationdrawertest.ui.fragment.MakeNoteFragment
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.AddFolderSheet
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.AddFolderTagSheetMenu
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.AddNoteTagSheetMenu
@@ -31,6 +33,7 @@ interface AppComponent {
     fun inject(activity: MainActivity)
     fun inject(application: NotesApplication)
     fun inject(viewANoteSheet: ViewANoteSheet)
+    fun inject(createFolderDialog: CreateFolderDialog)
     fun inject(baseFolderListFragment: BaseFolderListFragment)
     fun inject(mainScreenFragment: MainScreenFragment)
     fun inject(notesListFragment: NotesListFragment)
@@ -38,6 +41,7 @@ interface AppComponent {
     fun inject(addFolderSheet: AddFolderSheet)
     fun inject(baseNotesListFragment: BaseNotesListFragment)
     fun inject(addNoteTagSheetMenu: AddNoteTagSheetMenu)
+    fun inject(makeNoteFragment: MakeNoteFragment)
     fun inject(makeANoteSheet: MakeANoteSheet)
     fun inject(renameFolderSheet: RenameFolderSheet)
     fun inject(lastViewedFoldersFragment: LastViewedFoldersListFragment)

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">(test) room and navigation drawer test</string>
+    <string name="app_name">1note</string>
     <string name="title_activity_fullscreen_image">FullscreenImageActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
@@ -14,9 +14,13 @@
     <string name="notes">Заметки</string>
     <string name="all">Все</string>
 
+
     <string name="createFolder">Создать папку</string>
+    <string name="readyNameFolders">Готовые имена для названия папки</string>
+    <string name="colorsFolder">Цвета для папки</string>
     <string name="renameFolder">Изменить название папки</string>
     <string name="createTag">Создать метку</string>
     <string name="cancel">Отмена</string>
     <string name="audioRecordRunning">Идет запись аудио</string>
+    <string name="write_folder_name">Введите название папки</string>
 </resources>

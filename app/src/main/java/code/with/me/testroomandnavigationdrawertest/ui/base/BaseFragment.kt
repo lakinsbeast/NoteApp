@@ -19,10 +19,6 @@ abstract class BaseFragment<VB : ViewBinding>(val get: ((LayoutInflater, ViewGro
     private var _binding: VB? = null
     val binding get() = _binding!!
 
-    fun createToolBar() {
-        binding.root
-    }
-
     fun activity() = findActivity(requireContext())
 
     override fun onCreateView(
@@ -30,7 +26,7 @@ abstract class BaseFragment<VB : ViewBinding>(val get: ((LayoutInflater, ViewGro
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = get.invoke(inflater, container, false)
+        _binding = get(inflater, container, false)
         return binding.root
     }
 

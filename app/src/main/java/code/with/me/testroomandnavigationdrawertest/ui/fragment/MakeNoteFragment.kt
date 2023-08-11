@@ -1,4 +1,4 @@
-package code.with.me.testroomandnavigationdrawertest.ui.sheet
+package code.with.me.testroomandnavigationdrawertest.ui.fragment
 
 import android.Manifest
 import android.animation.ValueAnimator
@@ -34,7 +34,9 @@ import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityAddNoteBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.PhotoItemBinding
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
-import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
+import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
+import code.with.me.testroomandnavigationdrawertest.ui.sheet.MakeANoteSheet
+import code.with.me.testroomandnavigationdrawertest.ui.sheet.MakeANoteSheetDirections
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.UserActionNote
 import com.bumptech.glide.Glide
@@ -50,10 +52,9 @@ import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
 import javax.inject.Named
-import kotlin.coroutines.CoroutineContext
 
+class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBinding::inflate) {
 
-class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding::inflate) {
 
     private var currentPermission: TypeOfPermission = TypeOfPermission.EMPTY
     private var cameraUri: Uri? = null
@@ -115,6 +116,7 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
     private var imageSelected: (String) -> Unit = {}
     private var cameraSelected: (String) -> Unit = {}
     private var micSelected: (String) -> Unit = {}
+
 
     private fun openPaintSheet() {
         findNavController().navigate(MakeANoteSheetDirections.actionMakeANoteSheetToPaintSheet())
@@ -182,7 +184,6 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
         val appComponent = (requireActivity().application as NotesApplication).appComponent
         appComponent.inject(this)
         noteViewModel = ViewModelProvider(requireActivity(), factory)[NoteViewModel::class.java]
-        setFullScreenSheet()
         listenPaintSheetResult()
     }
 
@@ -224,10 +225,9 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
         initUI()
         initAdapter()
         initClickListeners()
-        initSheetCallbacks()
         initViewModel()
         initTextChangeListeners()
-        setBottomMarginBottomNav((getDisplayMetrics(activity()).heightPixels / 2) - 200)
+        setBottomMarginBottomNav(20)
     }
 
     private fun handleUserActionState(state: UserActionNote) {
@@ -272,7 +272,6 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
     }
 
 
-
     private fun initViewModel() {
         scope.launch {
             async {
@@ -288,24 +287,24 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
         }
     }
 
-    private fun initSheetCallbacks() {
-        onSlide = {
-//            println("onSlide: $it")
-        }
-        onStateChanged = { newState, oldState ->
-            if (newState != oldState) {
-                when (newState) {
-                    6 -> {
-                        setBottomNavHalfScreen(newState)
-                    }
-
-                    3 -> {
-                        setBottomNavFullScreen(newState)
-                    }
-                }
-            }
-        }
-    }
+//    private fun initSheetCallbacks() {
+//        onSlide = {
+////            println("onSlide: $it")
+//        }
+//        onStateChanged = { newState, oldState ->
+//            if (newState != oldState) {
+//                when (newState) {
+//                    6 -> {
+//                        setBottomNavHalfScreen(newState)
+//                    }
+//
+//                    3 -> {
+//                        setBottomNavFullScreen(newState)
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     private fun initClickListeners() {
         binding.bottomNavigation.setOnItemSelectedListener {
@@ -344,30 +343,30 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
         binding.bottomNavigation.setCheckable()
     }
 
-    private fun setBottomNavFullScreen(state: Int) {
-        println("state: $state")
-        val animator =
-            ValueAnimator.ofInt((getDisplayMetrics(activity()).heightPixels / 2) - 200, 40)
-        animator.duration = 100
-        animator.addUpdateListener {
-            val animatedValue = animator.animatedValue as Int
-            setBottomMarginBottomNav(animatedValue)
-        }
-        animator.start()
-        behavior?.state = state
-    }
+//    private fun setBottomNavFullScreen(state: Int) {
+//        println("state: $state")
+//        val animator =
+//            ValueAnimator.ofInt((getDisplayMetrics(activity()).heightPixels / 2) - 200, 40)
+//        animator.duration = 100
+//        animator.addUpdateListener {
+//            val animatedValue = animator.animatedValue as Int
+//            setBottomMarginBottomNav(animatedValue)
+//        }
+//        animator.start()
+//        behavior?.state = state
+//    }
 
-    private fun setBottomNavHalfScreen(state: Int) {
-        val animator =
-            ValueAnimator.ofInt(40, (getDisplayMetrics(activity()).heightPixels / 2) - 200)
-        animator.duration = 100
-        animator.addUpdateListener {
-            val animatedValue = animator.animatedValue as Int
-            setBottomMarginBottomNav(animatedValue)
-        }
-        animator.start()
-        behavior?.state = state
-    }
+//    private fun setBottomNavHalfScreen(state: Int) {
+//        val animator =
+//            ValueAnimator.ofInt(40, (getDisplayMetrics(activity()).heightPixels / 2) - 200)
+//        animator.duration = 100
+//        animator.addUpdateListener {
+//            val animatedValue = animator.animatedValue as Int
+//            setBottomMarginBottomNav(animatedValue)
+//        }
+//        animator.start()
+//        behavior?.state = state
+//    }
 
     private fun setBottomMarginBottomNav(animatedValue: Int) {
         val layParams =
@@ -514,16 +513,17 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
 
                 holder.binding.apply {
                     val item = getItem(position)
-                    Glide.with(this@MakeANoteSheet).load(item.path).into(image)
+                    Glide.with(this@MakeNoteFragment).load(item.path).into(image)
                 }
             }
         }.apply {
-            this@MakeANoteSheet.binding.photoList.adapter = this
-            this@MakeANoteSheet.binding.photoList.apply {
+            this@MakeNoteFragment.binding.photoList.adapter = this
+            this@MakeNoteFragment.binding.photoList.apply {
                 setHasFixedSize(false)
                 layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
             }
         }
     }
+
 
 }

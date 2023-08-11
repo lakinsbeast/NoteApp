@@ -4,21 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layouttocolor"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <include
-        android:id="@+id/include1"
-        layout="@layout/divider_line" />
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/photoList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@+id/titleEdit"
         app:layout_constraintEnd_toEndOf="parent"
-        android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/include1"
+
         tools:listitem="@layout/photo_item" />
 
 
@@ -32,6 +29,8 @@
         android:inputType="textPersonName"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/black"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -47,6 +46,8 @@
         android:inputType="textMultiLine"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/black"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/coordinatorLayout2"
         app:layout_constraintEnd_toEndOf="parent"
