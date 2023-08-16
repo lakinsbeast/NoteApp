@@ -1,6 +1,7 @@
 package code.with.me.testroomandnavigationdrawertest
 
 import android.app.Application
+import code.with.me.testroomandnavigationdrawertest.Utils.findActivity
 import code.with.me.testroomandnavigationdrawertest.data.di.AppComponent
 import code.with.me.testroomandnavigationdrawertest.data.di.DaggerAppComponent
 import code.with.me.testroomandnavigationdrawertest.data.di.DatabaseModule
@@ -20,6 +21,7 @@ class NotesApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
 
 //        appComponent = DaggerAppComponent.builder().build().inject(this)
     }

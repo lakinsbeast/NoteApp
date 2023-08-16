@@ -14,12 +14,14 @@ import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFolderListFragme
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseNotesListFragment
 import code.with.me.testroomandnavigationdrawertest.ui.di.ApplicationModule
 import code.with.me.testroomandnavigationdrawertest.ui.di.BindAppModule
+import code.with.me.testroomandnavigationdrawertest.ui.di.ControllerModule
 import code.with.me.testroomandnavigationdrawertest.ui.dialog.CreateFolderDialog
 import code.with.me.testroomandnavigationdrawertest.ui.fragment.MainScreenFragment
 import code.with.me.testroomandnavigationdrawertest.ui.fragment.MakeNoteFragment
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.AddFolderSheet
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.AddFolderTagSheetMenu
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.AddNoteTagSheetMenu
+import code.with.me.testroomandnavigationdrawertest.ui.sheet.AudioRecorderSheet
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.MakeANoteSheet
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.RenameFolderSheet
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.SelectFolderDestinationSheet
@@ -28,7 +30,7 @@ import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [ApplicationModule::class, DatabaseModule::class, RepositoryModule::class, BindAppModule::class])
+@Component(modules = [ApplicationModule::class, DatabaseModule::class, RepositoryModule::class, BindAppModule::class, ControllerModule::class])
 interface AppComponent {
     fun inject(activity: MainActivity)
     fun inject(application: NotesApplication)
@@ -49,6 +51,7 @@ interface AppComponent {
     fun inject(lastEditedFolderFragment: LastEditedFolderListFragment)
     fun inject(addFolderTagSheetMenu: AddFolderTagSheetMenu)
     fun inject(folderHomeFragment: FolderHomeFragment)
+    fun inject(audioRecorderSheet: AudioRecorderSheet)
     fun inject(selectFolderDestinationSheet: SelectFolderDestinationSheet)
     fun inject(noteHomeFragment: NoteHomeFragment)
 

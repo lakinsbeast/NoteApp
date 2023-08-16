@@ -18,6 +18,7 @@ import code.with.me.testroomandnavigationdrawertest.data.data_classes.Folder
 import code.with.me.testroomandnavigationdrawertest.databinding.MainScreenFragmentBinding
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
+import code.with.me.testroomandnavigationdrawertest.ui.controllers.FragmentOptions
 import code.with.me.testroomandnavigationdrawertest.ui.dialog.CreateFolderDialog
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.AddFolderSheet
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.ViewANoteSheet
@@ -170,9 +171,9 @@ class MainScreenFragment :
         val notesListFragment = NotesListFragment()
         notesListFragment.arguments = bundle
         (activity as MainActivity).fragmentController.replaceFragment(
+            activity as MainActivity,
             notesListFragment,
-            fragmentLay = R.id.fragment_container,
-            clearBackStack = true
+            FragmentOptions(R.id.fragment_container, clearBackStack = true)
         )
         showProgressBar(false)
     }
@@ -183,13 +184,16 @@ class MainScreenFragment :
         bundle.putInt("idFolder", selectedChipFolderId)
         fragment.arguments = bundle
         (activity as MainActivity).fragmentController.openFragment(
-            fragment
+            activity as MainActivity,
+            fragment, FragmentOptions(R.id.fragment_detail)
         )
     }
 
     private fun openMakeFolderSheet() {
         val sheet = AddFolderSheet()
-        (activity as MainActivity).sheetController.showSheet(sheet)
+        (activity as MainActivity).let { activity ->
+            activity.sheetController.showSheet(activity, sheet)
+        }
     }
 
     private fun showProgressBar(show: Boolean) {
@@ -221,7 +225,9 @@ class MainScreenFragment :
             viewNoteSheet.arguments = bundle.apply {
                 putInt("noteId", id)
             }
-            (activity as MainActivity).sheetController.showSheet(viewNoteSheet)
+            (activity as MainActivity).let { activity ->
+                activity.sheetController.showSheet(activity, viewNoteSheet)
+            }
         } catch (e: Exception) {
             Toast.makeText(activity, e.localizedMessage, Toast.LENGTH_LONG).show()
         }

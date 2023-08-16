@@ -4,47 +4,35 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
-import code.with.me.testroomandnavigationdrawertest.*
+import code.with.me.testroomandnavigationdrawertest.NotesApplication
+import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityMainBinding
+import code.with.me.testroomandnavigationdrawertest.ui.controllers.FragmentController
+import code.with.me.testroomandnavigationdrawertest.ui.controllers.FragmentOptions
 import code.with.me.testroomandnavigationdrawertest.ui.fragment.MainScreenFragment
-
+import code.with.me.testroomandnavigationdrawertest.ui.sheet.AudioRecorderSheet
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private val navController: NavController
-        get() = Navigation.findNavController(this, R.id.fragment_detail)
 
-    val fragmentController = FragmentController(this, R.id.fragment_detail)
-    val sheetController = SheetController(this)
-    private val listener =
-        NavController.OnDestinationChangedListener { controller, destination, arguments ->
-            when (destination.id) {
+    @Inject
+    lateinit var fragmentController: FragmentController
 
-            }
-        }
-
-
-    override fun onResume() {
-        super.onResume()
-//        navController.addOnDestinationChangedListener(listener)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-//        navController.removeOnDestinationChangedListener(listener)
-    }
+    @Inject
+    lateinit var sheetController: SheetController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         initDI()
-
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
 
-
         val fragment = MainScreenFragment()
-        fragmentController.openFragment(fragment)
+        val sheet = AudioRecorderSheet()
+//        fragmentController.openFragment(this, fragment, FragmentOptions(R.id.fragment_detail))
+        sheetController.showSheet(this, sheet)
     }
 
     private fun initDI() {

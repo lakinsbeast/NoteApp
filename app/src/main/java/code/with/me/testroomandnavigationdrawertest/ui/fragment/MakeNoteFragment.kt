@@ -1,7 +1,6 @@
 package code.with.me.testroomandnavigationdrawertest.ui.fragment
 
 import android.Manifest
-import android.animation.ValueAnimator
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaRecorder
@@ -21,15 +20,12 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
-import code.with.me.testroomandnavigationdrawertest.Utils.getDisplayMetrics
 import code.with.me.testroomandnavigationdrawertest.Utils.providerName
 import code.with.me.testroomandnavigationdrawertest.Utils.setCheckable
 import code.with.me.testroomandnavigationdrawertest.Utils.setRoundedCorners
-import code.with.me.testroomandnavigationdrawertest.Utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityAddNoteBinding
@@ -37,8 +33,6 @@ import code.with.me.testroomandnavigationdrawertest.databinding.PhotoItemBinding
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
-import code.with.me.testroomandnavigationdrawertest.ui.sheet.MakeANoteSheet
-import code.with.me.testroomandnavigationdrawertest.ui.sheet.MakeANoteSheetDirections
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.PaintSheet
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.UserActionNote
@@ -123,12 +117,13 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
 
     private fun openPaintSheet() {
         val paintSheet = PaintSheet()
-        (activity as MainActivity).sheetController.showSheet(paintSheet)
-//        findNavController().navigate(MakeANoteSheetDirections.actionMakeANoteSheetToPaintSheet())
+        (activity as MainActivity).let { activity ->
+            activity.sheetController.showSheet(activity, paintSheet)
+        }
     }
 
 
-    private var requestt =
+    private var request =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             when (currentPermission) {
                 TypeOfPermission.CAMERA -> {
@@ -155,8 +150,6 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
                     Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                 )
                 imageInString = imageUri.toString()
-                binding.coverImage.visible()
-                Glide.with(this).load(imageUri).into(binding.coverImage)
                 imageSelected.invoke(imageInString)
                 listOfPhotos.add(PhotoModel(imageInString))
                 adapter.submitList(listOfPhotos)
@@ -445,7 +438,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
                 ) == PackageManager.PERMISSION_DENIED
             ) {
                 currentPermission = TypeOfPermission.CAMERA
-                requestt.launch(
+                request.launch(
                     arrayOf(
                         Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE
                     )
