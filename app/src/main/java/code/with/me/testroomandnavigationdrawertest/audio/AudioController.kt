@@ -1,21 +1,15 @@
 package code.with.me.testroomandnavigationdrawertest.audio
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.os.Build
 import android.os.CountDownTimer
-import android.view.View
-import android.view.animation.OvershootInterpolator
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.registerForActivityResult
 import androidx.core.app.ActivityCompat
 import code.with.me.testroomandnavigationdrawertest.Utils.println
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
-import code.with.me.testroomandnavigationdrawertest.ui.sheet.AudioRecorderSheet
 import java.io.File
 import java.io.IOException
 import javax.inject.Inject
@@ -28,6 +22,7 @@ class AudioController @Inject constructor() {
     var activity: MainActivity? = null
     private var countDownTimer: CountDownTimer? = null
 
+    private var time = System.currentTimeMillis()
 
     private var requestAudioPermission =
         activity?.registerForActivityResult(ActivityResultContracts.RequestPermission()) { it ->
@@ -68,9 +63,9 @@ class AudioController @Inject constructor() {
         return false
     }
 
-    private fun getAudioPath(): String? {
+    fun getAudioPath(): String? {
         return activity?.let {
-            "${it.cacheDir.absolutePath}${File.pathSeparator}${System.currentTimeMillis()}.wav"
+            "${it.cacheDir.absolutePath}${File.pathSeparator}${time}.wav"
         }
     }
 
@@ -91,7 +86,7 @@ class AudioController @Inject constructor() {
         countDownTimer = object : CountDownTimer(60_000, 100) {
             override fun onTick(p0: Long) {
                 val volume = getVolume()
-                "Volume = $volume".println()
+//                "Volume = $volume".println()
                 val scale = min(8.0, volume / MAX_RECORD_AMPLITUDE + 1.0).toFloat()
                 scaleCallback?.invoke(scale)
             }

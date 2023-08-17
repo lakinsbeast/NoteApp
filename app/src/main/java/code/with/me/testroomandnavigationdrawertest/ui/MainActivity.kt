@@ -2,15 +2,14 @@ package code.with.me.testroomandnavigationdrawertest.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.NavController
-import androidx.navigation.Navigation
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityMainBinding
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.FragmentController
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.FragmentOptions
+import code.with.me.testroomandnavigationdrawertest.ui.dialog.CreateFolderDialog
 import code.with.me.testroomandnavigationdrawertest.ui.fragment.MainScreenFragment
-import code.with.me.testroomandnavigationdrawertest.ui.sheet.AudioRecorderSheet
+import code.with.me.testroomandnavigationdrawertest.ui.sheet.AudioRecorderDialog
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
@@ -30,9 +29,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val fragment = MainScreenFragment()
-        val sheet = AudioRecorderSheet()
-//        fragmentController.openFragment(this, fragment, FragmentOptions(R.id.fragment_detail))
-        sheetController.showSheet(this, sheet)
+        fragmentController.openFragment(this, fragment, FragmentOptions(R.id.fragment_detail))
     }
 
     private fun initDI() {

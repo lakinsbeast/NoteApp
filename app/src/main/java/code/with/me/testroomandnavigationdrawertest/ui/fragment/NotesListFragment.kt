@@ -54,7 +54,6 @@ class NotesListFragment :
                 is UserActionNote.SavedNoteToDB -> {
 
                 }
-
                 else -> {}
             }
         }

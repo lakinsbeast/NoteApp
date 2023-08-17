@@ -13,6 +13,7 @@
     <string name="allNotes">Все заметки</string>
     <string name="notes">Заметки</string>
     <string name="all">Все</string>
+    <string name="saveAudio">Сохранить голосовую запись</string>
 
 
     <string name="createFolder">Создать папку</string>
@@ -21,7 +22,7 @@
     <string name="renameFolder">Изменить название папки</string>
     <string name="createTag">Создать метку</string>
     <string name="cancel">Отмена</string>
-    <string name="audioRecordRunning">Идет запись аудио</string>
+    <string name="audioRecordRunning">Идет запись аудио...</string>
     <string name="write_folder_name">Введите название папки</string>
     <string name="favorite_folder">Избранная папка</string>
 </resources>

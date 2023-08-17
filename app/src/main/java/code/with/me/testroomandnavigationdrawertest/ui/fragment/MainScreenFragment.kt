@@ -55,6 +55,7 @@ class MainScreenFragment :
         listenViewModel()
         initClickListeners()
         openNotesListFragment()
+        createFirstChip()
     }
 
     private fun initClickListeners() {
@@ -81,14 +82,14 @@ class MainScreenFragment :
         lifecycleScope.launch {
             mainScreenViewModel.getAllFolders().collect() {
                 println("getAllFolders size: ${it.size}")
-                binding.chipGroup.removeAllViewsInLayout()
-                val chip = Chip(
-                    binding.chipGroup.context,
-                    null,
-                    MR.style.Widget_MaterialComponents_Chip_Filter
-                )
-                chip.setUpFirstChip()
-                binding.chipGroup.addView(chip)
+
+
+                //TODO FIX THIS SHIT
+                binding.chipGroup.forEachIndexed { index, view ->
+                    if (index != 0) {
+                        binding.chipGroup.removeView((binding.chipGroup[index] as Chip))
+                    }
+                }
                 if (it.isNotEmpty()) {
                     it.forEach { folder ->
                         val chip = Chip(
@@ -104,6 +105,16 @@ class MainScreenFragment :
         }
     }
 
+    private fun createFirstChip() {
+        val chip = Chip(
+            binding.chipGroup.context,
+            null,
+            MR.style.Widget_MaterialComponents_Chip_Filter
+        )
+        chip.setUpFirstChip()
+        binding.chipGroup.addView(chip)
+    }
+
     private fun Chip.setUpFirstChip() {
         text = getString(R.string.allNotes)
         isClickable = true
@@ -117,6 +128,7 @@ class MainScreenFragment :
                 R.color.black
             )
         )
+
         selectedChip = this.id
         chipCornerRadius = 15f
         setOnClickListener { view ->

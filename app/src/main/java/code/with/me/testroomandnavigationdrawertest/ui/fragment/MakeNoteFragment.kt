@@ -17,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -33,6 +34,7 @@ import code.with.me.testroomandnavigationdrawertest.databinding.PhotoItemBinding
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
+import code.with.me.testroomandnavigationdrawertest.ui.sheet.AudioRecorderDialog
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.PaintSheet
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.UserActionNote
@@ -127,7 +129,9 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             when (currentPermission) {
                 TypeOfPermission.CAMERA -> {
-                    openCamera()
+                    activity?.let {
+                        makeCameraFileAndOpenCamera(it)
+                    }
                 }
 
                 TypeOfPermission.IMAGE_GALLERY -> {
@@ -138,7 +142,9 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
                     audioRec()
                 }
 
-                else -> {}
+                else -> {
+                    println("jkghsfhkjsfgd")
+                }
             }
         }
 
@@ -241,7 +247,9 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
             }
 
             is UserActionNote.GetMicrophone -> {
-                println("GetCamera!")
+                AudioRecorderDialog(activity()) {
+                    audioInString = it
+                }.show()
             }
 
             is UserActionNote.GetDraw -> {
@@ -443,33 +451,37 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
                         Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE
                     )
                 )
-                currentPermission = TypeOfPermission.WRITE_EXTERNAL
+            } else {
+                makeCameraFileAndOpenCamera(it)
             }
-            val timeStamp = SimpleDateFormat("yyyyMMddHHmmSS").format(Date())
-            val storageDir = File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),
-                "NotesPhotos"
-            ).apply { mkdir() }
-            val imageFile = File(
-                storageDir,
-                "image".plus(Calendar.getInstance().timeInMillis).plus(timeStamp).plus(".jpg")
-            ).apply {
-                createNewFile()
-                if (parentFile?.exists()!!) {
-                    parentFile?.mkdirs()
-                }
-                if (exists()) {
-                    mkdirs()
-                }
+        }
+    }
+
+    private fun makeCameraFileAndOpenCamera(it: FragmentActivity): Job {
+        val timeStamp = SimpleDateFormat("yyyyMMddHHmmSS").format(Date())
+        val storageDir = File(
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),
+            "NotesPhotos"
+        ).apply { mkdir() }
+        val imageFile = File(
+            storageDir,
+            "image".plus(Calendar.getInstance().timeInMillis).plus(timeStamp).plus(".jpg")
+        ).apply {
+            createNewFile()
+            if (parentFile?.exists()!!) {
+                parentFile?.mkdirs()
             }
-            cameraUri = FileProvider.getUriForFile(
-                it,
-                providerName,
-                imageFile
-            )
-            lifecycleScope.launch {
-                getImageFromCamera.launch(cameraUri)
+            if (exists()) {
+                mkdirs()
             }
+        }
+        cameraUri = FileProvider.getUriForFile(
+            it,
+            providerName,
+            imageFile
+        )
+        return lifecycleScope.launch {
+            getImageFromCamera.launch(cameraUri)
         }
     }
 
