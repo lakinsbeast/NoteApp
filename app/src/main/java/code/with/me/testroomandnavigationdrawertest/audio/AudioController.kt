@@ -1,19 +1,23 @@
 package code.with.me.testroomandnavigationdrawertest.audio
 
 import android.Manifest
+import android.content.ContentValues
 import android.content.pm.PackageManager
 import android.media.MediaPlayer
 import android.media.MediaRecorder
+import android.net.Uri
 import android.os.Build
 import android.os.CountDownTimer
+import android.provider.MediaStore
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import code.with.me.testroomandnavigationdrawertest.Utils.println
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
-import java.io.File
+import java.io.FileDescriptor
 import java.io.IOException
 import javax.inject.Inject
 import kotlin.math.min
+
 
 class AudioController @Inject constructor() {
 
@@ -31,6 +35,7 @@ class AudioController @Inject constructor() {
             }
         }
 
+    var audiouri: Uri? = null
 
     fun startPlaying() {
         player = MediaPlayer().apply {
@@ -63,10 +68,17 @@ class AudioController @Inject constructor() {
         return false
     }
 
-    fun getAudioPath(): String? {
-        return activity?.let {
-            "${it.cacheDir.absolutePath}${File.pathSeparator}${time}.wav"
-        }
+    fun getAudioPath(): FileDescriptor? {
+        val values = ContentValues(4)
+        values.put(MediaStore.Audio.Media.TITLE, System.currentTimeMillis())
+        values.put(MediaStore.Audio.Media.DATE_ADDED, (System.currentTimeMillis() / 1000).toInt())
+        values.put(MediaStore.Audio.Media.MIME_TYPE, "audio/mp3")
+        values.put(MediaStore.Audio.Media.RELATIVE_PATH, "Music/Recordings/")
+
+        audiouri =
+            activity?.contentResolver?.insert(MediaStore.Audio.Media.INTERNAL_CONTENT_URI, values);
+        var file = audiouri?.let { activity?.contentResolver?.openFileDescriptor(it, "w") }
+        return file?.fileDescriptor
     }
 
     fun getVolume() = recorder?.maxAmplitude ?: 0

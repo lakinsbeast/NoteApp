@@ -80,7 +80,8 @@ class AudioRecorderDialog(private val myContext: Context, private val result: (S
             dismiss()
         }
         binding.saveAudioButton.setOnClickListener {
-            result.invoke(audioController.getAudioPath().toString())
+            audioController.stopRecording()
+            result.invoke(audioController.audiouri.toString())
             dismiss()
         }
     }

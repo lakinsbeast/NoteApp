@@ -13,8 +13,10 @@ import code.with.me.testroomandnavigationdrawertest.ui.fragment.NoteHomeFragment
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFolderListFragment
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseNotesListFragment
 import code.with.me.testroomandnavigationdrawertest.ui.di.ApplicationModule
+import code.with.me.testroomandnavigationdrawertest.ui.di.AudioModule
 import code.with.me.testroomandnavigationdrawertest.ui.di.BindAppModule
 import code.with.me.testroomandnavigationdrawertest.ui.di.ControllerModule
+import code.with.me.testroomandnavigationdrawertest.ui.di.FileModule
 import code.with.me.testroomandnavigationdrawertest.ui.dialog.CreateFolderDialog
 import code.with.me.testroomandnavigationdrawertest.ui.fragment.MainScreenFragment
 import code.with.me.testroomandnavigationdrawertest.ui.fragment.MakeNoteFragment
@@ -30,7 +32,16 @@ import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [ApplicationModule::class, DatabaseModule::class, RepositoryModule::class, BindAppModule::class, ControllerModule::class])
+@Component(
+    modules = [
+        ApplicationModule::class,
+        DatabaseModule::class,
+        RepositoryModule::class,
+        BindAppModule::class,
+        ControllerModule::class,
+        AudioModule::class,
+        FileModule::class]
+)
 interface AppComponent {
     fun inject(activity: MainActivity)
     fun inject(application: NotesApplication)

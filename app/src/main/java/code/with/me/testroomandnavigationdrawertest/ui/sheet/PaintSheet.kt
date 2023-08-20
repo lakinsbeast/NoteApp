@@ -17,8 +17,10 @@ import androidx.core.view.drawToBitmap
 import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.findNavController
 import code.with.me.testroomandnavigationdrawertest.R
+import code.with.me.testroomandnavigationdrawertest.Utils.println
 import code.with.me.testroomandnavigationdrawertest.Utils.providerName
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityPaintBinding
+import code.with.me.testroomandnavigationdrawertest.file.FilesController
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.MakeANoteSheet.Companion.paintResultKey
 import com.flask.colorpicker.ColorPickerView
@@ -29,6 +31,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.lang.Exception
 import java.util.*
+import javax.inject.Inject
 
 
 class PaintSheet : BaseSheet<ActivityPaintBinding>(ActivityPaintBinding::inflate) {
@@ -36,6 +39,9 @@ class PaintSheet : BaseSheet<ActivityPaintBinding>(ActivityPaintBinding::inflate
     private var isClicked: Boolean = false
     private var brushSizeForUndo: Float = 20f
     private var colorBrush: Int = -99999999
+
+    @Inject
+    lateinit var filesController: FilesController
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -69,49 +75,36 @@ class PaintSheet : BaseSheet<ActivityPaintBinding>(ActivityPaintBinding::inflate
         binding.saveBtn.setOnClickListener {
             try {
                 val bitmap: Bitmap = binding.paintCanvas.drawToBitmap()
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 60, ByteArrayOutputStream())
-                val storageDir = File(
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),
-                    "NotesPhotos"
-                ).apply {
-                    mkdir()
-                }
-                val imageFile = File(
-                    storageDir,
-                    "draw".plus(Calendar.getInstance().timeInMillis)
-                        .plus(
-                            SimpleDateFormat(
-                                "yyyyMMddHHmmSS",
-                                Locale.getDefault()
-                            ).format(Date())
-                        ).plus(".jpg")
-                )
-                imageFile.createNewFile()
-                FileOutputStream(imageFile).apply {
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 70, this)
-                    flush()
-                    close()
-                }
-                imageFile.createNewFile()
-                if (!imageFile.parentFile?.exists()!!) {
-                    imageFile.parentFile?.mkdirs()
-                }
-                if (!imageFile.exists()) {
-                    imageFile.mkdirs()
-                }
-                drawuri = FileProvider.getUriForFile(
+
+                val file = filesController.saveToInternalStorage(
                     requireContext(),
-                    providerName,
-                    imageFile
+                    "draw_${Calendar.getInstance().timeInMillis}_${
+                        SimpleDateFormat(
+                            "yyyyMMddHHmmSS",
+                            Locale.getDefault()
+                        ).format(Date())
+                    }.jpg"
                 )
+
+                FileOutputStream(file).use { outputStream ->
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream)
+                    outputStream.flush()
+                }
+
+                drawuri = file?.let { it1 ->
+                    filesController.getUriForFile(
+                        requireContext(),
+                        it1
+                    )
+                }
                 val resultIntent = Bundle().apply {
                     this.putString("pathBitmap", drawuri.toString())
                 }
                 setFragmentResult(paintResultKey, resultIntent)
             } catch (e: Exception) {
                 println("Error in ${javaClass.simpleName} error is ${e}")
-                Toast.makeText(context, "Ошибка: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
-                findNavController().popBackStack()
+                Toast.makeText(context, "Something went wrong", Toast.LENGTH_LONG).show()
+                e.printStackTrace()
             }
         }
     }

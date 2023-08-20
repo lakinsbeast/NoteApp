@@ -8,6 +8,7 @@ import code.with.me.testroomandnavigationdrawertest.data.repos.FolderRepositoryI
 import code.with.me.testroomandnavigationdrawertest.data.repos.NoteRepositoryImpl
 import code.with.me.testroomandnavigationdrawertest.data.repos.FolderTagRepositoryImpl
 import code.with.me.testroomandnavigationdrawertest.data.repos.NoteTagRepositoryImpl
+import code.with.me.testroomandnavigationdrawertest.file.FilesController
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import code.with.me.testroomandnavigationdrawertest.ui.SheetController
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.CloseFragmentImpl
@@ -129,4 +130,10 @@ class ControllerModule {
 class AudioModule {
     @Provides
     fun provideAudioController() = AudioController()
+}
+
+@Module
+class FileModule {
+    @Provides
+    fun provideFilesController() = FilesController()
 }

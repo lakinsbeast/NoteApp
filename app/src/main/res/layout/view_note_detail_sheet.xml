@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:layout_height="match_parent">
 
     <include layout="@layout/divider_line" />
 
@@ -34,14 +34,38 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/photoList"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:listitem="@layout/photo_item"/>
+                android:layout_height="150dp"
+                tools:listitem="@layout/photo_item" />
+
+            <com.masoudss.lib.WaveformSeekBar
+                android:id="@+id/waveForm"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:marker_color="@color/black"
+                app:marker_text_color="@color/design_default_color_error"
+                app:marker_text_padding="2dp"
+                app:marker_text_size="12dp"
+                app:marker_width="1dp"
+                app:wave_background_color="@color/white"
+                app:wave_corner_radius="2dp"
+                app:wave_gap="2dp"
+                app:wave_gravity="center"
+                app:wave_max_progress="100"
+                app:wave_min_height="5dp"
+                app:wave_padding_Bottom="2dp"
+                app:wave_padding_left="2dp"
+                app:wave_padding_right="2dp"
+                app:wave_padding_top="2dp"
+                app:wave_progress="33"
+                app:wave_progress_color="@color/gray"
+                app:wave_visible_progress="50"
+                app:wave_width="5dp" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/titleText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
+                
                 android:text=""
                 android:textSize="35sp"
                 android:textStyle="bold" />
@@ -60,7 +84,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:visibility="gone"
-        />
+        android:visibility="gone" />
 
 </FrameLayout>

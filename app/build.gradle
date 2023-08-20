@@ -59,9 +59,12 @@ ext {
 }
 dependencies {
 
-    implementation "com.bogdwellers:pinchtozoom:0.1"
+    //audio vizualizer
+    implementation 'com.github.lincollincol:amplituda:2.2.2'
+    implementation 'com.github.massoudss:waveformSeekBar:5.0.2'
 
-    implementation "io.github.gautamchibde:audiovisualizer:${audiovisualizer_version}"
+
+    implementation "com.bogdwellers:pinchtozoom:0.1"
 
     //naviagtion
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"

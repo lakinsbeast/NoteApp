@@ -31,6 +31,7 @@ import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityAddNoteBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.PhotoItemBinding
+import code.with.me.testroomandnavigationdrawertest.file.FilesController
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
@@ -49,6 +50,7 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -107,6 +109,9 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
     lateinit var adapter: BaseAdapter<PhotoModel, PhotoItemBinding>
     private lateinit var photoItem: PhotoItemBinding
 
+    @Inject
+    lateinit var filesController: FilesController
+
 
     enum class TypeOfPermission {
         CAMERA, IMAGE_GALLERY, AUDIO, WRITE_EXTERNAL, EMPTY,
@@ -139,7 +144,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
                 }
 
                 TypeOfPermission.AUDIO -> {
-                    audioRec()
+//                    audioRec()
                 }
 
                 else -> {
@@ -295,25 +300,6 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         }
     }
 
-//    private fun initSheetCallbacks() {
-//        onSlide = {
-////            println("onSlide: $it")
-//        }
-//        onStateChanged = { newState, oldState ->
-//            if (newState != oldState) {
-//                when (newState) {
-//                    6 -> {
-//                        setBottomNavHalfScreen(newState)
-//                    }
-//
-//                    3 -> {
-//                        setBottomNavFullScreen(newState)
-//                    }
-//                }
-//            }
-//        }
-//    }
-
     private fun initClickListeners() {
         binding.bottomNavigation.setOnItemSelectedListener {
             when (it.itemId) {
@@ -351,30 +337,6 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         binding.bottomNavigation.setCheckable()
     }
 
-//    private fun setBottomNavFullScreen(state: Int) {
-//        println("state: $state")
-//        val animator =
-//            ValueAnimator.ofInt((getDisplayMetrics(activity()).heightPixels / 2) - 200, 40)
-//        animator.duration = 100
-//        animator.addUpdateListener {
-//            val animatedValue = animator.animatedValue as Int
-//            setBottomMarginBottomNav(animatedValue)
-//        }
-//        animator.start()
-//        behavior?.state = state
-//    }
-
-//    private fun setBottomNavHalfScreen(state: Int) {
-//        val animator =
-//            ValueAnimator.ofInt(40, (getDisplayMetrics(activity()).heightPixels / 2) - 200)
-//        animator.duration = 100
-//        animator.addUpdateListener {
-//            val animatedValue = animator.animatedValue as Int
-//            setBottomMarginBottomNav(animatedValue)
-//        }
-//        animator.start()
-//        behavior?.state = state
-//    }
 
     private fun setBottomMarginBottomNav(animatedValue: Int) {
         val layParams =
@@ -458,30 +420,20 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
     }
 
     private fun makeCameraFileAndOpenCamera(it: FragmentActivity): Job {
-        val timeStamp = SimpleDateFormat("yyyyMMddHHmmSS").format(Date())
-        val storageDir = File(
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),
-            "NotesPhotos"
-        ).apply { mkdir() }
-        val imageFile = File(
-            storageDir,
-            "image".plus(Calendar.getInstance().timeInMillis).plus(timeStamp).plus(".jpg")
-        ).apply {
-            createNewFile()
-            if (parentFile?.exists()!!) {
-                parentFile?.mkdirs()
-            }
-            if (exists()) {
-                mkdirs()
-            }
-        }
-        cameraUri = FileProvider.getUriForFile(
+        val timeStamp = SimpleDateFormat("yyyyMMddHHmmSS", Locale.getDefault()).format(Date())
+
+        val file = filesController.saveToInternalStorage(
             it,
-            providerName,
-            imageFile
+            "image_${Calendar.getInstance().timeInMillis}_${timeStamp}.jpg"
+        )
+        cameraUri = filesController.getUriForFile(
+            it,
+            file!!
         )
         return lifecycleScope.launch {
-            getImageFromCamera.launch(cameraUri)
+            getImageFromCamera.launch(
+                cameraUri
+            )
         }
     }
 

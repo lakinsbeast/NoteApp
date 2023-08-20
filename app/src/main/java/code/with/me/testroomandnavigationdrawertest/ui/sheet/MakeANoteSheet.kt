@@ -448,7 +448,7 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
             }
             val timeStamp = SimpleDateFormat("yyyyMMddHHmmSS").format(Date())
             val storageDir = File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),
+                context?.filesDir,
                 "NotesPhotos"
             ).apply { mkdir() }
             val imageFile = File(
