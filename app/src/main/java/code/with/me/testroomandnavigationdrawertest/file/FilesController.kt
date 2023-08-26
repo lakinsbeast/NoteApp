@@ -3,6 +3,7 @@ package code.with.me.testroomandnavigationdrawertest.file
 import android.content.Context
 import android.net.Uri
 import androidx.core.content.FileProvider
+import code.with.me.testroomandnavigationdrawertest.Utils.println
 import java.io.File
 import java.io.FileOutputStream
 import java.util.Calendar
@@ -24,6 +25,7 @@ class FilesController @Inject constructor() {
         try {
             val dir = makeDirInInternalStorage(context)
             if (dir != null) {
+                "dirinsave not nul!!".println()
                 return File(
                     dir,
                     fileName
@@ -32,9 +34,8 @@ class FilesController @Inject constructor() {
                         parentFile?.mkdirs()
                     }
                     if (!exists()) {
-                        mkdirs()
+                        createNewFile()
                     }
-                    createNewFile()
                 }
             }
         } catch (e: Exception) {
@@ -43,6 +44,7 @@ class FilesController @Inject constructor() {
         return null
     }
 
+    //FileProvider используется, когда нужно предоставить другим приложениям доступ к моим файлам
     fun getUriForFile(
         context: Context,
         file: File,
@@ -58,7 +60,7 @@ class FilesController @Inject constructor() {
     /**
      * создает папку :)
      **/
-    private fun makeDirInInternalStorage(
+    fun makeDirInInternalStorage(
         context: Context,
         fileName: String = dirFileName
     ): File? {
@@ -66,15 +68,19 @@ class FilesController @Inject constructor() {
             context.filesDir,
             "NotesPhotos"
         )
-        return try {
-            if (dir.mkdir()) {
-                dir
+
+        if (!dir.exists()) {
+            if (dir.mkdirs()) {
+                "mkDir!".println()
             } else {
-                null
+                "not mkDir1!".println()
+                return null
             }
-        } catch (e: Exception) {
-            null
+        } else {
+            "dir exists, not creating!".println()
         }
 
+        return dir
     }
+
 }

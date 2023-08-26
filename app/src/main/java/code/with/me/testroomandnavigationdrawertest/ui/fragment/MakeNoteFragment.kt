@@ -6,16 +6,11 @@ import android.content.pm.PackageManager
 import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
-import androidx.core.content.FileProvider
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.setFragmentResultListener
@@ -24,7 +19,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
-import code.with.me.testroomandnavigationdrawertest.Utils.providerName
 import code.with.me.testroomandnavigationdrawertest.Utils.setCheckable
 import code.with.me.testroomandnavigationdrawertest.Utils.setRoundedCorners
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
@@ -45,8 +39,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import java.io.File
-import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -129,7 +121,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         }
     }
 
-
+//попробовать сделать UUID вместо случайных названий фоток
     private var request =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             when (currentPermission) {
@@ -201,8 +193,6 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
     private fun listenPaintSheetResult() {
         setFragmentResultListener(paintResultKey) { requestKey: String, bundle: Bundle ->
             val paintBitmap = bundle.getString("pathBitmap")
-            println("pathBitmap: ${paintBitmap}")
-            println("requestKey: ${requestKey}")
             if (paintBitmap != null) {
                 paintInString = paintBitmap
                 listOfPhotos.add(PhotoModel(paintInString))
@@ -216,7 +206,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
     }
 
     private fun saveNote() {
-        noteViewModel.saveNote(
+        val note = Note(
             lastSaveID.toInt(),
             binding.titleEdit.text.toString(),
             binding.textEdit.text.toString(),
@@ -228,6 +218,9 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
             lastOpenedTime,
             false,
             "-1"
+        )
+        noteViewModel.saveNote(
+            note
         )
     }
 
@@ -346,56 +339,56 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
     }
 
 
-    private fun stopAudio() {
-        try {
-            activity?.let {
-                recorder?.apply {
-                    stop()
-                    release()
-                }
-//                binding.imageButtonVoice.setImageResource(R.drawable.ic_baseline_keyboard_voice_24)
-                saveNote()
-                Toast.makeText(it, "Запись голоса завершена", Toast.LENGTH_SHORT).show()
-            }
-        } catch (e: Exception) {
-            Log.d("audioRecorder", e.message.toString())
-        }
-    }
-
-
-    private fun audioRec() {
-        activity?.let {
-            if (ActivityCompat.checkSelfPermission(
-                    it, Manifest.permission.RECORD_AUDIO
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    it, arrayOf(Manifest.permission.RECORD_AUDIO), RECORD_AUDIO
-                )
-            } else {
-                fileAudioName = it.externalCacheDir?.absolutePath.toString() + "/$randomNum.3gp"
-                audioInString = fileAudioName.toString()
-                micSelected.invoke(audioInString)
-                Log.d("filename", fileAudioName!!)
-
-                recorder = MediaRecorder().apply {
-                    setAudioSource(MediaRecorder.AudioSource.MIC)
-                    setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-                    setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
-                    setOutputFile(fileAudioName)
-
-                    try {
-                        prepare()
-                        start()
-                        Toast.makeText(it, "Началась запись голоса", Toast.LENGTH_SHORT).show()
-                    } catch (e: IOException) {
-                        Log.d("audioException", e.message.toString())
-                        Toast.makeText(it, e.message.toString(), Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-        }
-    }
+//    private fun stopAudio() {
+//        try {
+//            activity?.let {
+//                recorder?.apply {
+//                    stop()
+//                    release()
+//                }
+////                binding.imageButtonVoice.setImageResource(R.drawable.ic_baseline_keyboard_voice_24)
+//                saveNote()
+//                Toast.makeText(it, "Запись голоса завершена", Toast.LENGTH_SHORT).show()
+//            }
+//        } catch (e: Exception) {
+//            Log.d("audioRecorder", e.message.toString())
+//        }
+//    }
+//
+//
+//    private fun audioRec() {
+//        activity?.let {
+//            if (ActivityCompat.checkSelfPermission(
+//                    it, Manifest.permission.RECORD_AUDIO
+//                ) != PackageManager.PERMISSION_GRANTED
+//            ) {
+//                ActivityCompat.requestPermissions(
+//                    it, arrayOf(Manifest.permission.RECORD_AUDIO), RECORD_AUDIO
+//                )
+//            } else {
+//                fileAudioName = it.externalCacheDir?.absolutePath.toString() + "/$randomNum.3gp"
+//                audioInString = fileAudioName.toString()
+//                micSelected.invoke(audioInString)
+//                Log.d("filename", fileAudioName!!)
+//
+//                recorder = MediaRecorder().apply {
+//                    setAudioSource(MediaRecorder.AudioSource.MIC)
+//                    setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+//                    setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+//                    setOutputFile(fileAudioName)
+//
+//                    try {
+//                        prepare()
+//                        start()
+//                        Toast.makeText(it, "Началась запись голоса", Toast.LENGTH_SHORT).show()
+//                    } catch (e: IOException) {
+//                        Log.d("audioException", e.message.toString())
+//                        Toast.makeText(it, e.message.toString(), Toast.LENGTH_SHORT).show()
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     private fun chooseImage() {
         getImageFromGallery.launch(arrayOf("image/*"))
@@ -426,6 +419,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
             it,
             "image_${Calendar.getInstance().timeInMillis}_${timeStamp}.jpg"
         )
+        file?.createNewFile()
         cameraUri = filesController.getUriForFile(
             it,
             file!!

@@ -16,6 +16,7 @@ import androidx.core.content.FileProvider
 import androidx.core.view.drawToBitmap
 import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.findNavController
+import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.Utils.println
 import code.with.me.testroomandnavigationdrawertest.Utils.providerName
@@ -44,11 +45,17 @@ class PaintSheet : BaseSheet<ActivityPaintBinding>(ActivityPaintBinding::inflate
     lateinit var filesController: FilesController
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        initAppComponent()
         super.onViewCreated(view, savedInstanceState)
         setUpClickListeners()
         setUpPaint()
         behavior?.state = BottomSheetBehavior.STATE_EXPANDED
         behavior?.isDraggable = false
+    }
+
+    private fun initAppComponent() {
+        val appComponent = (requireActivity().application as NotesApplication).appComponent
+        appComponent.inject(this)
     }
 
     private fun setUpClickListeners() {
@@ -85,22 +92,26 @@ class PaintSheet : BaseSheet<ActivityPaintBinding>(ActivityPaintBinding::inflate
                         ).format(Date())
                     }.jpg"
                 )
-
+                "$file".println()
+                "first".println()
+//                 Error in PaintSheet error is java.io.FileNotFoundException: /data/user/0/code.with.me.
+//                 testroomandnavigationdrawertest/files/NotesPhotos/draw_1693061953980_20230826175999.jpg: open failed: EISDIR (Is a directory)
                 FileOutputStream(file).use { outputStream ->
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream)
                     outputStream.flush()
                 }
+                "second".println()
+                drawuri = filesController.getUriForFile(
+                    requireContext(),
+                    file!!
+                )
 
-                drawuri = file?.let { it1 ->
-                    filesController.getUriForFile(
-                        requireContext(),
-                        it1
-                    )
-                }
                 val resultIntent = Bundle().apply {
                     this.putString("pathBitmap", drawuri.toString())
                 }
                 setFragmentResult(paintResultKey, resultIntent)
+                dismiss()
+
             } catch (e: Exception) {
                 println("Error in ${javaClass.simpleName} error is ${e}")
                 Toast.makeText(context, "Something went wrong", Toast.LENGTH_LONG).show()

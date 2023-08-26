@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
@@ -50,7 +49,6 @@ import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
 import javax.inject.Named
-import kotlin.coroutines.CoroutineContext
 
 
 class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding::inflate) {
@@ -161,8 +159,7 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
             if (it) {
                 activity?.let {
                     MediaStore.Images.Media.getBitmap(it.contentResolver, cameraUri)
-                    val test = cameraUri.toString()
-                    cameraInString = test
+                    cameraInString = cameraUri.toString()
                     cameraSelected.invoke(cameraInString)
                     listOfPhotos.add(PhotoModel(cameraInString))
                     adapter.submitList(listOfPhotos)
@@ -204,7 +201,7 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
     }
 
     private fun saveNote() {
-        noteViewModel.saveNote(
+        val note = Note(
             lastSaveID.toInt(),
             binding.titleEdit.text.toString(),
             binding.textEdit.text.toString(),
@@ -216,6 +213,9 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
             lastOpenedTime,
             false,
             "-1"
+        )
+        noteViewModel.saveNote(
+            note
         )
     }
 

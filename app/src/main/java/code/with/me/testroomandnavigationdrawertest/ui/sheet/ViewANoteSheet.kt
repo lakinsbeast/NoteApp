@@ -1,24 +1,20 @@
 package code.with.me.testroomandnavigationdrawertest.ui.sheet
 
-import android.content.Context
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
-import android.provider.DocumentsContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
-import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.Utils.getDate
 import code.with.me.testroomandnavigationdrawertest.Utils.println
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 import code.with.me.testroomandnavigationdrawertest.databinding.PhotoItemBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.ViewNoteDetailSheetBinding
+import code.with.me.testroomandnavigationdrawertest.file.FilesController
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteState
@@ -26,8 +22,6 @@ import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
-import java.io.FileInputStream
-import java.net.URL
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -38,6 +32,9 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
     @Named("noteVMFactory")
     lateinit var factory: ViewModelProvider.Factory
     private lateinit var noteViewModel: NoteViewModel
+
+    @Inject
+    lateinit var filesController: FilesController
 
     lateinit var adapter: BaseAdapter<PhotoModel, PhotoItemBinding>
     private lateinit var photoItem: PhotoItemBinding
@@ -64,6 +61,7 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
 
     private fun initViewModel() {
         val idIntent = arguments?.getInt("noteId") ?: 0
+        "id: $idIntent".println()
         noteViewModel.getNoteById(idIntent)
         noteViewModel.state.observe(viewLifecycleOwner) { state ->
             handleViewState(state)
@@ -85,9 +83,10 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
                     titleText.text = note.titleNote
                     text.text = note.textNote
 
-
-//                    "File(note.audioUrl) exist? ${File(note.audioUrl).exists()}".println()
-//                    binding.waveForm.setSampleFrom(Uri.parse(note.audioUrl))
+                    val cleanPath = note.audioUrl.removePrefix("cache:")
+                    val audioFile = File(cleanPath)
+                    "File(note.audioUrl) exist? ${audioFile.exists()}".println()
+                    binding.waveForm.setSampleFrom(audioFile)
 
 
                     adapter.submitList(ArrayList(note.listOfImages))
@@ -136,7 +135,7 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
                 val binding =
                     PhotoItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 val holder = BaseViewHolder(binding)
-                //Почему-то pinch to zoom не работает даже с библиотеками upd: похоже не работает с sheet
+                //Почему-то pinch не работает даже с библиотеками upd: похоже не работает с sheet
 //                holder.itemView.setOnTouchListener(context?.let { ImageMatrixTouchHandler(it) })
                 holder.itemView.setOnLongClickListener {
                     onLongClickListener?.invoke(holder)

@@ -1,20 +1,16 @@
 package code.with.me.testroomandnavigationdrawertest.ui.base
 
-import android.R
 import android.os.Bundle
-import android.transition.Transition
-import android.transition.TransitionInflater
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
-import code.with.me.testroomandnavigationdrawertest.data.data_classes.NewNote
+import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.databinding.FragmentNotesListBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.NoteItemBinding
 import code.with.me.testroomandnavigationdrawertest.ui.fragment.MainScreenFragment
-import code.with.me.testroomandnavigationdrawertest.ui.fragment.NoteHomeFragment
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
 import javax.inject.Inject
 import javax.inject.Named
@@ -23,7 +19,7 @@ import javax.inject.Named
 abstract class BaseNotesListFragment : BaseFragment<FragmentNotesListBinding>(
     FragmentNotesListBinding::inflate
 ) {
-    lateinit var adapter: BaseAdapter<NewNote, NoteItemBinding>
+    lateinit var adapter: BaseAdapter<Note, NoteItemBinding>
     private lateinit var itemsBinding: NoteItemBinding
 
     var idFolder = -1
@@ -73,14 +69,14 @@ abstract class BaseNotesListFragment : BaseFragment<FragmentNotesListBinding>(
     }
 
     private fun initAdapter() {
-        adapter = object : BaseAdapter<NewNote, NoteItemBinding>(itemsBinding) {
+        adapter = object : BaseAdapter<Note, NoteItemBinding>(itemsBinding) {
             private var selected0 = -1
 
             init {
                 clickListener = {
                     selected0 = it.layoutPosition
-                    val item = getItem(it.layoutPosition) as NewNote
-                    openDetailFragment(item._id)
+                    val item = getItem(it.layoutPosition) as Note
+                    openDetailFragment(item.second_id)
                 }
             }
 

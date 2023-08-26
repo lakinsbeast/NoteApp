@@ -21,7 +21,7 @@ interface NoteDAO {
     @Query("SELECT * FROM note WHERE Title LiKE :title AND " + "text LIKE :text LIMIT 1")
     fun findByTitle(title: String, text: String): Note
 
-    @Query("SELECT * FROM note WHERE id=:id ")
+    @Query("SELECT * FROM note WHERE second_id=:id ")
     @Throws(SQLiteException::class)
     fun getNoteById(id: Int): Note
 

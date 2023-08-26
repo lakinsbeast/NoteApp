@@ -29,15 +29,9 @@ class AudioRecorderDialog(private val myContext: Context, private val result: (S
     Dialog(myContext) {
 
     private lateinit var binding: AudioRecorderBinding
-    private var fileAudioName: String? = null
-
-    private var recorder: MediaRecorder? = null
-    private var audioInString: String = ""
-    private var micSelected: (String) -> Unit = {}
-    private val randomNum = System.currentTimeMillis() / 1000
 
     private var timer: Job? = null
-    var seconds = 0L
+    private var seconds = 0L
 
     @Inject
     lateinit var audioController: AudioController
@@ -61,7 +55,6 @@ class AudioRecorderDialog(private val myContext: Context, private val result: (S
                     .duration = AudioController.VOLUME_UPDATE_DURATION
             }
         }
-
 
         launchTimer()
         initClickListeners()

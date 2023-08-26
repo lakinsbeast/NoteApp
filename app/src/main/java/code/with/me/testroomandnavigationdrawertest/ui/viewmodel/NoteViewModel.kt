@@ -3,15 +3,11 @@ package code.with.me.testroomandnavigationdrawertest.ui.viewmodel
 import androidx.lifecycle.*
 import code.with.me.testroomandnavigationdrawertest.Utils.println
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
-import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 //import code.with.me.testroomandnavigationdrawertest.data.repos.NoteRepository
 import code.with.me.testroomandnavigationdrawertest.domain.repo.NoteRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.cancellable
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.IllegalArgumentException
@@ -21,7 +17,7 @@ class NoteViewModel @Inject constructor(
     private val repoNote: NoteRepository
 ) : ViewModel() {
 
-    //MVI реализовал не самым лучшим способом, можно было создать
+    //MVI реализовал не самым лучшим способом, можно было наверно создать
     //BaseViewModel<MviState, MviActions> и сделать проще
 
     //upd: i dont like this ☹️
@@ -86,10 +82,10 @@ class NoteViewModel @Inject constructor(
 
 
     fun getNoteById(id: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
             try {
                 setState(NoteState.Loading)
-                withContext(Dispatchers.IO.limitedParallelism(1)) {
+                withContext(Dispatchers.IO) {
                     setState(NoteState.Result(repoNote.getNoteById(id)))
                 }
             } catch (e: Exception) {
@@ -141,35 +137,11 @@ class NoteViewModel @Inject constructor(
         }
     }
 
-
     fun saveNote(
-        noteId: Int,
-        title: String,
-        text: String,
-        listOfPhotos: List<PhotoModel>,
-        audio: String,
-        color: String,
-        folderId: Int,
-        createdTime: Long,
-        openedTime: Long,
-        isDeleted: Boolean,
-        customData: String
+        note: Note
     ) {
-        if (title.isNotEmpty() || text.isNotEmpty() || listOfPhotos.isNotEmpty()) {
+        if (note.titleNote.isNotEmpty() || note.textNote.isNotEmpty() || note.listOfImages.isNotEmpty()) {
             viewModelScope.launch {
-                val note = Note(
-                    noteId,
-                    title,
-                    text,
-                    listOfPhotos,
-                    audio,
-                    color,
-                    folderId,
-                    createdTime,
-                    openedTime,
-                    isDeleted,
-                    customData
-                )
                 repoNote.updateNote(note)
                 processUserActions(UserActionNote.SavedNoteToDB)
             }

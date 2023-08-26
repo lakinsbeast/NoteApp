@@ -31,7 +31,7 @@ class AudioController @Inject constructor() {
     private var requestAudioPermission =
         activity?.registerForActivityResult(ActivityResultContracts.RequestPermission()) { it ->
             if (it) {
-                startRecording()
+//                startRecording()
             }
         }
 
@@ -68,7 +68,7 @@ class AudioController @Inject constructor() {
         return false
     }
 
-    fun getAudioPath(): FileDescriptor? {
+    private fun getAudioPath(): FileDescriptor? {
         val values = ContentValues(4)
         values.put(MediaStore.Audio.Media.TITLE, System.currentTimeMillis())
         values.put(MediaStore.Audio.Media.DATE_ADDED, (System.currentTimeMillis() / 1000).toInt())
@@ -76,15 +76,14 @@ class AudioController @Inject constructor() {
         values.put(MediaStore.Audio.Media.RELATIVE_PATH, "Music/Recordings/")
 
         audiouri =
-            activity?.contentResolver?.insert(MediaStore.Audio.Media.INTERNAL_CONTENT_URI, values);
-        var file = audiouri?.let { activity?.contentResolver?.openFileDescriptor(it, "w") }
-        return file?.fileDescriptor
+            activity?.contentResolver?.insert(MediaStore.Audio.Media.INTERNAL_CONTENT_URI, values)
+        val file = audiouri?.let { activity?.contentResolver?.openFileDescriptor(it, "w") }?.fileDescriptor
+        return file
     }
 
     fun getVolume() = recorder?.maxAmplitude ?: 0
 
-
-    fun startRecording(scaleCallback: ((Float) -> Unit)? = null) {
+    fun startRecording(scaleCallback: ((Float) -> Unit)) {
         if (!checkPermission()) return
         if (isAudioRecording()) {
             recorder?.stop()
@@ -94,13 +93,13 @@ class AudioController @Inject constructor() {
         setAndStartRecorder(scaleCallback)
     }
 
-    private fun setAndStartRecorder(scaleCallback: ((Float) -> Unit)?) {
+    private inline fun setAndStartRecorder(crossinline scaleCallback: ((Float) -> Unit)) {
         countDownTimer = object : CountDownTimer(60_000, 100) {
             override fun onTick(p0: Long) {
                 val volume = getVolume()
 //                "Volume = $volume".println()
                 val scale = min(8.0, volume / MAX_RECORD_AMPLITUDE + 1.0).toFloat()
-                scaleCallback?.invoke(scale)
+                scaleCallback.invoke(scale)
             }
 
             override fun onFinish() {

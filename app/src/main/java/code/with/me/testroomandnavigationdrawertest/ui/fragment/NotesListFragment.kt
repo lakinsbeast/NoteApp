@@ -2,16 +2,9 @@ package code.with.me.testroomandnavigationdrawertest.ui.fragment
 
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import code.with.me.testroomandnavigationdrawertest.Utils.gone
-import code.with.me.testroomandnavigationdrawertest.Utils.println
 import code.with.me.testroomandnavigationdrawertest.Utils.visible
-import code.with.me.testroomandnavigationdrawertest.data.data_classes.NewNote
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteState
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseNotesListFragment
@@ -75,11 +68,11 @@ class NotesListFragment :
 
             is NoteState.Result<*> -> {
                 val newNoteList = state.data as List<Note>
-                val note: ArrayList<NewNote> = ArrayList()
-                newNoteList.forEach {
-                    note.add(it.toNewNote())
-                }
-                adapter.submitList(note)
+//                val note: ArrayList<Note> = ArrayList()
+//                newNoteList.forEach {
+//                    note.add(it.toNewNote())
+//                }
+                adapter.submitList(newNoteList.toMutableList())
                 adapter.notifyDataSetChanged()
                 showProgressBar(false)
             }
