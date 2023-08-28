@@ -18,9 +18,6 @@ class NotesListFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         idFolder = arguments?.getInt("idFolder") ?: -1
-//        if (idFolder == -1) {
-//            findNavController().popBackStack()
-//        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -68,10 +65,6 @@ class NotesListFragment :
 
             is NoteState.Result<*> -> {
                 val newNoteList = state.data as List<Note>
-//                val note: ArrayList<Note> = ArrayList()
-//                newNoteList.forEach {
-//                    note.add(it.toNewNote())
-//                }
                 adapter.submitList(newNoteList.toMutableList())
                 adapter.notifyDataSetChanged()
                 showProgressBar(false)

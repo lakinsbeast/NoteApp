@@ -1,5 +1,6 @@
 package code.with.me.testroomandnavigationdrawertest.ui.sheet
 
+import android.Manifest
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
@@ -11,7 +12,10 @@ import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.WindowManager
 import android.view.animation.OvershootInterpolator
+import code.with.me.testroomandnavigationdrawertest.AlertCreator
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
+import code.with.me.testroomandnavigationdrawertest.PermissionController
+import code.with.me.testroomandnavigationdrawertest.Utils.println
 import code.with.me.testroomandnavigationdrawertest.Utils.setCancelButton
 import code.with.me.testroomandnavigationdrawertest.Utils.setRoundedCornersView
 import code.with.me.testroomandnavigationdrawertest.audio.AudioController
@@ -62,6 +66,7 @@ class AudioRecorderDialog(private val myContext: Context, private val result: (S
         setUpDialogWindow()
     }
 
+
     private fun initAppComponent() {
         val appComponent =
             ((myContext as MainActivity).application as NotesApplication).appComponent
@@ -74,7 +79,7 @@ class AudioRecorderDialog(private val myContext: Context, private val result: (S
         }
         binding.saveAudioButton.setOnClickListener {
             audioController.stopRecording()
-            result.invoke(audioController.audiouri.toString())
+            result.invoke(audioController.getAudioPath(myContext as MainActivity))
             dismiss()
         }
     }

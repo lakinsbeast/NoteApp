@@ -24,6 +24,20 @@ object AlertCreator {
             }
     }
 
+    inline fun createAudioGivePermissionDialog(
+        context: Context,
+        crossinline isGiven: (Boolean) -> Unit
+    ) {
+        val dialog = AlertDialog.Builder(context).setTitle("Необходимо разрешение")
+            .setMessage("Для записи аудиосообщений необходимо размерение на запись с микрофона. Пожалуйста, разрешите приложению использовать камеру, чтобы вы могли добавлять фотографии к своим заметкам. Для этого нажмите 'Разрешить' в окне запроса разрешения. Без доступа к микрофону функция записи аудиосообщения в заметках будет недоступна ")
+            .setPositiveButton("Ок") { _, _ ->
+                isGiven.invoke(true)
+            }.setNegativeButton("Нет") { _, _ ->
+                isGiven.invoke(false)
+            }
+        dialog.show()
+    }
+
     inline fun createAddFolderMenu(
         context: Context,
         crossinline onNewTagClick: () -> Unit,

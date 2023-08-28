@@ -41,7 +41,7 @@ interface NoteDAO {
     @Update
     suspend fun updateNote(note: Note)
 
-    @Query("SELECT * FROM note ORDER BY id DESC LIMIT 1")
+    @Query("SELECT * FROM note ORDER BY second_id DESC LIMIT 1")
     fun getLastCustomer(): Long
 
 }

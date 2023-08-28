@@ -1,47 +1,36 @@
 package code.with.me.testroomandnavigationdrawertest.audio
 
 import android.Manifest
-import android.content.ContentValues
 import android.content.pm.PackageManager
 import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Build
 import android.os.CountDownTimer
-import android.provider.MediaStore
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import code.with.me.testroomandnavigationdrawertest.PermissionController
 import code.with.me.testroomandnavigationdrawertest.Utils.println
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
-import java.io.FileDescriptor
 import java.io.IOException
 import javax.inject.Inject
 import kotlin.math.min
 
-
+/**
+ * Необходимо присваивать activity, но думаю переделать и везде, где нужен активити передавать
+ * активити в параметры
+ **/
 class AudioController @Inject constructor() {
 
-    private var player: MediaPlayer? = null
+    var player: MediaPlayer? = null
     private var recorder: MediaRecorder? = null
     var activity: MainActivity? = null
     private var countDownTimer: CountDownTimer? = null
-
-    private var time = System.currentTimeMillis()
-
-    private var requestAudioPermission =
-        activity?.registerForActivityResult(ActivityResultContracts.RequestPermission()) { it ->
-            if (it) {
-//                startRecording()
-            }
-        }
-
-    var audiouri: Uri? = null
-
-    fun startPlaying() {
+    fun startPlaying(audioPath: String) {
         player = MediaPlayer().apply {
             try {
-                //TODO do with this
-                setDataSource(getAudioPath())
+                setDataSource(audioPath)
                 prepare()
                 start()
             } catch (e: IOException) {
@@ -50,41 +39,15 @@ class AudioController @Inject constructor() {
         }
     }
 
-    private fun checkPermission(): Boolean {
-        activity?.let { mainActivity ->
-            if (ActivityCompat.checkSelfPermission(
-                    mainActivity,
-                    Manifest.permission.RECORD_AUDIO
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-                return true
-            } else {
-                requestAudioPermission?.launch(
-                    Manifest.permission.RECORD_AUDIO
-                )
-                return false
-            }
-        }
-        return false
+    fun getAudioPath(activity: MainActivity): String {
+        val fileName = "${activity.externalCacheDir?.absolutePath}/audiorecordtest.3gp"
+        return fileName
     }
 
-    private fun getAudioPath(): FileDescriptor? {
-        val values = ContentValues(4)
-        values.put(MediaStore.Audio.Media.TITLE, System.currentTimeMillis())
-        values.put(MediaStore.Audio.Media.DATE_ADDED, (System.currentTimeMillis() / 1000).toInt())
-        values.put(MediaStore.Audio.Media.MIME_TYPE, "audio/mp3")
-        values.put(MediaStore.Audio.Media.RELATIVE_PATH, "Music/Recordings/")
-
-        audiouri =
-            activity?.contentResolver?.insert(MediaStore.Audio.Media.INTERNAL_CONTENT_URI, values)
-        val file = audiouri?.let { activity?.contentResolver?.openFileDescriptor(it, "w") }?.fileDescriptor
-        return file
-    }
 
     fun getVolume() = recorder?.maxAmplitude ?: 0
 
     fun startRecording(scaleCallback: ((Float) -> Unit)) {
-        if (!checkPermission()) return
         if (isAudioRecording()) {
             recorder?.stop()
             countDownTimer?.cancel()
@@ -115,7 +78,7 @@ class AudioController @Inject constructor() {
                 MediaRecorder(mainActivity).apply {
                     setAudioSource(MediaRecorder.AudioSource.MIC)
                     setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
-                    setOutputFile(getAudioPath())
+                    setOutputFile(getAudioPath(mainActivity))
                     setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
 
                     try {
@@ -128,33 +91,40 @@ class AudioController @Inject constructor() {
                 }
             }
         } else {
-            MediaRecorder().apply {
-                setAudioSource(MediaRecorder.AudioSource.MIC)
-                setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
-                setOutputFile(getAudioPath())
-                setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+            activity?.let { mainActivity ->
+                MediaRecorder().apply {
+                    setAudioSource(MediaRecorder.AudioSource.MIC)
+                    setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
+                    setOutputFile(getAudioPath(mainActivity))
+                    setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
 
-                try {
-                    prepare()
-                } catch (e: IOException) {
-                    "prepare() failed".println()
+                    try {
+                        prepare()
+                    } catch (e: IOException) {
+                        "prepare() failed".println()
+                    }
+
+                    start()
                 }
-
-                start()
             }
         }
     }
 
     fun isAudioRecording() = recorder != null
-
+    fun isAudioPlaying() = player?.isPlaying == true
 
     fun stopRecording() {
         recorder?.apply {
             stop()
+            reset()
             release()
         }
         countDownTimer?.cancel()
         recorder = null
+    }
+
+    fun pausePlaying() {
+        player?.pause()
     }
 
     fun stopPlaying() {

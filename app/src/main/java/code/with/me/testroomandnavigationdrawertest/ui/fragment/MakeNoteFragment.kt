@@ -17,10 +17,14 @@ import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import code.with.me.testroomandnavigationdrawertest.AlertCreator
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
+import code.with.me.testroomandnavigationdrawertest.PermissionController
 import code.with.me.testroomandnavigationdrawertest.R
+import code.with.me.testroomandnavigationdrawertest.Utils.println
 import code.with.me.testroomandnavigationdrawertest.Utils.setCheckable
 import code.with.me.testroomandnavigationdrawertest.Utils.setRoundedCorners
+import code.with.me.testroomandnavigationdrawertest.audio.AudioController
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityAddNoteBinding
@@ -104,6 +108,9 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
     @Inject
     lateinit var filesController: FilesController
 
+//    @Inject
+//    lateinit var audioController: AudioController
+
 
     enum class TypeOfPermission {
         CAMERA, IMAGE_GALLERY, AUDIO, WRITE_EXTERNAL, EMPTY,
@@ -121,7 +128,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         }
     }
 
-//попробовать сделать UUID вместо случайных названий фоток
+    //попробовать сделать UUID вместо случайных названий фоток
     private var request =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             when (currentPermission) {
@@ -174,6 +181,14 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
                     adapter.notifyDataSetChanged()
                     saveNote()
                 }
+            }
+        }
+
+    private val requestAudioPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { it ->
+            "requestAudioPermission it: $it".println()
+            if (it) {
+
             }
         }
 
@@ -245,9 +260,24 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
             }
 
             is UserActionNote.GetMicrophone -> {
-                AudioRecorderDialog(activity()) {
-                    audioInString = it
-                }.show()
+                if (!PermissionController.checkAudioPermission(activity())) {
+                    "fasel".println()
+                    AlertCreator.createAudioGivePermissionDialog(activity()) {
+                        "it: $it".println()
+                        if (it) {
+                            try {
+                                requestAudioPermission.launch(Manifest.permission.RECORD_AUDIO)
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+                    }
+                } else {
+                    "trueeee".println()
+                    AudioRecorderDialog(activity()) {
+                        audioInString = it
+                    }.show()
+                }
             }
 
             is UserActionNote.GetDraw -> {

@@ -3,7 +3,7 @@ package code.with.me.testroomandnavigationdrawertest.data.data_classes
 import androidx.room.*
 import kotlinx.serialization.Serializable
 
-//создал модельку для удобного создания адаптера
+//создал модельку для удобного создания адаптера recyclerview
 @Entity()
 class Note(
     @PrimaryKey(autoGenerate = true) var second_id: Int,

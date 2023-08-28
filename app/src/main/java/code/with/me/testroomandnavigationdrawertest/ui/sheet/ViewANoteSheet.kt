@@ -8,8 +8,14 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
+import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.Utils.getDate
+import code.with.me.testroomandnavigationdrawertest.Utils.gone
+import code.with.me.testroomandnavigationdrawertest.Utils.launchAfterTimerIO
+import code.with.me.testroomandnavigationdrawertest.Utils.launchAfterTimerMain
 import code.with.me.testroomandnavigationdrawertest.Utils.println
+import code.with.me.testroomandnavigationdrawertest.Utils.visible
+import code.with.me.testroomandnavigationdrawertest.audio.AudioController
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 import code.with.me.testroomandnavigationdrawertest.databinding.PhotoItemBinding
@@ -21,12 +27,22 @@ import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteState
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
+import com.masoudss.lib.SeekBarOnProgressChanged
+import com.masoudss.lib.WaveformSeekBar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Named
+import kotlin.math.roundToInt
 
 
 class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheetBinding::inflate) {
+
+    private var currentPos: Int = -1
 
     @Inject
     @Named("noteVMFactory")
@@ -36,8 +52,44 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
     @Inject
     lateinit var filesController: FilesController
 
+    @Inject
+    lateinit var audioController: AudioController
+
     lateinit var adapter: BaseAdapter<PhotoModel, PhotoItemBinding>
     private lateinit var photoItem: PhotoItemBinding
+
+    private val timerJob = CoroutineScope(Dispatchers.IO.limitedParallelism(1)).launch {
+
+    }
+
+    private var currentNote: Note? = null
+        set(value) {
+            if (value != field) {
+                field = value
+                if (value != null) {
+                    binding.apply {
+                        dateText.text = getDate(value.lastTimestampCreate)
+                        titleText.text = value.titleNote
+                        text.text = value.textNote
+
+                        if (value.audioUrl.isNotEmpty()) {
+                            audioLayout.visible()
+                            "File(value.audioUrl) exist? ${File(value.audioUrl).exists()}".println()
+                            try {
+                                waveForm.setSampleFrom(File(value.audioUrl))
+                            } catch (_: Exception) {
+
+                            }
+                        } else {
+                            audioLayout.gone()
+                        }
+
+                        adapter.submitList(ArrayList(value.listOfImages))
+                        adapter.notifyDataSetChanged()
+                    }
+                }
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +97,7 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
         appComponent.inject(this)
         noteViewModel = ViewModelProvider(this, factory)[NoteViewModel::class.java]
         setFullScreenSheet()
+        audioController.activity = activity()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -52,6 +105,82 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
         initAdapterInflating()
         initAdapter()
         initViewModel()
+        initClickListeners()
+        binding.waveForm.onProgressChanged = object : SeekBarOnProgressChanged {
+            override fun onProgressChanged(
+                waveformSeekBar: WaveformSeekBar,
+                progress: Float,
+                fromUser: Boolean
+            ) {
+                if (fromUser) {
+                    if (audioController.player?.isPlaying == true) {
+                        audioController.pausePlaying()
+                    }
+                    audioController.player?.let {
+                        currentPos =
+                            ((it.duration.times(progress)).roundToInt()) / 100
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * надо что-то сделать с после playAudio.setOnClickListener
+     **/
+    private fun initClickListeners() {
+        binding.apply {
+            playAudio.setOnClickListener {
+                "currentPos: $currentPos".println()
+                startAudioPlaying()
+            }
+        }
+    }
+
+    private fun ViewNoteDetailSheetBinding.startAudioPlaying() {
+        try {
+            if (!audioController.isAudioPlaying()) {
+                playAudio.setImageResource(R.drawable.small_pause_btn)
+                if (currentPos != -1) {
+                    audioController.player?.start()
+                    audioController.player?.seekTo(currentPos)
+                } else {
+                    audioController.startPlaying(currentNote?.audioUrl.toString())
+                }
+                launchAfterTimerMain(0) {
+                    run breaking@{
+                        while (true) {
+                            //в let нельзя использовать break, загуглил и нашел такой вариант через run breaking@
+                            audioController.player?.let { player ->
+                                currentPos =
+                                    player.currentPosition
+                                if (currentPos != -1) {
+                                    waveForm.progress =
+                                        ((currentPos * 100) / player.duration).toFloat()
+                                }
+                                if (player.currentPosition == player.duration) {
+                                    currentPos = -1
+                                }
+                                if (!audioController.isAudioPlaying()) {
+                                    playAudio.setImageResource(R.drawable.small_play_arrow_btn)
+                                    "audioController.player?.currentPosition ${audioController.player?.currentPosition}".println()
+                                    "audioController.player?.duration ${audioController.player?.duration}".println()
+                                    audioController.pausePlaying()
+                                    return@breaking
+                                }
+                            }
+                            delay(0)
+                        }
+                    }
+
+                }
+            } else {
+                playAudio.setImageResource(R.drawable.small_play_arrow_btn)
+                audioController.pausePlaying()
+            }
+        } catch (e: Exception) {
+            playAudio.setImageResource(R.drawable.small_play_arrow_btn)
+        }
     }
 
     private fun initAdapterInflating() {
@@ -66,7 +195,6 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
         noteViewModel.state.observe(viewLifecycleOwner) { state ->
             handleViewState(state)
         }
-
     }
 
     private fun handleViewState(state: NoteState) {
@@ -77,20 +205,8 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
 
             is NoteState.Result<*> -> {
                 binding.apply {
-                    val note = state.data as Note
+                    currentNote = state.data as Note
                     println("note: ${state.data}")
-                    dateText.text = getDate(note.lastTimestampCreate)
-                    titleText.text = note.titleNote
-                    text.text = note.textNote
-
-                    val cleanPath = note.audioUrl.removePrefix("cache:")
-                    val audioFile = File(cleanPath)
-                    "File(note.audioUrl) exist? ${audioFile.exists()}".println()
-                    binding.waveForm.setSampleFrom(audioFile)
-
-
-                    adapter.submitList(ArrayList(note.listOfImages))
-                    adapter.notifyDataSetChanged()
                 }
                 showProgressBar(false)
             }
@@ -104,7 +220,7 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
                         Snackbar.LENGTH_LONG
                     ).show()
                 }
-                println("ERROR in ${this.javaClass.simpleName} error: ${state.error}")
+                "ERROR in ${this.javaClass.simpleName} error: ${state.error}".println()
             }
 
             is NoteState.EmptyResult -> {
