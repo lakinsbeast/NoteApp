@@ -30,7 +30,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.masoudss.lib.SeekBarOnProgressChanged
 import com.masoudss.lib.WaveformSeekBar
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Delay
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -58,9 +60,8 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
     lateinit var adapter: BaseAdapter<PhotoModel, PhotoItemBinding>
     private lateinit var photoItem: PhotoItemBinding
 
-    private val timerJob = CoroutineScope(Dispatchers.IO.limitedParallelism(1)).launch {
-
-    }
+    private var timerJob: Job? = null
+    private var doWaveFormOnTouch = false
 
     private var currentNote: Note? = null
         set(value) {
@@ -106,6 +107,10 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
         initAdapter()
         initViewModel()
         initClickListeners()
+        setWaveformProgressCallback()
+    }
+
+    private fun setWaveformProgressCallback() {
         binding.waveForm.onProgressChanged = object : SeekBarOnProgressChanged {
             override fun onProgressChanged(
                 waveformSeekBar: WaveformSeekBar,
@@ -116,12 +121,31 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
                     if (audioController.player?.isPlaying == true) {
                         audioController.pausePlaying()
                     }
+                    if (audioController.player == null) {
+                        audioController.initPlayer(currentNote?.audioUrl.toString())
+                    }
                     audioController.player?.let {
                         currentPos =
                             ((it.duration.times(progress)).roundToInt()) / 100
                     }
+                    startTimer(100) {
+                        if (!doWaveFormOnTouch) {
+                            startAudioPlaying()
+                        }
+                    }
                 }
             }
+        }
+    }
+
+    fun startTimer(delayLong: Long, onDelayPassed: () -> Unit) {
+        if (timerJob != null) {
+            timerJob?.cancel()
+            timerJob = null
+        }
+        timerJob = CoroutineScope(Dispatchers.IO.limitedParallelism(1)).launch {
+            delay(delayLong)
+            onDelayPassed.invoke()
         }
     }
 
@@ -131,27 +155,33 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
     private fun initClickListeners() {
         binding.apply {
             playAudio.setOnClickListener {
-                "currentPos: $currentPos".println()
                 startAudioPlaying()
+            }
+            waveForm.setOnTouchListener { v, event ->
+                doWaveFormOnTouch = true
+                false
+            }
+            waveForm.setOnClickListener {
+                doWaveFormOnTouch = false
             }
         }
     }
 
-    private fun ViewNoteDetailSheetBinding.startAudioPlaying() {
-        try {
-            if (!audioController.isAudioPlaying()) {
-                playAudio.setImageResource(R.drawable.small_pause_btn)
-                if (currentPos != -1) {
-                    audioController.player?.start()
-                    audioController.player?.seekTo(currentPos)
-                } else {
-                    audioController.startPlaying(currentNote?.audioUrl.toString())
-                }
-                launchAfterTimerMain(0) {
-                    run breaking@{
+    private fun startAudioPlaying() {
+        binding.apply {
+            try {
+                if (!audioController.isAudioPlaying()) {
+                    playAudio.setImageResource(R.drawable.small_pause_btn)
+                    if (currentPos != -1) {
+                        audioController.player?.start()
+                        audioController.player?.seekTo(currentPos)
+                    } else {
+                        audioController.startPlaying(currentNote?.audioUrl.toString())
+                    }
+                    launchAfterTimerMain(10) {
                         while (true) {
-                            //в let нельзя использовать break, загуглил и нашел такой вариант через run breaking@
-                            audioController.player?.let { player ->
+                            if (audioController.player != null) {
+                                val player = audioController.player!!
                                 currentPos =
                                     player.currentPosition
                                 if (currentPos != -1) {
@@ -160,26 +190,24 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
                                 }
                                 if (player.currentPosition == player.duration) {
                                     currentPos = -1
+                                    waveForm.progress = 0F
                                 }
                                 if (!audioController.isAudioPlaying()) {
                                     playAudio.setImageResource(R.drawable.small_play_arrow_btn)
-                                    "audioController.player?.currentPosition ${audioController.player?.currentPosition}".println()
-                                    "audioController.player?.duration ${audioController.player?.duration}".println()
                                     audioController.pausePlaying()
-                                    return@breaking
+                                    break
                                 }
                             }
-                            delay(0)
+                            delay(10)
                         }
                     }
-
+                } else {
+                    playAudio.setImageResource(R.drawable.small_play_arrow_btn)
+                    audioController.pausePlaying()
                 }
-            } else {
+            } catch (e: Exception) {
                 playAudio.setImageResource(R.drawable.small_play_arrow_btn)
-                audioController.pausePlaying()
             }
-        } catch (e: Exception) {
-            playAudio.setImageResource(R.drawable.small_play_arrow_btn)
         }
     }
 

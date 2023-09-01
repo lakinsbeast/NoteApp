@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-private var scope = CoroutineScope(Dispatchers.Main + Job())
+private var scope = CoroutineScope(Dispatchers.Main.immediate + Job())
 private var ioScope = CoroutineScope(Dispatchers.IO + Job())
 
 //todo надо изменить, дичь какая-то

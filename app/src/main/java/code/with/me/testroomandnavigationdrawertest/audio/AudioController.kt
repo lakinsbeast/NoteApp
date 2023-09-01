@@ -39,6 +39,17 @@ class AudioController @Inject constructor() {
         }
     }
 
+    fun initPlayer(audioPath: String) {
+        player = MediaPlayer().apply {
+            try {
+                setDataSource(audioPath)
+                prepare()
+            } catch (e: IOException) {
+                "prepare() failed".println()
+            }
+        }
+    }
+
     fun getAudioPath(activity: MainActivity): String {
         val fileName = "${activity.externalCacheDir?.absolutePath}/audiorecordtest.3gp"
         return fileName

@@ -77,6 +77,7 @@ class CreateFolderDialog(private val myContext: Context) :
         binding.cancelButton.setCancelButton()
         binding.confirmButton.setConfirmButton()
         clearAllSelectedChip()
+
     }
 
     private fun setUpDialogWindow() {
