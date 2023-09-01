@@ -1,4 +1,15 @@
 <h1 align="center">NotesApp</h1>
+
+https://github.com/lakinsbeast/NoteApp/assets/45600625/0268f009-7281-4ea2-a44a-df6588b662a8
+
+Особенности:
+<ul>
+   <li>возможность рисования</li>
+  <li>автосохранение заметок при вводе</li>
+   <li>возможность добавления фотографии</li>
+   <li>запись голосовой заметки</li>
+  </ul>
+</h1>
 <h1 align="center">The application has been completely rewritten, everything written at the bottom is no longer valid!</h1>
 <h1 align="center">MVI/MVVM, coroutines, room</h1>
 <h1 align="center">
