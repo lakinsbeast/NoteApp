@@ -6,10 +6,10 @@ import code.with.me.testroomandnavigationdrawertest.ui.controllers.IDeleteLastFr
 
 
 // ?? помоему дичь
-class FragmentBackStackManager(private val fragmentManager: FragmentManager) :
+class FragmentBackStackManager :
     IClearBackStack,
     IDeleteLastFragmentIfNeeded {
-    override fun clearBackStackIfNeeded(clearBackStack: Boolean) {
+    override fun clearBackStackIfNeeded(clearBackStack: Boolean, fragmentManager: FragmentManager) {
         if (clearBackStack) {
             for (i in 0 until fragmentManager.backStackEntryCount - 1) {
                 fragmentManager.popBackStack()
@@ -17,7 +17,7 @@ class FragmentBackStackManager(private val fragmentManager: FragmentManager) :
         }
     }
 
-    override fun deleteLastFragmentIfNeeded(deleteLast: Boolean) {
+    override fun deleteLastFragmentIfNeeded(deleteLast: Boolean, fragmentManager: FragmentManager) {
         if (deleteLast) {
             try {
                 fragmentManager.popBackStack()

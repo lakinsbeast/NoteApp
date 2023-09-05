@@ -254,6 +254,7 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
             is NoteState.EmptyResult -> {
                 showProgressBar(false)
             }
+
         }
     }
 

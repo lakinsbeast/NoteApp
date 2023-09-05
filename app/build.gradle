@@ -13,8 +13,10 @@ android {
     packagingOptions {
         resources {
             excludes += ['META-INF/DEPENDENCIES', 'META-INF/NOTICE', 'META-INF/LICENSE', 'META-INF/LICENSE.txt', 'META-INF/NOTICE.txt']
+            excludes += ['META-INF/LICENSE.md', 'META-INF/LICENSE-notice.md']
         }
     }
+
 
     defaultConfig {
         applicationId "code.with.me.testroomandnavigationdrawertest"
@@ -24,6 +26,7 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
     }
     viewBinding {
         enabled = true
@@ -70,6 +73,9 @@ dependencies {
 
     //dagger 2
     implementation 'com.google.dagger:dagger:2.46.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+    androidTestImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.46.1'
     kapt 'com.google.dagger:dagger-compiler:2.46.1'
 
@@ -132,6 +138,7 @@ dependencies {
     //retrofit gson converter
     implementation "com.squareup.retrofit2:converter-gson:${retrofit_version}"
 
+
     //gms
     implementation 'com.google.android.gms:play-services-auth:20.6.0'
 
@@ -139,7 +146,12 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
 //    implementation group: 'com.google.android.material', name: 'material', version: '1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+
+
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3"
     testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation "androidx.arch.core:core-testing:2.2.0"
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }

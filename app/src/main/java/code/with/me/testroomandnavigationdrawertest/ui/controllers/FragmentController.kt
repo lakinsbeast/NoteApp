@@ -2,11 +2,12 @@ package code.with.me.testroomandnavigationdrawertest.ui.controllers
 
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import code.with.me.testroomandnavigationdrawertest.ui.FragmentBackStackManager
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import javax.inject.Inject
 
-
+// под чем я был, когда писал это?
 class FragmentController @Inject constructor(
     private val getFragmentImpl: IGetFragment,
     private val openFragmentImpl: IOpenFragment,
@@ -49,11 +50,11 @@ interface ICloseFragment {
 }
 
 interface IClearBackStack {
-    fun clearBackStackIfNeeded(clearBackStack: Boolean)
+    fun clearBackStackIfNeeded(clearBackStack: Boolean, fragmentManager: FragmentManager)
 }
 
 interface IDeleteLastFragmentIfNeeded {
-    fun deleteLastFragmentIfNeeded(deleteLast: Boolean)
+    fun deleteLastFragmentIfNeeded(deleteLast: Boolean, fragmentManager: FragmentManager)
 }
 
 class GetFragmentImpl @Inject constructor() : IGetFragment {
@@ -67,15 +68,22 @@ class GetFragmentImpl @Inject constructor() : IGetFragment {
     }
 }
 
-class OpenFragmentImpl @Inject constructor() : IOpenFragment {
+class OpenFragmentImpl @Inject constructor(
+    private val fragmentBackStackManager: FragmentBackStackManager
+) : IOpenFragment {
     override fun openFragment(
         activity: MainActivity,
         fragment: Fragment,
         options: FragmentOptions
     ) {
-        val fragmentBackStackManager = FragmentBackStackManager(activity.supportFragmentManager)
-        fragmentBackStackManager.clearBackStackIfNeeded(options.clearBackStack)
-        fragmentBackStackManager.deleteLastFragmentIfNeeded(options.deleteLast)
+        fragmentBackStackManager.clearBackStackIfNeeded(
+            options.clearBackStack,
+            activity.supportFragmentManager
+        )
+        fragmentBackStackManager.deleteLastFragmentIfNeeded(
+            options.deleteLast,
+            activity.supportFragmentManager
+        )
 
         activity.supportFragmentManager.beginTransaction()
             .add(options.fragmentLayout, fragment, fragment.javaClass.simpleName)
@@ -84,15 +92,22 @@ class OpenFragmentImpl @Inject constructor() : IOpenFragment {
     }
 }
 
-class ReplaceFragmentImpl @Inject constructor() : IReplaceFragment {
+class ReplaceFragmentImpl @Inject constructor(
+    private val fragmentBackStackManager: FragmentBackStackManager
+) : IReplaceFragment {
     override fun replaceFragment(
         activity: MainActivity,
         fragment: Fragment,
         options: FragmentOptions
     ) {
-        val fragmentBackStackManager = FragmentBackStackManager(activity.supportFragmentManager)
-        fragmentBackStackManager.clearBackStackIfNeeded(options.clearBackStack)
-        fragmentBackStackManager.deleteLastFragmentIfNeeded(options.deleteLast)
+        fragmentBackStackManager.clearBackStackIfNeeded(
+            options.clearBackStack,
+            activity.supportFragmentManager
+        )
+        fragmentBackStackManager.deleteLastFragmentIfNeeded(
+            options.deleteLast,
+            activity.supportFragmentManager
+        )
 
         activity.supportFragmentManager.beginTransaction()
             .replace(options.fragmentLayout, fragment, fragment.javaClass.simpleName)

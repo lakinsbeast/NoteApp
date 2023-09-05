@@ -7,21 +7,22 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NoteDAO {
-    @Query("SELECT * FROM note")
+
+    @Query(SELECT_NOTE)
     @Throws(SQLiteException::class)
     fun getListOfNotes(): Flow<List<Note>>
 
-    @Query("SELECT * FROM note WHERE folderId = :id")
+    @Query("$SELECT_NOTE WHERE folderId = :id")
     @Throws(SQLiteException::class)
     fun getListOfNotes(id: Int): Flow<List<Note>>
 
-    @Query("SELECT * FROM note WHERE id IN (:userIds)")
+    @Query("$SELECT_NOTE WHERE id IN (:userIds)")
     fun loadAllIds(userIds: IntArray): List<Note>
 
-    @Query("SELECT * FROM note WHERE Title LiKE :title AND " + "text LIKE :text LIMIT 1")
+    @Query("$SELECT_NOTE WHERE Title LiKE :title AND text LIKE :text LIMIT 1")
     fun findByTitle(title: String, text: String): Note
 
-    @Query("SELECT * FROM note WHERE second_id=:id ")
+    @Query("$SELECT_NOTE WHERE second_id=:id ")
     @Throws(SQLiteException::class)
     fun getNoteById(id: Int): Note
 
@@ -41,7 +42,13 @@ interface NoteDAO {
     @Update
     suspend fun updateNote(note: Note)
 
-    @Query("SELECT * FROM note ORDER BY second_id DESC LIMIT 1")
+    @Query("$SELECT_NOTE ORDER BY second_id DESC LIMIT 1")
     fun getLastCustomer(): Long
+
+    companion object {
+        private const val INSERT_NOTE = ""
+        private const val SELECT_NOTE = "SELECT * FROM note "
+    }
+
 
 }

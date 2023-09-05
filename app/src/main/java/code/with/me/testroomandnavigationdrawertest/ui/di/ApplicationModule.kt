@@ -9,6 +9,7 @@ import code.with.me.testroomandnavigationdrawertest.data.repos.NoteRepositoryImp
 import code.with.me.testroomandnavigationdrawertest.data.repos.FolderTagRepositoryImpl
 import code.with.me.testroomandnavigationdrawertest.data.repos.NoteTagRepositoryImpl
 import code.with.me.testroomandnavigationdrawertest.file.FilesController
+import code.with.me.testroomandnavigationdrawertest.ui.FragmentBackStackManager
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import code.with.me.testroomandnavigationdrawertest.ui.SheetController
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.CloseFragmentImpl
@@ -123,6 +124,9 @@ class ControllerModule {
 
     @Provides
     fun provideSheetController() = SheetController()
+
+    @Provides
+    fun provideFragmentBackStackManager() = FragmentBackStackManager()
 }
 
 
