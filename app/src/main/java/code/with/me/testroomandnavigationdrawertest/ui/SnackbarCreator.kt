@@ -29,8 +29,6 @@ fun Snackbar.makeViewANoteSheetBottomBar(@LayoutRes layoutRes: Int): Snackbar {
 
 }
 object SnackbarCreator {
-
-
     fun makeViewANoteSheetBottomBar(view: View, message: CharSequence, duration: Int): Snackbar {
         val customView =
 

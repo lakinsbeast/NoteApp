@@ -35,12 +35,6 @@ class NoteViewModel @Inject constructor(
 
     private lateinit var jobGetNote: Job
 
-    override fun onCleared() {
-        "before oncleared".println()
-        super.onCleared()
-        "after oncleared".println()
-    }
-
     fun getAllNotes(): Job {
         //после смены фрагмента в mainscreen продолжались доставаться данные
         //из обеих flow с айди и без, принято решение сделать так:

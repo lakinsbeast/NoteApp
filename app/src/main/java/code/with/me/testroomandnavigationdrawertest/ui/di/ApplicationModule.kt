@@ -30,6 +30,8 @@ import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModelFa
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderTagViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderTagViewModelFactory
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MainScreenViewModelFactory
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.ViewANoteViewModel
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.ViewANoteViewModelFactory
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -43,6 +45,11 @@ abstract class BindAppModule {
     @Singleton
     @Named("noteVMFactory")
     abstract fun bindNoteVMFactory(factory: NoteViewModelFactory): ViewModelProvider.Factory
+
+    @Binds
+    @Singleton
+    @Named("viewANoteVMFactory")
+    abstract fun bindViewANoteVMFactory(factory: ViewANoteViewModelFactory): ViewModelProvider.Factory
 
     @Binds
     @Singleton
@@ -78,6 +85,12 @@ class ApplicationModule(private val application: NotesApplication) {
     ) = NoteViewModel(repo)
 
     @Provides
+    fun provideViewANoteViewModel(
+        repo: NoteRepositoryImpl,
+        audioController: AudioController
+    ) = ViewANoteViewModel(repo, audioController)
+
+    @Provides
     fun provideNoteTagViewModel(
         repo: NoteTagRepositoryImpl
     ) = NoteTagViewModel(repo)
@@ -97,13 +110,20 @@ class ApplicationModule(private val application: NotesApplication) {
 class ControllerModule {
 
     @Provides
+    fun provideFragmentBackStackManager(): FragmentBackStackManager = FragmentBackStackManager()
+
+    @Provides
     fun provideGetFragmentImpl(): IGetFragment = GetFragmentImpl()
 
     @Provides
-    fun provideOpenFragmentImpl(): IOpenFragment = OpenFragmentImpl()
+    fun provideOpenFragmentImpl(
+        fragmentBackStackManager: FragmentBackStackManager
+    ): IOpenFragment = OpenFragmentImpl(fragmentBackStackManager)
 
     @Provides
-    fun provideReplaceFragmentImpl(): IReplaceFragment = ReplaceFragmentImpl()
+    fun provideReplaceFragmentImpl(
+        fragmentBackStackManager: FragmentBackStackManager
+    ): IReplaceFragment = ReplaceFragmentImpl(fragmentBackStackManager)
 
     @Provides
     fun provideCloseFragmentImpl(getFragment: IGetFragment): ICloseFragment =
@@ -125,8 +145,7 @@ class ControllerModule {
     @Provides
     fun provideSheetController() = SheetController()
 
-    @Provides
-    fun provideFragmentBackStackManager() = FragmentBackStackManager()
+
 }
 
 

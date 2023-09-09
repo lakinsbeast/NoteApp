@@ -18,6 +18,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.setFragmentResultListener
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -30,11 +32,15 @@ import code.with.me.testroomandnavigationdrawertest.Utils.setCheckable
 import code.with.me.testroomandnavigationdrawertest.Utils.setRoundedCorners
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
+import code.with.me.testroomandnavigationdrawertest.data.repos.NoteRepositoryImpl
+import code.with.me.testroomandnavigationdrawertest.data.repos.NoteRepositoryImpl_Factory
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityAddNoteBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.PhotoItemBinding
+import code.with.me.testroomandnavigationdrawertest.domain.repo.NoteRepository
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModelFactory
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.UserActionNote
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.CoroutineScope
@@ -104,7 +110,6 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
 
     lateinit var adapter: BaseAdapter<PhotoModel, PhotoItemBinding>
     private lateinit var photoItem: PhotoItemBinding
-
 
     enum class TypeOfPermission {
         CAMERA, IMAGE_GALLERY, AUDIO, WRITE_EXTERNAL, EMPTY,
@@ -270,7 +275,6 @@ class MakeANoteSheet : BaseSheet<ActivityAddNoteBinding>(ActivityAddNoteBinding:
             }
         }
     }
-
 
 
     private fun initViewModel() {

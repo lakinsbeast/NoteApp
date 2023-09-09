@@ -19,6 +19,7 @@ import code.with.me.testroomandnavigationdrawertest.databinding.MainScreenFragme
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.FragmentOptions
+import code.with.me.testroomandnavigationdrawertest.ui.controllers.fragmentOptionsBuilder
 import code.with.me.testroomandnavigationdrawertest.ui.dialog.CreateFolderDialog
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.AddFolderSheet
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.ViewANoteSheet
@@ -173,7 +174,10 @@ class MainScreenFragment :
         (activity as MainActivity).fragmentController.replaceFragment(
             activity as MainActivity,
             notesListFragment,
-            FragmentOptions(R.id.fragment_container, clearBackStack = true)
+            fragmentOptionsBuilder {
+                fragmentLayout = R.id.fragment_container
+                clearBackStack = true
+            }
         )
         showProgressBar(false)
     }
@@ -185,7 +189,9 @@ class MainScreenFragment :
         fragment.arguments = bundle
         (activity as MainActivity).fragmentController.openFragment(
             activity as MainActivity,
-            fragment, FragmentOptions(R.id.fragment_detail)
+            fragment, fragmentOptionsBuilder {
+                fragmentLayout = R.id.fragment_detail
+            }
         )
     }
 

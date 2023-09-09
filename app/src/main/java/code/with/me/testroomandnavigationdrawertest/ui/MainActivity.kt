@@ -6,10 +6,8 @@ import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityMainBinding
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.FragmentController
-import code.with.me.testroomandnavigationdrawertest.ui.controllers.FragmentOptions
-import code.with.me.testroomandnavigationdrawertest.ui.dialog.CreateFolderDialog
+import code.with.me.testroomandnavigationdrawertest.ui.controllers.fragmentOptionsBuilder
 import code.with.me.testroomandnavigationdrawertest.ui.fragment.MainScreenFragment
-import code.with.me.testroomandnavigationdrawertest.ui.sheet.AudioRecorderDialog
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
@@ -22,17 +20,20 @@ class MainActivity : AppCompatActivity() {
     lateinit var sheetController: SheetController
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        initDI()
+        initAppComponent()
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
 
         val fragment = MainScreenFragment()
-        fragmentController.openFragment(this, fragment, FragmentOptions(R.id.fragment_detail))
+//        fragmentController.openFragment(this, fragment, FragmentOptions(R.id.fragment_detail))
+        fragmentController.openFragment(this, fragment, fragmentOptionsBuilder {
+            fragmentLayout = R.id.fragment_detail
+        })
     }
 
-    private fun initDI() {
+    private fun initAppComponent() {
         val appComponent = (application as NotesApplication).appComponent
         appComponent.inject(this)
     }

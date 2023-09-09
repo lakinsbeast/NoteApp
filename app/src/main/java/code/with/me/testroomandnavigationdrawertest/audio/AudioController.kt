@@ -10,9 +10,11 @@ import android.os.CountDownTimer
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.MutableLiveData
 import code.with.me.testroomandnavigationdrawertest.PermissionController
 import code.with.me.testroomandnavigationdrawertest.Utils.println
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.AudioPlayerState
 import java.io.IOException
 import javax.inject.Inject
 import kotlin.math.min
@@ -27,15 +29,36 @@ class AudioController @Inject constructor() {
     private var recorder: MediaRecorder? = null
     var activity: MainActivity? = null
     private var countDownTimer: CountDownTimer? = null
+
+
+    val audioPlaybackStateLiveData = MutableLiveData<AudioPlayerState>()
+
+
     fun startPlaying(audioPath: String) {
         player = MediaPlayer().apply {
             try {
                 setDataSource(audioPath)
                 prepare()
                 start()
+                audioPlaybackStateLiveData.postValue(AudioPlayerState.Playing)
             } catch (e: IOException) {
                 "prepare() failed".println()
             }
+        }.apply {
+            this.setOnCompletionListener {
+                println("setOnCompletionListener!")
+            }
+        }
+    }
+
+    fun continuePlaying() {
+        try {
+            player?.let {
+                it.start()
+                audioPlaybackStateLiveData.postValue(AudioPlayerState.Playing)
+            }
+        } catch (e: IOException) {
+            "continue mediaPlayer failed".println()
         }
     }
 
@@ -136,11 +159,13 @@ class AudioController @Inject constructor() {
 
     fun pausePlaying() {
         player?.pause()
+        audioPlaybackStateLiveData.postValue(AudioPlayerState.Paused)
     }
 
     fun stopPlaying() {
         player?.release()
         player = null
+        audioPlaybackStateLiveData.postValue(AudioPlayerState.Completed)
     }
 
 

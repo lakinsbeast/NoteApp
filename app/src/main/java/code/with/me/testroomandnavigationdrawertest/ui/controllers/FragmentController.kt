@@ -21,15 +21,21 @@ class FragmentController @Inject constructor(
     fun replaceFragment(activity: MainActivity, fragment: Fragment, options: FragmentOptions) {
         replaceFragmentImpl.replaceFragment(activity, fragment, options)
     }
-
-
 }
 
-data class FragmentOptions(
-    val fragmentLayout: Int,
-    val addToBackStack: Boolean = true,
-    val clearBackStack: Boolean = false,
-    val deleteLast: Boolean = false
+//dsl? https://kotlinexpertise.com/java-builders-kotlin-dsls/
+fun fragmentOptionsBuilder(options: FragmentOptions.() -> Unit): FragmentOptions {
+    val fragmentOptions = FragmentOptions()
+    fragmentOptions.options()
+    return fragmentOptions
+}
+
+
+class FragmentOptions(
+    var fragmentLayout: Int = -1,
+    var addToBackStack: Boolean = true,
+    var clearBackStack: Boolean = false,
+    var deleteLast: Boolean = false
 )
 
 
