@@ -43,10 +43,15 @@ class AudioController @Inject constructor() {
                 audioPlaybackStateLiveData.postValue(AudioPlayerState.Playing)
             } catch (e: IOException) {
                 "prepare() failed".println()
+                audioPlaybackStateLiveData.postValue(AudioPlayerState.Error(e.localizedMessage))
             }
         }.apply {
             this.setOnCompletionListener {
-                println("setOnCompletionListener!")
+                audioPlaybackStateLiveData.postValue(AudioPlayerState.Completed)
+            }
+            this.setOnErrorListener { mp, what, extra ->
+                audioPlaybackStateLiveData.postValue(AudioPlayerState.Error("Упс, что-то сломалось"))
+                true
             }
         }
     }
@@ -59,6 +64,7 @@ class AudioController @Inject constructor() {
             }
         } catch (e: IOException) {
             "continue mediaPlayer failed".println()
+            audioPlaybackStateLiveData.postValue(AudioPlayerState.Error(e.localizedMessage))
         }
     }
 
@@ -69,6 +75,8 @@ class AudioController @Inject constructor() {
                 prepare()
             } catch (e: IOException) {
                 "prepare() failed".println()
+                audioPlaybackStateLiveData.postValue(AudioPlayerState.Error(e.localizedMessage))
+
             }
         }
     }
@@ -119,6 +127,8 @@ class AudioController @Inject constructor() {
                         prepare()
                     } catch (e: IOException) {
                         "prepare() failed".println()
+                        audioPlaybackStateLiveData.postValue(AudioPlayerState.Error(e.localizedMessage))
+
                     }
 
                     start()
@@ -136,6 +146,8 @@ class AudioController @Inject constructor() {
                         prepare()
                     } catch (e: IOException) {
                         "prepare() failed".println()
+                        audioPlaybackStateLiveData.postValue(AudioPlayerState.Error(e.localizedMessage))
+
                     }
 
                     start()

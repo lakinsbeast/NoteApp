@@ -5,13 +5,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import code.with.me.testroomandnavigationdrawertest.AlertCreator
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.Utils.getDate
 import code.with.me.testroomandnavigationdrawertest.Utils.gone
-import code.with.me.testroomandnavigationdrawertest.Utils.launchAfterTimerMain
 import code.with.me.testroomandnavigationdrawertest.Utils.println
 import code.with.me.testroomandnavigationdrawertest.Utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
@@ -19,12 +20,12 @@ import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 import code.with.me.testroomandnavigationdrawertest.databinding.PhotoItemBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.ViewNoteDetailSheetBinding
 import code.with.me.testroomandnavigationdrawertest.file.FilesController
+import code.with.me.testroomandnavigationdrawertest.ui.SnackbarCreator
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.AudioPlayerState
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.UserActionAudioState
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteState
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.UserActionNote
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.ViewANoteViewModel
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
@@ -38,23 +39,18 @@ import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Named
-import kotlin.math.roundToInt
 
 
 class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheetBinding::inflate) {
 
-    private var currentPos: Int = -1
+    /**
+     * Нет обработки ошибок у MediaPlayer во viewModel
+     **/
 
     @Inject
     @Named("viewANoteVMFactory")
     lateinit var factory: ViewModelProvider.Factory
     private lateinit var viewANoteViewModel: ViewANoteViewModel
-
-    @Inject
-    lateinit var filesController: FilesController
-
-//    @Inject
-//    lateinit var audioController: AudioController
 
     lateinit var adapter: BaseAdapter<PhotoModel, PhotoItemBinding>
     private lateinit var photoItem: PhotoItemBinding
@@ -135,14 +131,14 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
         }
     }
 
-    fun startTimer(delayLong: Long, onDelayPassed: () -> Unit) {
+    fun startTimer(delayLong: Long, doOnDelayPassed: () -> Unit) {
         if (timerJob != null) {
             timerJob?.cancel()
             timerJob = null
         }
         timerJob = CoroutineScope(Dispatchers.IO.limitedParallelism(1)).launch {
             delay(delayLong)
-            onDelayPassed.invoke()
+            doOnDelayPassed.invoke()
         }
     }
 
@@ -187,9 +183,13 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
         viewANoteViewModel.waveFormProgress.observe(viewLifecycleOwner) { progress ->
             binding.waveForm.progress = progress
         }
+        viewANoteViewModel.userActionAudioState.observe(viewLifecycleOwner) {
+            if (it is UserActionAudioState.Error<*>) {
+                Toast.makeText(activity(), it.error.toString(), Toast.LENGTH_SHORT).show()
+            }
+        }
 
         viewANoteViewModel.getAudioPlaybackStateLiveData().observe(viewLifecycleOwner) { state ->
-            println("state audioPlaybackObserver: $state")
             when (state) {
                 is AudioPlayerState.Idle -> {
                     binding.playAudio.setImageResource(R.drawable.small_play_arrow_btn)
@@ -205,6 +205,10 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
 
                 AudioPlayerState.Completed -> {
                     binding.playAudio.setImageResource(R.drawable.small_play_arrow_btn)
+                }
+
+                is AudioPlayerState.Error<*> -> {
+                    Toast.makeText(activity(), state.error.toString(), Toast.LENGTH_SHORT).show()
                 }
             }
         }

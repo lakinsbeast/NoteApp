@@ -58,6 +58,7 @@ class ViewANoteViewModel @Inject constructor(
         _waveFormProgress.postValue(progress)
     }
 
+
     init {
         audioController.audioPlaybackStateLiveData.observeForever(audioPlaybackObserver)
     }
@@ -98,35 +99,44 @@ class ViewANoteViewModel @Inject constructor(
             is UserActionAudioState.StartPlaying -> {
                 _audioPlayerState.postValue(AudioPlayerState.Playing)
                 _userActionAudioState.postValue(UserActionAudioState.StartPlaying(userAction.audioUri))
-                if (!audioController.isAudioPlaying()) {
-                    if (currentPos != -1) {
-                        audioController.continuePlaying()
-                        audioController.player?.seekTo(currentPos)
-                    } else {
-                        audioController.startPlaying(userAction.audioUri)
-                    }
-                    viewModelScope.launch {
-                        while (true) {
-                            if (audioController.player != null) {
-                                val player = audioController.player!!
-                                currentPos =
-                                    player.currentPosition
-                                if (currentPos != -1) {
-                                    setWaveFormProgress(((currentPos * 100) / player.duration).toFloat())
-                                }
-                                if (player.currentPosition == player.duration) {
-                                    currentPos = -1
-                                    setWaveFormProgress(0f)
-                                }
-                                if (!audioController.isAudioPlaying()) {
-                                    audioController.pausePlaying()
+                try {
+                    if (!audioController.isAudioPlaying()) {
+                        if (currentPos != -1) {
+                            audioController.continuePlaying()
+                            audioController.player?.seekTo(currentPos)
+                        } else {
+                            audioController.startPlaying(userAction.audioUri)
+                        }
+                        viewModelScope.launch {
+                            while (true) {
+                                try {
+                                    if (audioController.player != null) {
+                                        val player = audioController.player!!
+                                        currentPos =
+                                            player.currentPosition
+                                        if (currentPos != -1) {
+                                            setWaveFormProgress(((currentPos * 100) / player.duration).toFloat())
+                                        }
+                                        if (player.currentPosition == player.duration) {
+                                            currentPos = -1
+                                            setWaveFormProgress(0f)
+                                        }
+                                        if (!audioController.isAudioPlaying()) {
+                                            audioController.pausePlaying()
+                                            break
+                                        }
+
+                                    }
+                                } catch (e: Exception) {
+                                    processUserActionsAudio(UserActionAudioState.Error(e.localizedMessage))
                                     break
                                 }
-
+                                delay(10)
                             }
-                            delay(10)
                         }
                     }
+                } catch (e: Exception) {
+                    processUserActionsAudio(UserActionAudioState.Error(e.localizedMessage))
                 }
             }
 
@@ -138,11 +148,16 @@ class ViewANoteViewModel @Inject constructor(
                 }
             }
 
+            else -> {
 
-            UserActionAudioState.Loading -> TODO()
-            is UserActionAudioState.SeekTo -> TODO()
-            is UserActionAudioState.StartPlayingAt -> TODO()
-            is UserActionAudioState.InitPlayer -> {}
+            }
+//            UserActionAudioState.Loading -> {}
+//            is UserActionAudioState.SeekTo -> {
+//
+//            }
+//
+//            is UserActionAudioState.StartPlayingAt -> {}
+//            is UserActionAudioState.InitPlayer -> {}
         }
     }
 
@@ -160,14 +175,6 @@ class ViewANoteViewModel @Inject constructor(
         }
     }
 
-    /**
-     *         noteViewModel.getNoteById(idIntent)
-     *         noteViewModel.state.observe(viewLifecycleOwner) { state ->
-     *             handleViewState(state)
-     *         }
-     */
-
-
     override fun onCleared() {
         audioController.activity = null
         audioController.audioPlaybackStateLiveData.removeObserver(audioPlaybackObserver)
@@ -183,8 +190,8 @@ sealed class UserActionAudioState {
     data object PausePlaying : UserActionAudioState()
     class SeekTo(val position: Int) : UserActionAudioState()
     data class IsPlaying(val isPlaying: Boolean) : UserActionAudioState()
-
     class InitPlayer(val audioUri: String) : UserActionAudioState()
+    class Error<T>(val error: T) : UserActionAudioState()
 
 }
 
@@ -193,6 +200,7 @@ sealed class AudioPlayerState {
     data object Playing : AudioPlayerState()
     data object Paused : AudioPlayerState()
     data object Completed : AudioPlayerState()
+    class Error<T>(val error: T) : AudioPlayerState()
 }
 
 
