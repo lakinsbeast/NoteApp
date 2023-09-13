@@ -30,6 +30,8 @@ import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModelFa
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderTagViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderTagViewModelFactory
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MainScreenViewModelFactory
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MakeNoteViewModel
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MakeNoteViewModelFactory
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.ViewANoteViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.ViewANoteViewModelFactory
 import dagger.Binds
@@ -45,6 +47,12 @@ abstract class BindAppModule {
     @Singleton
     @Named("noteVMFactory")
     abstract fun bindNoteVMFactory(factory: NoteViewModelFactory): ViewModelProvider.Factory
+
+    @Binds
+    @Singleton
+    @Named("makeNoteVMFactory")
+    abstract fun bindMakeNoteVMFactory(factory: MakeNoteViewModelFactory): ViewModelProvider.Factory
+
 
     @Binds
     @Singleton
@@ -83,6 +91,11 @@ class ApplicationModule(private val application: NotesApplication) {
     fun provideNoteViewModel(
         repo: NoteRepositoryImpl
     ) = NoteViewModel(repo)
+
+    @Provides
+    fun provideMakeNoteViewModel(
+        repo: NoteRepositoryImpl
+    ) = MakeNoteViewModel(repo)
 
     @Provides
     fun provideViewANoteViewModel(

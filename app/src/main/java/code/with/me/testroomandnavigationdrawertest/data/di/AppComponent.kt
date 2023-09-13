@@ -24,7 +24,6 @@ import code.with.me.testroomandnavigationdrawertest.ui.sheet.AddFolderSheet
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.AddFolderTagSheetMenu
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.AddNoteTagSheetMenu
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.AudioRecorderDialog
-import code.with.me.testroomandnavigationdrawertest.ui.sheet.MakeANoteSheet
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.PaintSheet
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.RenameFolderSheet
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.SelectFolderDestinationSheet
@@ -57,7 +56,6 @@ interface AppComponent {
     fun inject(baseNotesListFragment: BaseNotesListFragment)
     fun inject(addNoteTagSheetMenu: AddNoteTagSheetMenu)
     fun inject(makeNoteFragment: MakeNoteFragment)
-    fun inject(makeANoteSheet: MakeANoteSheet)
     fun inject(renameFolderSheet: RenameFolderSheet)
     fun inject(lastViewedFoldersFragment: LastViewedFoldersListFragment)
     fun inject(favoriteFoldersFragment: FavoriteFoldersListFragment)

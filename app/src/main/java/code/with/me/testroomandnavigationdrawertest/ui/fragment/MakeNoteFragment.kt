@@ -3,7 +3,6 @@ package code.with.me.testroomandnavigationdrawertest.ui.fragment
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -24,8 +23,6 @@ import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.Utils.println
 import code.with.me.testroomandnavigationdrawertest.Utils.setCheckable
 import code.with.me.testroomandnavigationdrawertest.Utils.setRoundedCorners
-import code.with.me.testroomandnavigationdrawertest.audio.AudioController
-import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityAddNoteBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.PhotoItemBinding
@@ -35,13 +32,12 @@ import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.AudioRecorderDialog
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.PaintSheet
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MakeNoteViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.UserActionNote
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -52,73 +48,19 @@ import javax.inject.Named
 
 class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBinding::inflate) {
 
-
-    private var currentPermission: TypeOfPermission = TypeOfPermission.EMPTY
+    //    private var currentPermission: TypeOfPermission = TypeOfPermission.EMPTY
     private var cameraUri: Uri? = null
-    private var cameraInString: String = ""
-    private var audioInString: String = ""
-    private var paintInString: String = ""
-    private var imageInString: String = ""
-    private var lastCreatedTime: Long = 0L
-    private var lastOpenedTime: Long = 0L
-
-    private var lastSaveID = 0L
-
-    init {
-        lastCreatedTime = System.currentTimeMillis()
-        lastOpenedTime = System.currentTimeMillis()
-    }
-
-    private var RECORD_AUDIO: Int = 0
-
-    private val randomNum = System.currentTimeMillis() / 1000
-
-    private var fileAudioName: String? = null
-
-    private var recorder: MediaRecorder? = null
-
-    var scope = CoroutineScope(Job() + Dispatchers.IO)
-
-    private var pickedColor: String = "#FFFFFFFF"
-
-    private var listOfPhotos = mutableListOf<PhotoModel>()
-
-    private var note: Note = Note(
-        lastSaveID.toInt(),
-        "",
-        "",
-        listOfPhotos.toList(),
-        audioInString,
-        pickedColor,
-        -1,
-        lastCreatedTime,
-        lastOpenedTime,
-        false,
-        "-1"
-    )
 
     @Inject
-    @Named("noteVMFactory")
+    @Named("makeNoteVMFactory")
     lateinit var factory: ViewModelProvider.Factory
-    private lateinit var noteViewModel: NoteViewModel
+    private lateinit var makeNoteViewModel: MakeNoteViewModel
 
     lateinit var adapter: BaseAdapter<PhotoModel, PhotoItemBinding>
     private lateinit var photoItem: PhotoItemBinding
 
     @Inject
     lateinit var filesController: FilesController
-
-//    @Inject
-//    lateinit var audioController: AudioController
-
-
-    enum class TypeOfPermission {
-        CAMERA, IMAGE_GALLERY, AUDIO, WRITE_EXTERNAL, EMPTY,
-    }
-
-    private var imageSelected: (String) -> Unit = {}
-    private var cameraSelected: (String) -> Unit = {}
-    private var micSelected: (String) -> Unit = {}
 
 
     private fun openPaintSheet() {
@@ -131,23 +73,25 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
     //попробовать сделать UUID вместо случайных названий фоток
     private var request =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            when (currentPermission) {
-                TypeOfPermission.CAMERA -> {
-                    activity?.let {
-                        makeCameraFileAndOpenCamera(it)
+            makeNoteViewModel.currentPermission.observe(viewLifecycleOwner) { currentPermission ->
+                when (currentPermission) {
+                    MakeNoteViewModel.Companion.TypeOfPermission.CAMERA -> {
+                        activity?.let {
+                            makeCameraFileAndOpenCamera(it)
+                        }
                     }
-                }
 
-                TypeOfPermission.IMAGE_GALLERY -> {
-                    chooseImage()
-                }
+                    MakeNoteViewModel.Companion.TypeOfPermission.IMAGE_GALLERY -> {
+                        chooseImage()
+                    }
 
-                TypeOfPermission.AUDIO -> {
+                    MakeNoteViewModel.Companion.TypeOfPermission.AUDIO -> {
 //                    audioRec()
-                }
+                    }
 
-                else -> {
-                    println("jkghsfhkjsfgd")
+                    else -> {
+                        println("jkghsfhkjsfgd")
+                    }
                 }
             }
         }
@@ -159,11 +103,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
                     imageUri,
                     Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                 )
-                imageInString = imageUri.toString()
-                imageSelected.invoke(imageInString)
-                listOfPhotos.add(PhotoModel(imageInString))
-                adapter.submitList(listOfPhotos)
-                adapter.notifyDataSetChanged()
+                makeNoteViewModel.getImageFromGallery(imageUri)
                 saveNote()
             }
         }
@@ -173,12 +113,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
             if (it) {
                 activity?.let {
                     MediaStore.Images.Media.getBitmap(it.contentResolver, cameraUri)
-                    val test = cameraUri.toString()
-                    cameraInString = test
-                    cameraSelected.invoke(cameraInString)
-                    listOfPhotos.add(PhotoModel(cameraInString))
-                    adapter.submitList(listOfPhotos)
-                    adapter.notifyDataSetChanged()
+                    makeNoteViewModel.getImageFromCamera(cameraUri.toString())
                     saveNote()
                 }
             }
@@ -187,9 +122,9 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
     private val requestAudioPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { it ->
             "requestAudioPermission it: $it".println()
-            if (it) {
-
-            }
+//            if (it) {
+//
+//            }
         }
 
     companion object {
@@ -201,7 +136,8 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         super.onCreate(savedInstanceState)
         val appComponent = (requireActivity().application as NotesApplication).appComponent
         appComponent.inject(this)
-        noteViewModel = ViewModelProvider(requireActivity(), factory)[NoteViewModel::class.java]
+        makeNoteViewModel =
+            ViewModelProvider(requireActivity(), factory)[MakeNoteViewModel::class.java]
         listenPaintSheetResult()
     }
 
@@ -209,10 +145,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         setFragmentResultListener(paintResultKey) { requestKey: String, bundle: Bundle ->
             val paintBitmap = bundle.getString("pathBitmap")
             if (paintBitmap != null) {
-                paintInString = paintBitmap
-                listOfPhotos.add(PhotoModel(paintInString))
-                adapter.submitList(listOfPhotos)
-                adapter.notifyDataSetChanged()
+                makeNoteViewModel.setPaintSheetResult(paintBitmap)
                 saveNote()
             } else {
                 throw java.lang.Exception("Не удалось получить данные paintActivity")
@@ -221,22 +154,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
     }
 
     private fun saveNote() {
-        val note = Note(
-            lastSaveID.toInt(),
-            binding.titleEdit.text.toString(),
-            binding.textEdit.text.toString(),
-            listOfPhotos.toList(),
-            audioInString,
-            pickedColor,
-            arguments?.getInt("idFolder")!!,
-            lastCreatedTime,
-            lastOpenedTime,
-            false,
-            "-1"
-        )
-        noteViewModel.saveNote(
-            note
-        )
+        makeNoteViewModel.saveNote()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -261,9 +179,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
 
             is UserActionNote.GetMicrophone -> {
                 if (!PermissionController.checkAudioPermission(activity())) {
-                    "fasel".println()
                     AlertCreator.createAudioGivePermissionDialog(activity()) {
-                        "it: $it".println()
                         if (it) {
                             try {
                                 requestAudioPermission.launch(Manifest.permission.RECORD_AUDIO)
@@ -273,10 +189,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
                         }
                     }
                 } else {
-                    "trueeee".println()
-                    AudioRecorderDialog(activity()) {
-                        audioInString = it
-                    }.show()
+                    openAudioRecordDialog()
                 }
             }
 
@@ -285,23 +198,31 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
             }
 
             is UserActionNote.SavedNoteToDB -> {
-                println("${javaClass.simpleName} is UserActionNote.SavedNoteToDB")
+//                println("${javaClass.simpleName} is UserActionNote.SavedNoteToDB")
             }
         }
 
     }
 
+    private fun openAudioRecordDialog() {
+        AudioRecorderDialog(activity()) {
+            makeNoteViewModel.audioInString = it
+        }.show()
+    }
+
     private fun sendViewAction(action: UserActionNote) {
-        noteViewModel.processUserActions(action)
+        makeNoteViewModel.processUserActions(action)
     }
 
     private fun initTextChangeListeners() {
         binding.apply {
             titleEdit.addTextChangedListener {
+                makeNoteViewModel.titleText = it.toString()
                 saveNote()
             }
 
-            textEdit.addTextChangedListener {
+            textEdit.setOnTextChangeListener {
+                makeNoteViewModel.text = it.toString()
                 saveNote()
             }
         }
@@ -309,17 +230,12 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
 
 
     private fun initViewModel() {
-        scope.launch {
-            async {
-                lastSaveID = noteViewModel.getLastCustomer()
-                lastSaveID += 1
-            }.await()
-            launch {
-                noteViewModel.insert(note)
-            }
-        }
-        noteViewModel.userActionState.observe(viewLifecycleOwner) { state ->
+        makeNoteViewModel.userActionState.observe(viewLifecycleOwner) { state ->
             handleUserActionState(state)
+        }
+        makeNoteViewModel.updateAdapterObserver.observe(viewLifecycleOwner) {
+            adapter.submitList(it)
+            adapter.notifyDataSetChanged()
         }
     }
 
@@ -368,58 +284,6 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         binding.bottomNavigation.layoutParams = layParams
     }
 
-
-//    private fun stopAudio() {
-//        try {
-//            activity?.let {
-//                recorder?.apply {
-//                    stop()
-//                    release()
-//                }
-////                binding.imageButtonVoice.setImageResource(R.drawable.ic_baseline_keyboard_voice_24)
-//                saveNote()
-//                Toast.makeText(it, "Запись голоса завершена", Toast.LENGTH_SHORT).show()
-//            }
-//        } catch (e: Exception) {
-//            Log.d("audioRecorder", e.message.toString())
-//        }
-//    }
-//
-//
-//    private fun audioRec() {
-//        activity?.let {
-//            if (ActivityCompat.checkSelfPermission(
-//                    it, Manifest.permission.RECORD_AUDIO
-//                ) != PackageManager.PERMISSION_GRANTED
-//            ) {
-//                ActivityCompat.requestPermissions(
-//                    it, arrayOf(Manifest.permission.RECORD_AUDIO), RECORD_AUDIO
-//                )
-//            } else {
-//                fileAudioName = it.externalCacheDir?.absolutePath.toString() + "/$randomNum.3gp"
-//                audioInString = fileAudioName.toString()
-//                micSelected.invoke(audioInString)
-//                Log.d("filename", fileAudioName!!)
-//
-//                recorder = MediaRecorder().apply {
-//                    setAudioSource(MediaRecorder.AudioSource.MIC)
-//                    setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-//                    setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
-//                    setOutputFile(fileAudioName)
-//
-//                    try {
-//                        prepare()
-//                        start()
-//                        Toast.makeText(it, "Началась запись голоса", Toast.LENGTH_SHORT).show()
-//                    } catch (e: IOException) {
-//                        Log.d("audioException", e.message.toString())
-//                        Toast.makeText(it, e.message.toString(), Toast.LENGTH_SHORT).show()
-//                    }
-//                }
-//            }
-//        }
-//    }
-
     private fun chooseImage() {
         getImageFromGallery.launch(arrayOf("image/*"))
     }
@@ -430,7 +294,8 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
                 ) == PackageManager.PERMISSION_DENIED
             ) {
-                currentPermission = TypeOfPermission.CAMERA
+                makeNoteViewModel.setPermission(MakeNoteViewModel.Companion.TypeOfPermission.CAMERA)
+//                currentPermission = TypeOfPermission.CAMERA
                 request.launch(
                     arrayOf(
                         Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE

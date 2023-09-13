@@ -98,8 +98,8 @@ abstract class BaseNotesListFragment : BaseFragment<FragmentNotesListBinding>(
 
                 holder.binding.apply {
                     val item = getItem(holder.adapterPosition)
-                    titleID.text = cutText(item.titleNote)
-                    textID.text = cutText(item.textNote)
+                    titleID.text = cutText(item.titleNote).checkEmptyTitle()
+                    textID.text = cutText(item.textNote).checkEmptyText()
                     menuBtn.setOnClickListener {
                         printText()
                     }
@@ -132,7 +132,6 @@ abstract class BaseNotesListFragment : BaseFragment<FragmentNotesListBinding>(
                 println("bjdsjhfdhfklasd")
             }
 
-
             fun posItemText(count: Int): String {
                 val count = count + 1
                 return if (count < 10) {
@@ -140,6 +139,20 @@ abstract class BaseNotesListFragment : BaseFragment<FragmentNotesListBinding>(
                 } else {
                     "$count/"
                 }
+            }
+
+            fun String.checkEmptyTitle(): String {
+                if (this.isEmpty()) {
+                    return "Пустая заметка"
+                }
+                return this
+            }
+
+            fun String.checkEmptyText(): String {
+                if (this.isEmpty()) {
+                    return "Нет дополнительного текста"
+                }
+                return this
             }
         }
     }

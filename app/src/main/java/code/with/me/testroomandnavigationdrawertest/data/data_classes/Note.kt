@@ -17,4 +17,15 @@ class Note(
     @ColumnInfo(name = "lastTimestampOpen") val lastTimestampOpen: Long,
     @ColumnInfo(name = "isFavorite") val isFavorite: Boolean,
     @ColumnInfo(name = "tags") val tags: String,
-) : Model()
+) : Model() {
+    override fun toString(): String {
+        return "id: $id \n second_id $second_id \n titleNote $titleNote \n textNote $textNote \n listOfImages $listOfImages \n" +
+                " audioUrl $audioUrl \n" +
+                " colorCard $colorCard \n" +
+                " folderId $folderId \n" +
+                " lastTimestampCreate $lastTimestampCreate \n" +
+                " lastTimestampOpen $lastTimestampOpen \n" +
+                " isFavorite $isFavorite \n" +
+                " tags $tags \n"
+    }
+}

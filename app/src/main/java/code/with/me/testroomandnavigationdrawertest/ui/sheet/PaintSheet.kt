@@ -23,7 +23,7 @@ import code.with.me.testroomandnavigationdrawertest.Utils.providerName
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityPaintBinding
 import code.with.me.testroomandnavigationdrawertest.file.FilesController
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
-import code.with.me.testroomandnavigationdrawertest.ui.sheet.MakeANoteSheet.Companion.paintResultKey
+import code.with.me.testroomandnavigationdrawertest.ui.fragment.MakeNoteFragment.Companion.paintResultKey
 import com.flask.colorpicker.ColorPickerView
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder
 import com.google.android.material.bottomsheet.BottomSheetBehavior

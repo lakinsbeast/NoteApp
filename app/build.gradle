@@ -62,6 +62,9 @@ ext {
 }
 dependencies {
 
+    implementation 'jp.wasabeef:richeditor-android:2.0.0'
+
+
     //audio vizualizer
     implementation 'com.github.lincollincol:amplituda:2.2.2'
     implementation 'com.github.massoudss:waveformSeekBar:5.0.2'
