@@ -33,8 +33,13 @@ class MakeNoteViewModel @Inject constructor(
 
     private var listOfPhotos = mutableListOf<PhotoModel>()
 
-    var titleText = ""
-    var text = ""
+    private var _titleText = MutableLiveData("")
+    val titleText: LiveData<String>
+        get() = _titleText
+
+    private var _text = MutableLiveData("")
+    val text: LiveData<String>
+        get() = _text
 
     private var _currentPermission = MutableLiveData(TypeOfPermission.EMPTY)
     val currentPermission: LiveData<TypeOfPermission>
@@ -64,8 +69,8 @@ class MakeNoteViewModel @Inject constructor(
 
     private var note: Note = Note(
         lastSaveID.toInt(),
-        titleText,
-        text,
+        titleText.value.toString(),
+        text.value.toString(),
         listOfPhotos.toList(),
         audioInString,
         pickedColor,
@@ -90,6 +95,14 @@ class MakeNoteViewModel @Inject constructor(
 
     private fun setState(state: NoteState) {
         _state.postValue(state)
+    }
+
+    fun setTitleText(text: String) {
+        _titleText.postValue(text)
+    }
+
+    fun setText(text: String) {
+        _text.postValue(text)
     }
 
     fun setPermission(newPermission: TypeOfPermission) {
@@ -130,8 +143,8 @@ class MakeNoteViewModel @Inject constructor(
     fun saveNote() {
         val newNote = Note(
             lastSaveID.toInt(),
-            titleText,
-            text,
+            titleText.value.toString(),
+            text.value.toString(),
             listOfPhotos.toList(),
             audioInString,
             pickedColor,

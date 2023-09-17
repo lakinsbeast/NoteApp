@@ -32,6 +32,15 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+
+        super.onSaveInstanceState(outState)
+    }
+
     private fun initAppComponent() {
         val appComponent = (application as NotesApplication).appComponent
         appComponent.inject(this)

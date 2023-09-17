@@ -8,6 +8,7 @@ import code.with.me.testroomandnavigationdrawertest.Utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteState
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseNotesListFragment
+import code.with.me.testroomandnavigationdrawertest.ui.sheet.SeeTextSheet
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.UserActionNote
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
@@ -35,6 +36,38 @@ class NotesListFragment :
                 noteViewModel.getAllNotes(idFolder)
             }
         }
+        activity().sheetController.showSheet(
+            activity(), SeeTextSheet(
+                "> # Заголовок 1\n" +
+                        "\n" +
+                        "Это **жирный текст** и *курсив*.\n" +
+                        "Это *не рабочий жирный текст** и *неправильный курсив**.\n" +
+                        "Это **жирный текст** и ***жирный курсив***.\n" +
+                        "> > аволпвао о ывалдо ыдвлоа ылд о\n" +
+                        "[Текст ссылки](http://example.com/\n" +
+                        "\n" +
+                        "# Заголовок 1\n" +
+                        "\n" +
+                        "## Заголовок 2\n" +
+                        "\n" +
+                        "### Заголовок 3\n" +
+                        "\n" +
+                        "#### Заголовок 4\n" +
+                        "\n" +
+                        "##### Заголовок 5\n" +
+                        "\n" +
+                        "###### Заголовок 6\n" +
+                        "\n" +
+                        "~~Зачеркнутый текст~~ 2\n" +
+                        "\n" +
+                        "Список:\n" +
+                        "\n" +
+                        "1. Пункт 1\n" +
+                        "2. Пункт 2\n" +
+                        "   - Подпункт 2.1\n" +
+                        "   - Подпункт 2.2\n"
+            )
+        )
     }
 
 
@@ -44,6 +77,7 @@ class NotesListFragment :
                 is UserActionNote.SavedNoteToDB -> {
 
                 }
+
                 else -> {}
             }
         }

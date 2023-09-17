@@ -3,12 +3,20 @@ package code.with.me.testroomandnavigationdrawertest.ui.fragment
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.Editable
+import android.text.SpannableString
+import android.text.TextWatcher
+import android.text.style.StrikethroughSpan
+import android.text.style.StyleSpan
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.FragmentActivity
@@ -20,6 +28,7 @@ import code.with.me.testroomandnavigationdrawertest.AlertCreator
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.PermissionController
 import code.with.me.testroomandnavigationdrawertest.R
+import code.with.me.testroomandnavigationdrawertest.Utils.mainScope
 import code.with.me.testroomandnavigationdrawertest.Utils.println
 import code.with.me.testroomandnavigationdrawertest.Utils.setCheckable
 import code.with.me.testroomandnavigationdrawertest.Utils.setRoundedCorners
@@ -38,13 +47,16 @@ import com.bumptech.glide.Glide
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import java.util.Stack
 import javax.inject.Inject
 import javax.inject.Named
+
 
 class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBinding::inflate) {
 
@@ -197,9 +209,8 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
                 openPaintSheet()
             }
 
-            is UserActionNote.SavedNoteToDB -> {
-//                println("${javaClass.simpleName} is UserActionNote.SavedNoteToDB")
-            }
+            is UserActionNote.SavedNoteToDB -> {}
+            else -> {}
         }
 
     }
@@ -217,17 +228,146 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
     private fun initTextChangeListeners() {
         binding.apply {
             titleEdit.addTextChangedListener {
-                makeNoteViewModel.titleText = it.toString()
+//                makeNoteViewModel.titleText = it.toString()
+                makeNoteViewModel.setTitleText(it.toString())
                 saveNote()
             }
 
-            textEdit.setOnTextChangeListener {
-                makeNoteViewModel.text = it.toString()
+//            textEdit.setOnTextChangeListener {
+//                makeNoteViewModel.setText(it.toString())
+//                saveNote()
+//            }
+//            textEdit.addTextChangedListener(object : TextWatcher {
+//                override fun beforeTextChanged(
+//                    s: CharSequence?,
+//                    start: Int,
+//                    count: Int,
+//                    after: Int
+//                ) {
+//                }
+//
+//                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+//                    if (!s.isNullOrEmpty()) {
+//                        //check is char deleted
+//                        if (before == count) {
+//                            if (!isFormattingText) {
+//                                doOnDeleteText(s.toString())
+//                            }
+//                        } else {
+//                            if (!isFormattingText) {
+//                                doWithText(s.toString())
+//                            }
+//                        }
+//                    }
+//                }
+//
+//                override fun afterTextChanged(s: Editable?) {
+//                    makeNoteViewModel.setText(s.toString())
+//                    saveNote()
+////                    doWithText(s.toString())
+//                }
+//
+//            })
+            textEdit.addTextChangedListener {
+                makeNoteViewModel.setText(it.toString())
                 saveNote()
+//                doWithText(it.toString())
             }
         }
     }
 
+//    var isStar = false
+//    var startStack = Stack<String>()
+//    var startStartCursor = 0
+//    var endStartCursor = -1
+
+//    var isFormattingText = false
+
+//    fun doOnDeleteText(text: String) {
+//        CoroutineScope(Dispatchers.IO).launch {
+//            async {
+//                if (text.isNotEmpty() && text.last() == '*' && startStack.isNotEmpty()) {
+//                    startStack.pop()
+//                    checkStartStack()
+//                }
+//            }
+//            async {
+//                acceptStyleText()
+//            }
+//        }
+//    }
+//
+//    fun doWithText(text: String) {
+//        //сохраняем позицию курсора, потому что setText сбрасывает его
+//        CoroutineScope(Dispatchers.IO).launch {
+//            async {
+//                if (text.isNotEmpty() && text.last() == '*') {
+//                    println("startStack.size: ${startStack.size}")
+//                    startStack.push("*")
+////                    when {
+////                        !isStar -> {
+////                            startStack.push("*")
+////                        }
+////
+////                        isStar -> {
+////                            startStack.pop()
+////                        }
+////                    }
+//                    checkStartStack()
+//                }
+//            }.await()
+//            async {
+//                acceptStyleText()
+//            }
+//        }
+//    }
+
+//    private fun checkStartStack() {
+//        when {
+//            startStack.size >= 2 -> {
+//                isStar = true
+//                startStartCursor = binding.textEdit.selectionStart
+//            }
+//
+//            startStack.size == 0 -> {
+//                isStar = false
+//                endStartCursor = binding.textEdit.selectionEnd
+//            }
+//        }
+//    }
+
+//    private suspend fun CoroutineScope.acceptStyleText() {
+//        isFormattingText = true
+//        val selStart = binding.textEdit.selectionStart
+//        val selEnd = binding.textEdit.selectionEnd
+//        println("selStart: $selStart")
+//        println("selEnd: $selEnd")
+//        println("startStartCursor: $startStartCursor")
+//        val spannableString =
+//            SpannableString(binding.textEdit.text.toString())
+//        if (isStar) {
+//            println("isStar true")
+//            spannableString.setSpan(
+//                StrikethroughSpan(),
+//                startStartCursor,
+//                endStartCursor,
+//                0
+//            )
+//        } else {
+//            println("isStar false")
+//            spannableString.setSpan(
+//                StyleSpan(Typeface.NORMAL),
+//                selStart,
+//                selEnd,
+//                0
+//            )
+//        }
+//        mainScope {
+//            binding.textEdit.setText(spannableString)
+//            binding.textEdit.setSelection(binding.textEdit.length())
+//            isFormattingText = false
+//        }
+//    }
 
     private fun initViewModel() {
         makeNoteViewModel.userActionState.observe(viewLifecycleOwner) { state ->
@@ -236,6 +376,19 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         makeNoteViewModel.updateAdapterObserver.observe(viewLifecycleOwner) {
             adapter.submitList(it)
             adapter.notifyDataSetChanged()
+        }
+        makeNoteViewModel.titleText.observe(viewLifecycleOwner) {
+            if (it != binding.titleEdit.text.toString()) {
+                binding.titleEdit.setText(it)
+            }
+        }
+        makeNoteViewModel.text.observe(viewLifecycleOwner) {
+//            if (it != binding.textEdit.html) {
+//                binding.textEdit.html = it
+//            }
+            if (it != binding.textEdit.text.toString()) {
+                binding.textEdit.setText(it)
+            }
         }
     }
 
@@ -288,6 +441,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         getImageFromGallery.launch(arrayOf("image/*"))
     }
 
+
     private fun openCamera() {
         activity?.let {
             if (it.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED || it.checkSelfPermission(
@@ -307,6 +461,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         }
     }
 
+    //пока не знаю как быть с этой функцией, думаю какую-то часть перенести во вьюмодельку, но нужно будет инжектить filesController
     private fun makeCameraFileAndOpenCamera(it: FragmentActivity): Job {
         val timeStamp = SimpleDateFormat("yyyyMMddHHmmSS", Locale.getDefault()).format(Date())
 
@@ -330,17 +485,17 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         adapter = object : BaseAdapter<PhotoModel, PhotoItemBinding>(photoItem) {
             private var selected0 = -1
 
-            init {
-                clickListener = {
-                    selected0 = it.layoutPosition
-                    val item = getItem(it.layoutPosition) as PhotoModel
-//                    openDetailFragment(item.id)
-                }
-                onLongClickListener = {
-                    selected0 = it.layoutPosition
-                    val item = getItem(it.layoutPosition) as PhotoModel
-                }
-            }
+//            init {
+//                clickListener = {
+//                    selected0 = it.layoutPosition
+//                    val item = getItem(it.layoutPosition) as PhotoModel
+////                    openDetailFragment(item.id)
+//                }
+//                onLongClickListener = {
+//                    selected0 = it.layoutPosition
+//                    val item = getItem(it.layoutPosition) as PhotoModel
+//                }
+//            }
 
             override fun onCreateViewHolder(
                 parent: ViewGroup, viewType: Int
@@ -348,13 +503,13 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
                 val binding =
                     PhotoItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 val holder = BaseViewHolder(binding)
-                holder.itemView.setOnClickListener {
-                    clickListener?.invoke(holder)
-                }
-                holder.itemView.setOnLongClickListener {
-                    onLongClickListener?.invoke(holder)
-                    return@setOnLongClickListener true
-                }
+//                holder.itemView.setOnClickListener {
+//                    clickListener?.invoke(holder)
+//                }
+//                holder.itemView.setOnLongClickListener {
+//                    onLongClickListener?.invoke(holder)
+//                    return@setOnLongClickListener true
+//                }
                 return holder
             }
 

@@ -13,6 +13,7 @@ import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.Utils.gone
 import code.with.me.testroomandnavigationdrawertest.Utils.launchAfterTimerMain
+import code.with.me.testroomandnavigationdrawertest.Utils.println
 import code.with.me.testroomandnavigationdrawertest.Utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Folder
 import code.with.me.testroomandnavigationdrawertest.databinding.MainScreenFragmentBinding
@@ -56,7 +57,28 @@ class MainScreenFragment :
         listenViewModel()
         initClickListeners()
         openNotesListFragment()
+        println("fragmentTag saved: ${savedInstanceState?.getString("fragmentTag")}")
+        when (savedInstanceState?.getString("fragmentTag")) {
+            "MakeNoteFragment" -> {
+                openMakeNoteFragment()
+            }
+        }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        kotlin.io.println("onSaveInstanceState fragment tag ${fragmentManager?.fragments?.last()?.javaClass?.simpleName}")
+        outState.putString(
+            "fragmentTag",
+            fragmentManager?.fragments?.last()?.javaClass?.simpleName
+        )
+        super.onSaveInstanceState(outState)
+    }
+
+
 
     private fun initClickListeners() {
         binding.apply {
