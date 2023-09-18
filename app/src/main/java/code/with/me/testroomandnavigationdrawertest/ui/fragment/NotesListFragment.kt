@@ -37,14 +37,15 @@ class NotesListFragment :
             }
         }
         activity().sheetController.showSheet(
-            activity(), SeeTextSheet(
-                "> # Заголовок 1\n" +
+            activity(), SeeTextSheet( // "link(http://example.com) \n" +
+                "[link](https://example.com) \n" +
+                        "# Заголовок 1\n" +
                         "\n" +
                         "Это **жирный текст** и *курсив*.\n" +
                         "Это *не рабочий жирный текст** и *неправильный курсив**.\n" +
                         "Это **жирный текст** и ***жирный курсив***.\n" +
                         "> > аволпвао о ывалдо ыдвлоа ылд о\n" +
-                        "[Текст ссылки](http://example.com/\n" +
+                        "[link](http://example.com) \n" +
                         "\n" +
                         "# Заголовок 1\n" +
                         "\n" +
