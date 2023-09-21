@@ -5,13 +5,16 @@ import code.with.me.testroomandnavigationdrawertest.markdown.BlockQuoteFormatter
 import code.with.me.testroomandnavigationdrawertest.markdown.FirstNewLineTextCheckerImpl
 import code.with.me.testroomandnavigationdrawertest.markdown.FirstSpaceTextCheckerImpl
 import code.with.me.testroomandnavigationdrawertest.markdown.Formatter
+import code.with.me.testroomandnavigationdrawertest.markdown.Heading
 import code.with.me.testroomandnavigationdrawertest.markdown.HeadingFormatter
 import code.with.me.testroomandnavigationdrawertest.markdown.HeadingFormatterImpl
 import code.with.me.testroomandnavigationdrawertest.markdown.HeadingTextCheckerImpl
+import code.with.me.testroomandnavigationdrawertest.markdown.ITextCheckerT
 import code.with.me.testroomandnavigationdrawertest.markdown.ReferenceBracketFormatter
 import code.with.me.testroomandnavigationdrawertest.markdown.ReferenceBracketFormatterImpl
 import code.with.me.testroomandnavigationdrawertest.markdown.ReferenceSquareFormatter
 import code.with.me.testroomandnavigationdrawertest.markdown.ReferenceSquareFormatterImpl
+import code.with.me.testroomandnavigationdrawertest.markdown.Star
 import code.with.me.testroomandnavigationdrawertest.markdown.StarFormatter
 import code.with.me.testroomandnavigationdrawertest.markdown.StarFormatterImpl
 import code.with.me.testroomandnavigationdrawertest.markdown.StarTextCheckerImpl
@@ -20,46 +23,64 @@ import code.with.me.testroomandnavigationdrawertest.markdown.StrikethroughFormat
 import code.with.me.testroomandnavigationdrawertest.markdown.StrikethroughTextCheckerImpl
 import dagger.Module
 import dagger.Provides
+import javax.inject.Named
 
 @Module
 class FormatterModule {
 
     @Provides
-    fun provideFormatters(): Array<Formatter> {
+    fun provideFormatters(
+        starTextChecker: ITextCheckerT<Star>,
+        strikethroughTextChecker: ITextCheckerT<Boolean>,
+        headingTextChecker: ITextCheckerT<Heading>,
+        @Named("FirstNewLineTextChecker") firstNewLineTextChecker: ITextCheckerT<Int>,
+        @Named("FirstSpaceTextChecker") firstSpaceTextChecker: ITextCheckerT<Int>
+    ): Array<Formatter> {
         return arrayOf(
-            provideStarFormatter(),
-            provideStrikethroughFormatter(),
-            provideHeadingFormatter(),
-            provideBlockQuoteFormatter(),
-            provideReferenceSquareFormatter(),
+            provideStarFormatter(starTextChecker),
+            provideStrikethroughFormatter(strikethroughTextChecker),
+            provideHeadingFormatter(headingTextChecker, firstNewLineTextChecker),
+            provideBlockQuoteFormatter(firstNewLineTextChecker),
+            provideReferenceSquareFormatter(firstSpaceTextChecker),
             provideReferenceBracketFormatter()
         )
     }
 
 
     @Provides
-    fun provideStarFormatter(): StarFormatter {
-        return StarFormatterImpl(StarTextCheckerImpl())
+    fun provideStarFormatter(
+        starTextChecker: ITextCheckerT<Star>
+    ): StarFormatter {
+        return StarFormatterImpl(starTextChecker)
     }
 
     @Provides
-    fun provideStrikethroughFormatter(): StrikethroughFormatter {
-        return StrikethroughFormatterImpl(StrikethroughTextCheckerImpl())
+    fun provideStrikethroughFormatter(
+        strikethroughTextChecker: ITextCheckerT<Boolean>
+    ): StrikethroughFormatter {
+        return StrikethroughFormatterImpl(strikethroughTextChecker)
     }
 
     @Provides
-    fun provideHeadingFormatter(): HeadingFormatter {
-        return HeadingFormatterImpl(HeadingTextCheckerImpl(), FirstNewLineTextCheckerImpl())
+    fun provideHeadingFormatter(
+        headingTextChecker: ITextCheckerT<Heading>,
+        firstNewLineTextChecker: ITextCheckerT<Int>
+    ): HeadingFormatter {
+        return HeadingFormatterImpl(headingTextChecker, firstNewLineTextChecker)
     }
 
     @Provides
-    fun provideBlockQuoteFormatter(): BlockQuoteFormatter {
-        return BlockQuoteFormatterImpl(FirstNewLineTextCheckerImpl())
+    fun provideBlockQuoteFormatter(
+        firstNewLineTextChecker: ITextCheckerT<Int>
+    ): BlockQuoteFormatter {
+        return BlockQuoteFormatterImpl(firstNewLineTextChecker)
     }
 
     @Provides
-    fun provideReferenceSquareFormatter(): ReferenceSquareFormatter {
-        return ReferenceSquareFormatterImpl(FirstSpaceTextCheckerImpl())
+    fun provideReferenceSquareFormatter(
+        firstSpaceTextChecker: ITextCheckerT<Int>
+    ): ReferenceSquareFormatter {
+        return ReferenceSquareFormatterImpl(firstSpaceTextChecker)
     }
 
     @Provides

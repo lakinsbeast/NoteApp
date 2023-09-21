@@ -10,6 +10,7 @@ import code.with.me.testroomandnavigationdrawertest.markdown.StarTextCheckerImpl
 import code.with.me.testroomandnavigationdrawertest.markdown.StrikethroughTextCheckerImpl
 import dagger.Module
 import dagger.Provides
+import javax.inject.Named
 
 @Module
 class MarkdownParserModule {
@@ -29,12 +30,14 @@ class MarkdownParserModule {
     }
 
     @Provides
-    fun provideFirstNewLineTextCheckerImpl(): ITextCheckerT<Int> {
+    @Named("FirstNewLineTextChecker")
+    fun provideFirstNewLineTextChecker(): ITextCheckerT<Int> {
         return FirstNewLineTextCheckerImpl()
     }
 
     @Provides
-    fun provideFirstSpaceTextCheckerImpl(): ITextCheckerT<Int> {
+    @Named("FirstSpaceTextChecker")
+    fun provideFirstSpaceTextChecker(): ITextCheckerT<Int> {
         return FirstSpaceTextCheckerImpl()
     }
 
