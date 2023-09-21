@@ -17,6 +17,8 @@ import code.with.me.testroomandnavigationdrawertest.ui.di.AudioModule
 import code.with.me.testroomandnavigationdrawertest.ui.di.BindAppModule
 import code.with.me.testroomandnavigationdrawertest.ui.di.ControllerModule
 import code.with.me.testroomandnavigationdrawertest.ui.di.FileModule
+import code.with.me.testroomandnavigationdrawertest.ui.di.FormatterModule
+import code.with.me.testroomandnavigationdrawertest.ui.di.MarkdownParserModule
 import code.with.me.testroomandnavigationdrawertest.ui.dialog.CreateFolderDialog
 import code.with.me.testroomandnavigationdrawertest.ui.fragment.MainScreenFragment
 import code.with.me.testroomandnavigationdrawertest.ui.fragment.MakeNoteFragment
@@ -26,6 +28,7 @@ import code.with.me.testroomandnavigationdrawertest.ui.sheet.AddNoteTagSheetMenu
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.AudioRecorderDialog
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.PaintSheet
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.RenameFolderSheet
+import code.with.me.testroomandnavigationdrawertest.ui.sheet.SeeTextSheet
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.SelectFolderDestinationSheet
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.ViewANoteSheet
 import dagger.Component
@@ -40,7 +43,9 @@ import javax.inject.Singleton
         BindAppModule::class,
         ControllerModule::class,
         AudioModule::class,
-        FileModule::class]
+        FileModule::class,
+        MarkdownParserModule::class,
+        FormatterModule::class]
 )
 interface AppComponent {
     fun inject(activity: MainActivity)
@@ -65,5 +70,6 @@ interface AppComponent {
     fun inject(audioRecorderDialog: AudioRecorderDialog)
     fun inject(selectFolderDestinationSheet: SelectFolderDestinationSheet)
     fun inject(noteHomeFragment: NoteHomeFragment)
+    fun inject(seeTextSheet: SeeTextSheet)
 
 }

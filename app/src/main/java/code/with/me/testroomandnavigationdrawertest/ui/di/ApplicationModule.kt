@@ -9,6 +9,9 @@ import code.with.me.testroomandnavigationdrawertest.data.repos.NoteRepositoryImp
 import code.with.me.testroomandnavigationdrawertest.data.repos.FolderTagRepositoryImpl
 import code.with.me.testroomandnavigationdrawertest.data.repos.NoteTagRepositoryImpl
 import code.with.me.testroomandnavigationdrawertest.file.FilesController
+import code.with.me.testroomandnavigationdrawertest.markdown.Formatter
+import code.with.me.testroomandnavigationdrawertest.markdown.IStringToMarkdownTextParser
+import code.with.me.testroomandnavigationdrawertest.markdown.StringToMarkdownTextParser
 import code.with.me.testroomandnavigationdrawertest.ui.FragmentBackStackManager
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import code.with.me.testroomandnavigationdrawertest.ui.SheetController
@@ -87,6 +90,7 @@ class ApplicationModule(private val application: NotesApplication) {
     @Singleton
     fun provideApp(): NotesApplication = application
 
+    //TODO: создать ViewModelModule и перенести туда
     @Provides
     fun provideNoteViewModel(
         repo: NoteRepositoryImpl
@@ -117,6 +121,13 @@ class ApplicationModule(private val application: NotesApplication) {
     fun provideFolderTagViewModel(
         repo: FolderTagRepositoryImpl
     ) = FolderTagViewModel(repo)
+
+
+    @Provides
+    fun provideStringToMarkdownTextParser(vararg formatters: Formatter): IStringToMarkdownTextParser {
+        return StringToMarkdownTextParser(*formatters)
+    }
+
 }
 
 @Module

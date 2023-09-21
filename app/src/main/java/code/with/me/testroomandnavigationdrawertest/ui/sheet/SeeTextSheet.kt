@@ -2,6 +2,7 @@ package code.with.me.testroomandnavigationdrawertest.ui.sheet
 
 import android.os.Bundle
 import android.view.View
+import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.Utils.mainScope
 import code.with.me.testroomandnavigationdrawertest.databinding.SeeTextSheetBinding
 import code.with.me.testroomandnavigationdrawertest.markdown.BlockQuoteFormatterImpl
@@ -20,40 +21,43 @@ import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SeeTextSheet(newText: String) :
+class SeeTextSheet(private val newText: String) :
     BaseSheet<SeeTextSheetBinding>(SeeTextSheetBinding::inflate) {
 
-    var text = ""
 
-    init {
-        text = newText
-    }
-
-    var index1 = 0
-
+    @Inject
+    lateinit var markdownParser: StringToMarkdownTextParser
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val appComponent = (requireActivity().application as NotesApplication).appComponent
+        appComponent.inject(this)
         super.onViewCreated(view, savedInstanceState)
 
-        if (text.isNotEmpty()) {
+        if (newText.isNotEmpty()) {
             val before = System.currentTimeMillis()
             println("before: $before")
             CoroutineScope(Dispatchers.Default).launch {
                 mainScope {
-                    val starChecker = StarTextCheckerImpl()
-                    val strikethroughTextChecker = StrikethroughTextCheckerImpl()
-                    val headingTextChecker = HeadingTextCheckerImpl()
-                    val firstNewLineTextCheckerImpl = FirstNewLineTextCheckerImpl()
-                    val firstSpaceTextCheckerImpl = FirstSpaceTextCheckerImpl()
+                    //нужно впихнуть в даггер
+//                    val starChecker = StarTextCheckerImpl()
+//                    val strikethroughTextChecker = StrikethroughTextCheckerImpl()
+//                    val headingTextChecker = HeadingTextCheckerImpl()
+//                    val firstNewLineTextCheckerImpl = FirstNewLineTextCheckerImpl()
+//                    val firstSpaceTextCheckerImpl = FirstSpaceTextCheckerImpl()
+//
+//                    binding.textView.text = StringToMarkdownTextParser(
+//                        StarFormatterImpl(starChecker),
+//                        StrikethroughFormatterImpl(strikethroughTextChecker),
+//                        HeadingFormatterImpl(headingTextChecker, firstNewLineTextCheckerImpl),
+//                        BlockQuoteFormatterImpl(firstNewLineTextCheckerImpl),
+//                        ReferenceSquareFormatterImpl(firstSpaceTextCheckerImpl),
+//                        ReferenceBracketFormatterImpl()
+//                    ).getParsedText(newText)
+//                    val after = System.currentTimeMillis()
+//                    println("total: ${after - before} ")
 
-                    binding.textView.text = StringToMarkdownTextParser(
-                        StarFormatterImpl(starChecker),
-                        StrikethroughFormatterImpl(strikethroughTextChecker),
-                        HeadingFormatterImpl(headingTextChecker, firstNewLineTextCheckerImpl),
-                        BlockQuoteFormatterImpl(firstNewLineTextCheckerImpl),
-                        ReferenceSquareFormatterImpl(firstSpaceTextCheckerImpl),
-                        ReferenceBracketFormatterImpl()
-                    ).getParsedText(text)
+                    binding.textView.text = markdownParser.getParsedText(newText)
                 }
             }
         }

@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import java.util.Stack
+import javax.inject.Inject
 
 interface Formatter
 
@@ -627,6 +628,6 @@ abstract class IStringToMarkdownTextParser(
     }
 }
 
-class StringToMarkdownTextParser(
-    vararg formatter: Formatter
+class StringToMarkdownTextParser @Inject constructor(
+    vararg formatter : Formatter
 ) : IStringToMarkdownTextParser(*formatter)
