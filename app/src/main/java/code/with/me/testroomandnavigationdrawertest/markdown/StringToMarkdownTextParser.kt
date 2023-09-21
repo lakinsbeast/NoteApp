@@ -10,17 +10,271 @@ import android.text.style.QuoteSpan
 import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.view.View
-import code.with.me.testroomandnavigationdrawertest.Utils.mainScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import java.util.Stack
 
-class StringToMarkdownTextParser() : IMarkdownTextParser {
+interface Formatter
 
-    var text = ""
+interface StarFormatter : Formatter {
+    //STAR--------------------------------------
+    var starStack: Stack<Int>
+    var starHash: HashMap<Int, Int>
 
-    var index1 = 0
+    var twoStarStack: Stack<Int>
+    var twoStarHash: HashMap<Int, Int>
+
+    var threeStarStack: Stack<Int>
+    var threeStarHash: HashMap<Int, Int>
+
+    //--------------------------------------
+
+    fun handleStarFormatting(text: String, index: Int): Star
+}
+
+class StarFormatterImpl(private val textChecker: ITextCheckerT<Star>) : StarFormatter {
+    override var starStack = Stack<Int>()
+    override var starHash = HashMap<Int, Int>()
+
+    override var twoStarStack = Stack<Int>()
+    override var twoStarHash = HashMap<Int, Int>()
+
+    override var threeStarStack = Stack<Int>()
+    override var threeStarHash = HashMap<Int, Int>()
+    override fun handleStarFormatting(
+        text: String,
+        index: Int
+    ): Star {
+        when (textChecker.checkText(text, index)) {
+            Star.Empty -> {
+                return Star.Empty
+            }
+
+            Star.OneStar -> {
+                if (starStack.isEmpty()) {
+                    starStack.push(index)
+                } else {
+                    starHash[starStack[0]] = index
+                    starStack.pop()
+                }
+                return Star.OneStar
+            }
+
+            Star.TwoStar -> {
+                if (twoStarStack.isEmpty()) {
+                    twoStarStack.push(index)
+                } else {
+                    twoStarHash[twoStarStack[0]] = index
+                    twoStarStack.pop()
+                }
+                return Star.TwoStar
+            }
+
+            Star.ThreeStar -> {
+                if (threeStarStack.isEmpty()) {
+                    threeStarStack.push(index)
+                } else {
+                    threeStarHash[threeStarStack[0]] = index
+                    threeStarStack.pop()
+                }
+                return Star.ThreeStar
+            }
+        }
+    }
+}
+
+interface StrikethroughFormatter : Formatter {
+    //STRIKETHROUGH--------------------------------------
+    var strikethroughStack: Stack<Int>
+    var strikethroughHash: HashMap<Int, Int>
+
+    //--------------------------------------
+
+    fun handleStrikethroughFormatter(text: String, index: Int): Boolean
+}
+
+class StrikethroughFormatterImpl(private val textChecker: ITextCheckerT<Boolean>) :
+    StrikethroughFormatter {
+    override var strikethroughStack = Stack<Int>()
+    override var strikethroughHash = HashMap<Int, Int>()
+
+    override fun handleStrikethroughFormatter(
+        text: String,
+        index: Int
+    ): Boolean {
+        return when (textChecker.checkText(text, index)) {
+            true -> {
+                if (strikethroughStack.isEmpty()) {
+                    strikethroughStack.push(index)
+                } else {
+                    strikethroughHash[strikethroughStack[0]] = index
+                    strikethroughStack.pop()
+                }
+                true
+            }
+
+            else -> {
+                false
+            }
+        }
+    }
+}
+
+interface HeadingFormatter : Formatter {
+    //HEADING--------------------------------------
+    var firstHeadingHash: HashMap<Int, Int>
+    var secondHeadingHash: HashMap<Int, Int>
+    var thirdHeadingHash: HashMap<Int, Int>
+    var fourthHeadingHash: HashMap<Int, Int>
+    var fifthHeadingHash: HashMap<Int, Int>
+    var sixthHeadingHash: HashMap<Int, Int>
+
+    //--------------------------------------
+    var firstNewLineTextChecker: ITextCheckerT<Int>
+
+    fun handleHeadingFormatter(text: String, index: Int): Heading
+}
+
+class HeadingFormatterImpl(
+    private val textChecker: ITextCheckerT<Heading>,
+    firstNewLineTC: ITextCheckerT<Int>
+) : HeadingFormatter {
+    override var firstNewLineTextChecker: ITextCheckerT<Int> = firstNewLineTC
+
+    override var firstHeadingHash = HashMap<Int, Int>()
+    override var secondHeadingHash = HashMap<Int, Int>()
+    override var thirdHeadingHash = HashMap<Int, Int>()
+    override var fourthHeadingHash = HashMap<Int, Int>()
+    override var fifthHeadingHash = HashMap<Int, Int>()
+    override var sixthHeadingHash = HashMap<Int, Int>()
+
+
+    override fun handleHeadingFormatter(text: String, index: Int): Heading {
+        when (textChecker.checkText(text, index)) {
+            Heading.FirstHeading -> {
+                return Heading.FirstHeading
+            }
+
+            Heading.SecondHeading -> {
+                return Heading.SecondHeading
+
+            }
+
+            Heading.ThreeHeading -> {
+                return Heading.ThreeHeading
+
+            }
+
+            Heading.FourthHeading -> {
+                return Heading.FourthHeading
+            }
+
+            Heading.FifthHeading -> {
+                return Heading.FifthHeading
+            }
+
+            Heading.SixthHeading -> {
+                return Heading.SixthHeading
+            }
+        }
+    }
+}
+
+interface BlockQuoteFormatter : Formatter {
+    //BlockQuote--------------------------------------
+    var blockQuoteHash: HashMap<Int, Int>
+    var firstNewLineTextChecker: ITextCheckerT<Int>
+
+    fun handleBlockQuote(text: String, index: Int)
+}
+
+class BlockQuoteFormatterImpl(override var firstNewLineTextChecker: ITextCheckerT<Int>) :
+    BlockQuoteFormatter {
+    override var blockQuoteHash = HashMap<Int, Int>()
+
+    override fun handleBlockQuote(text: String, index: Int) {
+        blockQuoteHash[index] = firstNewLineTextChecker.checkText(text, index)
+    }
+}
+
+interface ReferenceFormatter : Formatter {
+    fun handleReference(text: String, index: Int)
+}
+
+interface ReferenceSquareFormatter : ReferenceFormatter {
+    var referenceSquareStack: Stack<Int>
+    var referenceSquareHash: HashMap<Int, Int>
+    var firstSpaceTextCheckerImpl: ITextCheckerT<Int>
+}
+
+interface ReferenceBracketFormatter : ReferenceFormatter {
+    var referenceBracketStack: Stack<Int>
+    var referenceBracketHash: HashMap<Int, Int>
+}
+
+class ReferenceSquareFormatterImpl(override var firstSpaceTextCheckerImpl: ITextCheckerT<Int>) :
+    ReferenceSquareFormatter {
+    override var referenceSquareStack = Stack<Int>()
+    override var referenceSquareHash = HashMap<Int, Int>()
+
+
+    override fun handleReference(text: String, index: Int) {
+        println("ReferenceSquareFormatterImpl handleReference index:$index")
+        if (referenceSquareStack.isEmpty()) {
+            referenceSquareStack.push(index)
+            println("pushed")
+        } else {
+            referenceSquareHash[referenceSquareStack[0]] = index
+            referenceSquareStack.pop()
+            println("poped")
+        }
+
+    }
+}
+
+
+class ReferenceBracketFormatterImpl : ReferenceBracketFormatter {
+    override var referenceBracketStack = Stack<Int>()
+    override var referenceBracketHash = HashMap<Int, Int>()
+
+    override fun handleReference(text: String, index: Int) {
+        if (referenceBracketStack.isEmpty()) {
+            referenceBracketStack.push(index)
+        } else {
+            referenceBracketHash[referenceBracketStack[0]] = index
+            referenceBracketStack.pop()
+        }
+    }
+
+}
+
+abstract class IStringToMarkdownTextParser(
+    vararg formatter: Formatter
+) : IMarkdownTextParser {
+    var text: String = ""
+    var index1: Int = 0
+
+    init {
+        formatter.forEach {
+            when (it) {
+                is StarFormatter -> starFormatter = it
+                is StrikethroughFormatter -> strikethroughFormatter = it
+                is HeadingFormatter -> headingFormatter = it
+                is BlockQuoteFormatter -> blockquoteFormatter = it
+                is ReferenceBracketFormatter -> referenceBracketFormatter = it
+                is ReferenceSquareFormatter -> referenceSquareFormatter = it
+            }
+        }
+    }
+
+    lateinit var starFormatter: StarFormatter
+    lateinit var strikethroughFormatter: StrikethroughFormatter
+    lateinit var headingFormatter: HeadingFormatter
+    lateinit var blockquoteFormatter: BlockQuoteFormatter
+    lateinit var referenceBracketFormatter: ReferenceBracketFormatter
+    lateinit var referenceSquareFormatter: ReferenceSquareFormatter
+
 
     var skipIteration = false
     var skipTwoIteration = false
@@ -29,50 +283,24 @@ class StringToMarkdownTextParser() : IMarkdownTextParser {
     var skipFifthIteration = false
     var skipSixthIteration = false
 
-
-    //STAR--------------------------------------
-    var starStack = Stack<Int>()
-    var starHash = HashMap<Int, Int>()
-
-    var twoStarStack = Stack<Int>()
-    var twoStarHash = HashMap<Int, Int>()
-
-    var threeStarStack = Stack<Int>()
-    var threeStarHash = HashMap<Int, Int>()
-
-    //--------------------------------------
-//STRIKETHROUGH--------------------------------------
-    var strikethroughStack = Stack<Int>()
-    var strikethroughHash = HashMap<Int, Int>()
-
-    //--------------------------------------
-//HEADING--------------------------------------
-    var firstHeadingHash = HashMap<Int, Int>()
-    var secondHeadingHash = HashMap<Int, Int>()
-    var thirdHeadingHash = HashMap<Int, Int>()
-    var fourthHeadingHash = HashMap<Int, Int>()
-    var fifthHeadingHash = HashMap<Int, Int>()
-    var sixthHeadingHash = HashMap<Int, Int>()
-
-    //--------------------------------------
-//BlockQuote--------------------------------------
-    var blockQuoteHash = HashMap<Int, Int>()
-//--------------------------------------
-
-    //References--------------------------------------
-    var referenceSquareStack = Stack<Int>()
-    var referenceSquareHash = HashMap<Int, Int>()
-
-    var referenceBracketStack = Stack<Int>()
-    var referenceBracketHash = HashMap<Int, Int>()
-//--------------------------------------
-
-    val textChecker = TextCheckerImpl()
-
-    override suspend fun parseText(text: String): SpannableString {
+    override suspend fun getParsedText(text: String): SpannableString {
         this.text = text
 
         while (index1 < this.text.length) {
+
+            /**
+             * change to :
+             * val skipIterations = arrayOf(skipIteration, skipTwoIteration, skipThreeIteration, skipFourthIteration, skipFifthIteration, skipSixthIteration)
+             *
+             * for (i in 0 until skipIterations.size) {
+             *     if (skipIterations[i]) {
+             *         index1 += i + 1
+             *         skipIterations[i] = false
+             *         continue
+             *     }
+             * }
+             *
+             **/
             when {
                 skipIteration -> {
                     index1++
@@ -113,12 +341,27 @@ class StringToMarkdownTextParser() : IMarkdownTextParser {
             doWithTextNew(this.text, index1)
             index1++
         }
-        return setTextSpannable(this.text)
+        return parseText(this.text)
     }
 
-    override suspend fun setTextSpannable(text: String): SpannableString {
+    override suspend fun parseText(text: String): SpannableString {
         val spannableString =
             SpannableString(text)
+        val starHash = starFormatter.starHash
+        val twoStarHash = starFormatter.twoStarHash
+        val threeStarHash = starFormatter.threeStarHash
+        val strikethroughHash = strikethroughFormatter.strikethroughHash
+        val firstHeadingHash = headingFormatter.firstHeadingHash
+        val secondHeadingHash = headingFormatter.secondHeadingHash
+        val thirdHeadingHash = headingFormatter.thirdHeadingHash
+        val fourthHeadingHash = headingFormatter.fourthHeadingHash
+        val fifthHeadingHash = headingFormatter.fifthHeadingHash
+        val sixthHeadingHash = headingFormatter.sixthHeadingHash
+        val blockQuoteHash = blockquoteFormatter.blockQuoteHash
+        val referenceBracketHash = referenceBracketFormatter.referenceBracketHash
+        val referenceSquareHash = referenceSquareFormatter.referenceSquareHash
+
+
         if (starHash.isNotEmpty()) {
             starHash.forEach { (key, value) ->
                 spannableString.setSpan(
@@ -241,6 +484,7 @@ class StringToMarkdownTextParser() : IMarkdownTextParser {
         var i = 0
         if (referenceSquareHash.isNotEmpty() && referenceBracketHash.isNotEmpty()) {
             referenceBracketHash.forEach { (key, value) ->
+                println("bracket: k:$key v:$value")
                 i = key
                 while (i < value) {
                     word += text[i]
@@ -251,6 +495,7 @@ class StringToMarkdownTextParser() : IMarkdownTextParser {
             }
             i = 0
             referenceSquareHash.forEach { (key, value) ->
+                println("square: k:$key v:$value")
                 spannableString.setSpan(
                     object : ClickableSpan() {
                         override fun onClick(widget: View) {
@@ -259,7 +504,7 @@ class StringToMarkdownTextParser() : IMarkdownTextParser {
 
                     },
                     key,
-                    textChecker.checkFirstSpace(text, value),
+                    referenceSquareFormatter.firstSpaceTextCheckerImpl.checkText(text, value),
                     0
                 )
                 i++
@@ -268,123 +513,120 @@ class StringToMarkdownTextParser() : IMarkdownTextParser {
         return spannableString
     }
 
-    suspend fun doWithTextNew(textParam: String, index: Int) = withContext(Dispatchers.Default) {
-        async {
-            if (textParam[index] == '*') {
-                when (textChecker.checkWhichStar(text, index)) {
-                    Star.Empty -> {}
-                    Star.OneStar -> {
-                        if (starStack.isEmpty()) {
-                            starStack.push(index)
-                        } else {
-                            starHash[starStack[0]] = index
-                            starStack.pop()
+
+    open suspend fun doWithTextNew(textParam: String, index: Int) {
+        withContext(Dispatchers.Default) {
+            async {
+                if (textParam[index] == '*') {
+                    when (starFormatter.handleStarFormatting(
+                        text,
+                        index
+                    )) {
+                        Star.Empty -> {}
+                        Star.OneStar -> {
+                            index1--
+                            text = text.removeRange(index, index + 1)
                         }
-                        index1--
-                        text = text.removeRange(index, index + 1)
-                    }
 
-                    Star.TwoStar -> {
-                        if (twoStarStack.isEmpty()) {
-                            twoStarStack.push(index)
-                        } else {
-                            twoStarHash[twoStarStack[0]] = index
-                            twoStarStack.pop()
+                        Star.TwoStar -> {
+                            index1 -= 2
+                            text = text.removeRange(index, index + 2)
                         }
-                        index1 -= 2
-                        text = text.removeRange(index, index + 2)
-                    }
 
-                    Star.ThreeStar -> {
-                        if (threeStarStack.isEmpty()) {
-                            threeStarStack.push(index)
-                        } else {
-                            threeStarHash[threeStarStack[0]] = index
-                            threeStarStack.pop()
+                        Star.ThreeStar -> {
+                            index1 -= 3
+                            text = text.removeRange(index, index + 3)
                         }
-                        index1 -= 3
-                        text = text.removeRange(index, index + 3)
                     }
-                }
-            } else if (textParam[index] == '~') {
-                when (textChecker.checkToStrikethrough(text, index)) {
-                    true -> {
-                        if (strikethroughStack.isEmpty()) {
-                            strikethroughStack.push(index)
-                        } else {
-                            strikethroughHash[strikethroughStack[0]] = index
-                            strikethroughStack.pop()
+                } else if (textParam[index] == '~') {
+                    when (strikethroughFormatter.handleStrikethroughFormatter(
+                        text,
+                        index
+                    )) {
+                        true -> {
+                            index1--
+                            text = text.removeRange(index, index + 2)
                         }
-                        index1--
-                        text = text.removeRange(index, index + 2)
+
+                        else -> {
+
+                        }
+                    }
+                } else if (textParam[index] == '#') {
+                    headingFormatter.apply {
+                        when (headingFormatter.handleHeadingFormatter(
+                            text,
+                            index
+                        )) {
+                            Heading.FirstHeading -> {
+                                index1 -= 2
+                                text = text.removeRange(index, index + 2)
+                                firstHeadingHash[index] =
+                                    firstNewLineTextChecker.checkText(text, index + 2)
+                            }
+
+                            Heading.SecondHeading -> {
+                                index1 -= 3
+                                text = text.removeRange(index, index + 3)
+                                secondHeadingHash[index] =
+                                    firstNewLineTextChecker.checkText(text, index + 3)
+                            }
+
+                            Heading.ThreeHeading -> {
+                                index1 -= 4
+                                text = text.removeRange(index, index + 4)
+                                thirdHeadingHash[index] =
+                                    firstNewLineTextChecker.checkText(text, index + 4)
+                            }
+
+                            Heading.FourthHeading -> {
+                                index1 -= 5
+                                text = text.removeRange(index, index + 5)
+                                fourthHeadingHash[index] =
+                                    firstNewLineTextChecker.checkText(text, index + 5)
+                            }
+
+                            Heading.FifthHeading -> {
+                                index1 -= 6
+                                text = text.removeRange(index, index + 6)
+                                fifthHeadingHash[index] =
+                                    firstNewLineTextChecker.checkText(text, index + 6)
+                            }
+
+                            Heading.SixthHeading -> {
+                                index1 -= 7
+                                text = text.removeRange(index, index + 7)
+                                sixthHeadingHash[index] =
+                                    firstNewLineTextChecker.checkText(
+                                        text,
+                                        index + 7
+                                    )
+                                println("after text: $text")
+                            }
+                        }
                     }
 
-                    else -> {}
-                }
-            } else if (textParam[index] == '#') {
-                when (textChecker.checkHeading(text, index)) {
-                    Heading.FirstHeading -> {
-                        index1 -= 2
-                        text = text.removeRange(index, index + 2)
-                        firstHeadingHash[index] = textChecker.checkFirstNewLine(text, index + 2)
-                    }
-
-                    Heading.SecondHeading -> {
-                        index1 -= 3
-                        text = text.removeRange(index, index + 3)
-                        secondHeadingHash[index] = textChecker.checkFirstNewLine(text, index + 3)
-
-                    }
-
-                    Heading.ThreeHeading -> {
-                        index1 -= 4
-                        text = text.removeRange(index, index + 4)
-                        thirdHeadingHash[index] = textChecker.checkFirstNewLine(text, index + 4)
-
-                    }
-
-                    Heading.FourthHeading -> {
-                        index1 -= 5
-                        text = text.removeRange(index, index + 5)
-                        fourthHeadingHash[index] = textChecker.checkFirstNewLine(text, index + 5)
-                    }
-
-                    Heading.FifthHeading -> {
-                        index1 -= 6
-                        text = text.removeRange(index, index + 6)
-                        fifthHeadingHash[index] = textChecker.checkFirstNewLine(text, index + 6)
-                    }
-
-                    Heading.SixthHeading -> {
-                        index1 -= 7
-                        text = text.removeRange(index, index + 7)
-                        sixthHeadingHash[index] = textChecker.checkFirstNewLine(text, index + 7)
-                    }
-                }
-            } else if (textParam[index] == '>') {
-                // Не работает
-                blockQuoteHash[index] = textChecker.checkFirstNewLine(text, index)
-            } else if (textParam[index] == '[' || textParam[index] == ']') {
-                println("[ or ] founded index: $index text: ${text.substring(0, index)}")
-                if (referenceSquareStack.isEmpty()) {
-                    referenceSquareStack.push(index)
+                } else if (textParam[index] == '>') {
+                    // Не работает
+                    blockquoteFormatter.handleBlockQuote(text, index)
+                } else if (textParam[index] == '[' || textParam[index] == ']') {
+                    println("[ or ] founded index: $index text: ${text.substring(0, index)}")
+                    referenceBracketFormatter.handleReference(text, index)
+                    index1 -= 1
+                    text = text.removeRange(index, index + 1)
+                } else if (textParam[index] == '(' || textParam[index] == ')') {
+                    println("( or ) founded index: $index text: ${text.substring(0, index)}")
+                    referenceSquareFormatter.handleReference(text, index)
+                    index1 -= 1
+                    text = text.removeRange(index, index + 1)
                 } else {
-                    referenceSquareHash[referenceSquareStack[0]] = index
-                    referenceSquareStack.pop()
+
                 }
-                index1 -= 1
-                text = text.removeRange(index, index + 1)
-            } else if (textParam[index] == '(' || textParam[index] == ')') {
-                println("( or ) founded index: $index text: ${text.substring(0, index)}")
-                if (referenceBracketStack.isEmpty()) {
-                    referenceBracketStack.push(index)
-                } else {
-                    referenceBracketHash[referenceBracketStack[0]] = index
-                    referenceBracketStack.pop()
-                }
-                index1 -= 1
-                text = text.removeRange(index, index + 1)
-            }
-        }.await()
+            }.await()
+        }
     }
 }
+
+class StringToMarkdownTextParser(
+    vararg formatter: Formatter
+) : IStringToMarkdownTextParser(*formatter)
