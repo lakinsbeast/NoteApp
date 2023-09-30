@@ -13,6 +13,7 @@ import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.Utils.getDate
 import code.with.me.testroomandnavigationdrawertest.Utils.gone
+import code.with.me.testroomandnavigationdrawertest.Utils.mainScope
 import code.with.me.testroomandnavigationdrawertest.Utils.println
 import code.with.me.testroomandnavigationdrawertest.Utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
@@ -20,6 +21,7 @@ import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 import code.with.me.testroomandnavigationdrawertest.databinding.PhotoItemBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.ViewNoteDetailSheetBinding
 import code.with.me.testroomandnavigationdrawertest.file.FilesController
+import code.with.me.testroomandnavigationdrawertest.markdown.StringToMarkdownTextParser
 import code.with.me.testroomandnavigationdrawertest.ui.SnackbarCreator
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
@@ -52,6 +54,9 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
     lateinit var factory: ViewModelProvider.Factory
     private lateinit var viewANoteViewModel: ViewANoteViewModel
 
+    @Inject
+    lateinit var markdownParser: StringToMarkdownTextParser
+
     lateinit var adapter: BaseAdapter<PhotoModel, PhotoItemBinding>
     private lateinit var photoItem: PhotoItemBinding
 
@@ -66,7 +71,20 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
                     binding.apply {
                         dateText.text = getDate(value.lastTimestampCreate)
                         titleText.text = value.titleNote
-                        text.text = value.textNote
+                        CoroutineScope(Dispatchers.IO).launch {
+                            try {
+                                val parsedText = markdownParser.getParsedText(value.textNote)
+                                mainScope {
+                                    text.text = parsedText
+                                }
+                            } catch (e: Exception) {
+                                mainScope {
+                                    Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
+                                    text.text = value.textNote
+                                    e.printStackTrace()
+                                }
+                            }
+                        }
 
                         if (value.audioUrl.isNotEmpty()) {
                             audioLayout.visible()

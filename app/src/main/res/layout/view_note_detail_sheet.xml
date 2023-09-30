@@ -56,17 +56,10 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="71dp"
-                    android:layout_marginVertical="25dp"
-                    android:background="@drawable/rounded_20dp"
-                    android:backgroundTint="@color/black" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="69dp"
                     android:layout_gravity="center"
-                    android:layout_marginHorizontal="1dp"
+                    android:layout_marginVertical="25dp"
                     android:background="@drawable/rounded_19dp"
-                    android:backgroundTint="@color/white" />
+                    android:backgroundTint="@color/pale_golden" />
 
                 <LinearLayout
                     android:layout_width="match_parent"

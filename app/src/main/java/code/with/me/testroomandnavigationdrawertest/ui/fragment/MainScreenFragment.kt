@@ -79,16 +79,23 @@ class MainScreenFragment :
     }
 
 
-
     private fun initClickListeners() {
         binding.apply {
             makeNoteBtn.setOnClickListener {
-//                openMakeNoteSheet()
                 openMakeNoteFragment()
             }
             makeFolderBtn.setOnClickListener {
-//                openMakeFolderSheet()
                 CreateFolderDialog(requireContext()).show()
+            }
+            settingsBtn.setOnClickListener {
+                Toast.makeText(context, "Settings Fragment", Toast.LENGTH_LONG)
+                    .show()
+                //TODO create SettingsFragment
+            }
+            searchBtn.setOnClickListener {
+                Toast.makeText(context, "Search Fragment", Toast.LENGTH_LONG)
+                    .show()
+                //TODO create SearchFragment
             }
         }
     }
@@ -121,6 +128,9 @@ class MainScreenFragment :
                         chip.setUpChip(folder)
                         binding.chipGroup.addView(chip)
                     }
+                    binding.folderLayout.visible()
+                } else {
+                    binding.folderLayout.gone()
                 }
             }
         }

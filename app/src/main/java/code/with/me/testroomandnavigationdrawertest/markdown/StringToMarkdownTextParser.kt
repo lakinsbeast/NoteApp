@@ -64,8 +64,10 @@ class StarFormatterImpl(private val textChecker: ITextCheckerT<Star>) : StarForm
 
             Star.TwoStar -> {
                 if (twoStarStack.isEmpty()) {
+                    println("twoStarStack push index: $index")
                     twoStarStack.push(index)
                 } else {
+                    println("twoStarStack pop index=$index twoStarStack[0]=${twoStarStack[0]} ")
                     twoStarHash[twoStarStack[0]] = index
                     twoStarStack.pop()
                 }
@@ -284,66 +286,83 @@ abstract class IStringToMarkdownTextParser(
     var skipFifthIteration = false
     var skipSixthIteration = false
 
-    override suspend fun getParsedText(text: String): SpannableString {
-        this.text = text
+    override suspend fun getParsedText(text: String): SpannableString =
+        withContext(Dispatchers.Default) {
+            this@IStringToMarkdownTextParser.text = text
 
-        while (index1 < this.text.length) {
+            while (index1 < this@IStringToMarkdownTextParser.text.length) {
 
-            /**
-             * change to :
-             * val skipIterations = arrayOf(skipIteration, skipTwoIteration, skipThreeIteration, skipFourthIteration, skipFifthIteration, skipSixthIteration)
-             *
-             * for (i in 0 until skipIterations.size) {
-             *     if (skipIterations[i]) {
-             *         index1 += i + 1
-             *         skipIterations[i] = false
-             *         continue
-             *     }
-             * }
-             *
-             **/
-            when {
-                skipIteration -> {
-                    index1++
-                    skipIteration = false
-                    continue
+                /**
+                 * change to :
+                 * val skipIterations = arrayOf(skipIteration, skipTwoIteration, skipThreeIteration, skipFourthIteration, skipFifthIteration, skipSixthIteration)
+                 *
+                 * for (i in 0 until skipIterations.size) {
+                 *     if (skipIterations[i]) {
+                 *         index1 += i + 1
+                 *         skipIterations[i] = false
+                 *         continue
+                 *     }
+                 * }
+                 *
+                 **/
+
+                /**
+                 * change to :
+                 * val skipIterations = arrayOf(skipIteration, skipTwoIteration, skipThreeIteration, skipFourthIteration, skipFifthIteration, skipSixthIteration)
+                 *
+                 * for (i in 0 until skipIterations.size) {
+                 *     if (skipIterations[i]) {
+                 *         index1 += i + 1
+                 *         skipIterations[i] = false
+                 *         continue
+                 *     }
+                 * }
+                 *
+                 **/
+                when {
+                    skipIteration -> {
+                        index1++
+                        skipIteration = false
+                        continue
+                    }
+
+                    skipTwoIteration -> {
+                        index1 += 2
+                        skipTwoIteration = false
+                        continue
+                    }
+
+                    skipThreeIteration -> {
+                        index1 += 3
+                        skipThreeIteration = false
+                        continue
+                    }
+
+                    skipFourthIteration -> {
+                        index1 += 4
+                        skipFourthIteration = false
+                        continue
+                    }
+
+                    skipFifthIteration -> {
+                        index1 += 5
+                        skipFifthIteration = false
+                        continue
+                    }
+
+                    skipSixthIteration -> {
+                        index1 += 6
+                        skipSixthIteration = false
+                        continue
+                    }
                 }
-
-                skipTwoIteration -> {
-                    index1 += 2
-                    skipTwoIteration = false
-                    continue
-                }
-
-                skipThreeIteration -> {
-                    index1 += 3
-                    skipThreeIteration = false
-                    continue
-                }
-
-                skipFourthIteration -> {
-                    index1 += 4
-                    skipFourthIteration = false
-                    continue
-                }
-
-                skipFifthIteration -> {
-                    index1 += 5
-                    skipFifthIteration = false
-                    continue
-                }
-
-                skipSixthIteration -> {
-                    index1 += 6
-                    skipSixthIteration = false
-                    continue
-                }
+                async {
+                    doWithTextNew(this@IStringToMarkdownTextParser.text, index1)
+                }.await()
+                index1++
             }
-            doWithTextNew(this.text, index1)
-            index1++
+            return@withContext parseText(this@IStringToMarkdownTextParser.text)
         }
-        return parseText(this.text)
-    }
 
     override suspend fun parseText(text: String): SpannableString {
         val spannableString =
@@ -405,6 +424,7 @@ abstract class IStringToMarkdownTextParser(
         }
         if (firstHeadingHash.isNotEmpty()) {
             firstHeadingHash.forEach { (key, value) ->
+                println("key: $key value: $value")
                 spannableString.setSpan(
                     AbsoluteSizeSpan(35, true),
                     key,
@@ -518,7 +538,9 @@ abstract class IStringToMarkdownTextParser(
     open suspend fun doWithTextNew(textParam: String, index: Int) {
         withContext(Dispatchers.Default) {
             async {
+                println("index before:$index")
                 if (textParam[index] == '*') {
+                    println("index:$index")
                     when (starFormatter.handleStarFormatting(
                         text,
                         index
@@ -530,12 +552,12 @@ abstract class IStringToMarkdownTextParser(
                         }
 
                         Star.TwoStar -> {
-                            index1 -= 2
+                            index1++
                             text = text.removeRange(index, index + 2)
                         }
 
                         Star.ThreeStar -> {
-                            index1 -= 3
+                            index1 -= 2
                             text = text.removeRange(index, index + 3)
                         }
                     }
@@ -560,47 +582,46 @@ abstract class IStringToMarkdownTextParser(
                             index
                         )) {
                             Heading.FirstHeading -> {
-                                index1 -= 2
-                                text = text.removeRange(index, index + 2)
+                                text = text.removeRange(index, index + 1)
                                 firstHeadingHash[index] =
-                                    firstNewLineTextChecker.checkText(text, index + 2)
+                                    firstNewLineTextChecker.checkText(text, index + 1)
                             }
 
                             Heading.SecondHeading -> {
-                                index1 -= 3
-                                text = text.removeRange(index, index + 3)
+                                index1 -= 1
+                                text = text.removeRange(index, index + 2)
                                 secondHeadingHash[index] =
-                                    firstNewLineTextChecker.checkText(text, index + 3)
+                                    firstNewLineTextChecker.checkText(text, index + 2)
                             }
 
                             Heading.ThreeHeading -> {
-                                index1 -= 4
-                                text = text.removeRange(index, index + 4)
+                                index1 -= 2
+                                text = text.removeRange(index, index + 3)
                                 thirdHeadingHash[index] =
-                                    firstNewLineTextChecker.checkText(text, index + 4)
+                                    firstNewLineTextChecker.checkText(text, index + 3)
                             }
 
                             Heading.FourthHeading -> {
-                                index1 -= 5
-                                text = text.removeRange(index, index + 5)
+                                index1 -= 3
+                                text = text.removeRange(index, index + 4)
                                 fourthHeadingHash[index] =
-                                    firstNewLineTextChecker.checkText(text, index + 5)
+                                    firstNewLineTextChecker.checkText(text, index + 4)
                             }
 
                             Heading.FifthHeading -> {
-                                index1 -= 6
-                                text = text.removeRange(index, index + 6)
+                                index1 -= 4
+                                text = text.removeRange(index, index + 5)
                                 fifthHeadingHash[index] =
-                                    firstNewLineTextChecker.checkText(text, index + 6)
+                                    firstNewLineTextChecker.checkText(text, index + 5)
                             }
 
                             Heading.SixthHeading -> {
-                                index1 -= 7
-                                text = text.removeRange(index, index + 7)
+                                index1 -= 5
+                                text = text.removeRange(index, index + 6)
                                 sixthHeadingHash[index] =
                                     firstNewLineTextChecker.checkText(
                                         text,
-                                        index + 7
+                                        index + 6
                                     )
                                 println("after text: $text")
                             }
@@ -629,5 +650,5 @@ abstract class IStringToMarkdownTextParser(
 }
 
 class StringToMarkdownTextParser @Inject constructor(
-    vararg formatter : Formatter
+    vararg formatter: Formatter
 ) : IStringToMarkdownTextParser(*formatter)

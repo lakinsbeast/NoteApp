@@ -38,35 +38,36 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintTop_toBottomOf="@+id/photoList" />
 
-<!--    <jp.wasabeef.richeditor.RichEditor-->
-<!--        android:id="@+id/textEdit"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="0dp"-->
-<!--        app:layout_constraintBottom_toTopOf="@+id/coordinatorLayout2"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintHorizontal_bias="0.0"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/titleEdit" />-->
+    <!--    <jp.wasabeef.richeditor.RichEditor-->
+    <!--        android:id="@+id/textEdit"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="0dp"-->
+    <!--        app:layout_constraintBottom_toTopOf="@+id/coordinatorLayout2"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintHorizontal_bias="0.0"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/titleEdit" />-->
 
 
-        <EditText
-            android:id="@+id/textEdit"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:background="@android:color/transparent"
-            android:gravity="top"
-            android:hint="@string/text"
-            android:inputType="textMultiLine"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:textColor="@color/black"
-            android:textColorHint="@color/black"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@+id/coordinatorLayout2"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/titleEdit" />
+    <EditText
+        android:id="@+id/textEdit"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@android:color/transparent"
+        android:gravity="top"
+        android:hint="@string/text"
+        android:imeOptions="actionDone"
+        android:inputType="textMultiLine"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/black"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/coordinatorLayout2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/titleEdit" />
 
     <LinearLayout
         android:id="@+id/colorpickerlayout"

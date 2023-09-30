@@ -34,6 +34,13 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
 
     var behavior: BottomSheetBehavior<FrameLayout>? = null
     private var fullScreen: Boolean = false
+    var height: Int = -1
+        set(value) {
+            view?.let {
+                setSheetHeightTo(it, value)
+                behavior?.state = BottomSheetBehavior.STATE_EXPANDED
+            }
+        }
     private var peekHeight: Int = 1100
     private var canHide = true
     val binding get() = _binding!!
@@ -83,10 +90,14 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
             setSheetToFullScreen(view)
         }
         behavior?.let { behavior ->
-            behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            if (fullScreen) {
+                behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            } else {
+                behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            }
             behavior.isHideable = canHide
             behavior.skipCollapsed = true
-            behavior.isFitToContents = false
+            behavior.isFitToContents = true
             behavior.halfExpandedRatio = 0.6f
             behavior.addBottomSheetCallback(object :
                 BottomSheetBehavior.BottomSheetCallback() {
@@ -108,6 +119,12 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
     private fun setSheetToFullScreen(view: View) {
         val layoutParams = (view.parent as FrameLayout).layoutParams
         layoutParams.height = getDisplayMetrics(activity()).heightPixels
+        (view.parent as FrameLayout).layoutParams = layoutParams
+    }
+
+    fun setSheetHeightTo(view: View, height: Int) {
+        val layoutParams = (view.parent as FrameLayout).layoutParams
+        layoutParams.height = height
         (view.parent as FrameLayout).layoutParams = layoutParams
     }
 

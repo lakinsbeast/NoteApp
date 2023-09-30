@@ -25,8 +25,6 @@ import javax.inject.Inject
 
 class SeeTextSheet(private val newText: String) :
     BaseSheet<SeeTextSheetBinding>(SeeTextSheetBinding::inflate) {
-
-
     @Inject
     lateinit var markdownParser: StringToMarkdownTextParser
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -35,28 +33,8 @@ class SeeTextSheet(private val newText: String) :
         super.onViewCreated(view, savedInstanceState)
 
         if (newText.isNotEmpty()) {
-            val before = System.currentTimeMillis()
-            println("before: $before")
             CoroutineScope(Dispatchers.Default).launch {
                 mainScope {
-                    //нужно впихнуть в даггер
-//                    val starChecker = StarTextCheckerImpl()
-//                    val strikethroughTextChecker = StrikethroughTextCheckerImpl()
-//                    val headingTextChecker = HeadingTextCheckerImpl()
-//                    val firstNewLineTextCheckerImpl = FirstNewLineTextCheckerImpl()
-//                    val firstSpaceTextCheckerImpl = FirstSpaceTextCheckerImpl()
-//
-//                    binding.textView.text = StringToMarkdownTextParser(
-//                        StarFormatterImpl(starChecker),
-//                        StrikethroughFormatterImpl(strikethroughTextChecker),
-//                        HeadingFormatterImpl(headingTextChecker, firstNewLineTextCheckerImpl),
-//                        BlockQuoteFormatterImpl(firstNewLineTextCheckerImpl),
-//                        ReferenceSquareFormatterImpl(firstSpaceTextCheckerImpl),
-//                        ReferenceBracketFormatterImpl()
-//                    ).getParsedText(newText)
-//                    val after = System.currentTimeMillis()
-//                    println("total: ${after - before} ")
-
                     binding.textView.text = markdownParser.getParsedText(newText)
                 }
             }

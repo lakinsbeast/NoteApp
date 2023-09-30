@@ -16,6 +16,7 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.addTextChangedListener
@@ -174,9 +175,36 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         initUI()
         initAdapter()
         initClickListeners()
+        initOnEditorActionListener()
         initViewModel()
         initTextChangeListeners()
         setBottomMarginBottomNav(20)
+    }
+
+    private fun initOnEditorActionListener() {
+        binding.apply {
+
+            textEdit.setOnEditorActionListener { v, actionId, event ->
+                println("event: $event actionId: $actionId")
+                when (actionId) {
+                    EditorInfo.IME_ACTION_DONE -> {
+                        println("NEW LINE!")
+                        textEdit.append("\n")
+                        true
+                    }
+
+                    EditorInfo.IME_ACTION_NEXT -> {
+                        println("NEW LINE!")
+                        textEdit.append("\n")
+                        true
+                    }
+
+                    else -> {
+                        false
+                    }
+                }
+            }
+        }
     }
 
     private fun handleUserActionState(state: UserActionNote) {
@@ -212,7 +240,6 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
             is UserActionNote.SavedNoteToDB -> {}
             else -> {}
         }
-
     }
 
     private fun openAudioRecordDialog() {
@@ -232,142 +259,12 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
                 makeNoteViewModel.setTitleText(it.toString())
                 saveNote()
             }
-
-//            textEdit.setOnTextChangeListener {
-//                makeNoteViewModel.setText(it.toString())
-//                saveNote()
-//            }
-//            textEdit.addTextChangedListener(object : TextWatcher {
-//                override fun beforeTextChanged(
-//                    s: CharSequence?,
-//                    start: Int,
-//                    count: Int,
-//                    after: Int
-//                ) {
-//                }
-//
-//                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-//                    if (!s.isNullOrEmpty()) {
-//                        //check is char deleted
-//                        if (before == count) {
-//                            if (!isFormattingText) {
-//                                doOnDeleteText(s.toString())
-//                            }
-//                        } else {
-//                            if (!isFormattingText) {
-//                                doWithText(s.toString())
-//                            }
-//                        }
-//                    }
-//                }
-//
-//                override fun afterTextChanged(s: Editable?) {
-//                    makeNoteViewModel.setText(s.toString())
-//                    saveNote()
-////                    doWithText(s.toString())
-//                }
-//
-//            })
             textEdit.addTextChangedListener {
                 makeNoteViewModel.setText(it.toString())
                 saveNote()
-//                doWithText(it.toString())
             }
         }
     }
-
-//    var isStar = false
-//    var startStack = Stack<String>()
-//    var startStartCursor = 0
-//    var endStartCursor = -1
-
-//    var isFormattingText = false
-
-//    fun doOnDeleteText(text: String) {
-//        CoroutineScope(Dispatchers.IO).launch {
-//            async {
-//                if (text.isNotEmpty() && text.last() == '*' && startStack.isNotEmpty()) {
-//                    startStack.pop()
-//                    checkStartStack()
-//                }
-//            }
-//            async {
-//                acceptStyleText()
-//            }
-//        }
-//    }
-//
-//    fun doWithText(text: String) {
-//        //сохраняем позицию курсора, потому что setText сбрасывает его
-//        CoroutineScope(Dispatchers.IO).launch {
-//            async {
-//                if (text.isNotEmpty() && text.last() == '*') {
-//                    println("startStack.size: ${startStack.size}")
-//                    startStack.push("*")
-////                    when {
-////                        !isStar -> {
-////                            startStack.push("*")
-////                        }
-////
-////                        isStar -> {
-////                            startStack.pop()
-////                        }
-////                    }
-//                    checkStartStack()
-//                }
-//            }.await()
-//            async {
-//                acceptStyleText()
-//            }
-//        }
-//    }
-
-//    private fun checkStartStack() {
-//        when {
-//            startStack.size >= 2 -> {
-//                isStar = true
-//                startStartCursor = binding.textEdit.selectionStart
-//            }
-//
-//            startStack.size == 0 -> {
-//                isStar = false
-//                endStartCursor = binding.textEdit.selectionEnd
-//            }
-//        }
-//    }
-
-//    private suspend fun CoroutineScope.acceptStyleText() {
-//        isFormattingText = true
-//        val selStart = binding.textEdit.selectionStart
-//        val selEnd = binding.textEdit.selectionEnd
-//        println("selStart: $selStart")
-//        println("selEnd: $selEnd")
-//        println("startStartCursor: $startStartCursor")
-//        val spannableString =
-//            SpannableString(binding.textEdit.text.toString())
-//        if (isStar) {
-//            println("isStar true")
-//            spannableString.setSpan(
-//                StrikethroughSpan(),
-//                startStartCursor,
-//                endStartCursor,
-//                0
-//            )
-//        } else {
-//            println("isStar false")
-//            spannableString.setSpan(
-//                StyleSpan(Typeface.NORMAL),
-//                selStart,
-//                selEnd,
-//                0
-//            )
-//        }
-//        mainScope {
-//            binding.textEdit.setText(spannableString)
-//            binding.textEdit.setSelection(binding.textEdit.length())
-//            isFormattingText = false
-//        }
-//    }
 
     private fun initViewModel() {
         makeNoteViewModel.userActionState.observe(viewLifecycleOwner) { state ->
@@ -383,9 +280,6 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
             }
         }
         makeNoteViewModel.text.observe(viewLifecycleOwner) {
-//            if (it != binding.textEdit.html) {
-//                binding.textEdit.html = it
-//            }
             if (it != binding.textEdit.text.toString()) {
                 binding.textEdit.setText(it)
             }
