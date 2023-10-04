@@ -17,12 +17,12 @@ import android.widget.ProgressBar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateMargins
 import androidx.viewbinding.ViewBinding
-import code.with.me.testroomandnavigationdrawertest.Utils.findActivity
-import code.with.me.testroomandnavigationdrawertest.Utils.getDisplayMetrics
-import code.with.me.testroomandnavigationdrawertest.Utils.gone
-import code.with.me.testroomandnavigationdrawertest.Utils.setCenterGravity
-import code.with.me.testroomandnavigationdrawertest.Utils.setRoundedCornersView
-import code.with.me.testroomandnavigationdrawertest.Utils.visible
+import code.with.me.testroomandnavigationdrawertest.data.Utils.findActivity
+import code.with.me.testroomandnavigationdrawertest.data.Utils.getDisplayMetrics
+import code.with.me.testroomandnavigationdrawertest.data.Utils.gone
+import code.with.me.testroomandnavigationdrawertest.data.Utils.setCenterGravity
+import code.with.me.testroomandnavigationdrawertest.data.Utils.setRoundedCornersView
+import code.with.me.testroomandnavigationdrawertest.data.Utils.visible
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -90,6 +90,9 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
             setSheetToFullScreen(view)
         }
         behavior?.let { behavior ->
+            /**
+             * Если не сделать эту проверку, то из-за стейта sheet будет выходит верх своего размера и получится странный вид
+             **/
             if (fullScreen) {
                 behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
             } else {

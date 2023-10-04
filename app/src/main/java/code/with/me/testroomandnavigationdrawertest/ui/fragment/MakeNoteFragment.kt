@@ -29,10 +29,10 @@ import code.with.me.testroomandnavigationdrawertest.AlertCreator
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.PermissionController
 import code.with.me.testroomandnavigationdrawertest.R
-import code.with.me.testroomandnavigationdrawertest.Utils.mainScope
-import code.with.me.testroomandnavigationdrawertest.Utils.println
-import code.with.me.testroomandnavigationdrawertest.Utils.setCheckable
-import code.with.me.testroomandnavigationdrawertest.Utils.setRoundedCorners
+import code.with.me.testroomandnavigationdrawertest.data.Utils.mainScope
+import code.with.me.testroomandnavigationdrawertest.data.Utils.println
+import code.with.me.testroomandnavigationdrawertest.data.Utils.setCheckable
+import code.with.me.testroomandnavigationdrawertest.data.Utils.setRoundedCorners
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityAddNoteBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.PhotoItemBinding
@@ -60,7 +60,6 @@ import javax.inject.Named
 
 
 class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBinding::inflate) {
-
     //    private var currentPermission: TypeOfPermission = TypeOfPermission.EMPTY
     private var cameraUri: Uri? = null
 
@@ -133,12 +132,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         }
 
     private val requestAudioPermission =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { it ->
-            "requestAudioPermission it: $it".println()
-//            if (it) {
-//
-//            }
-        }
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { it ->}
 
     companion object {
         const val paintResultKey = "paintResultKey"
@@ -152,6 +146,9 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         makeNoteViewModel =
             ViewModelProvider(requireActivity(), factory)[MakeNoteViewModel::class.java]
         listenPaintSheetResult()
+        if (arguments?.getInt("idFolder") != null && arguments?.getInt("idFolder") != -1) {
+             makeNoteViewModel.setFolderId(arguments?.getInt("idFolder")!!)
+        }
     }
 
     private fun listenPaintSheetResult() {
@@ -185,7 +182,6 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         binding.apply {
 
             textEdit.setOnEditorActionListener { v, actionId, event ->
-                println("event: $event actionId: $actionId")
                 when (actionId) {
                     EditorInfo.IME_ACTION_DONE -> {
                         println("NEW LINE!")

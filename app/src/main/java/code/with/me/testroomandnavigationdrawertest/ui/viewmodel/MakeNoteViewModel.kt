@@ -30,6 +30,7 @@ class MakeNoteViewModel @Inject constructor(
     private var lastSaveID = 0L
 
     private var pickedColor: String = "#FFFFFFFF"
+    private var folderId = -1
 
     private var listOfPhotos = mutableListOf<PhotoModel>()
 
@@ -74,7 +75,7 @@ class MakeNoteViewModel @Inject constructor(
         listOfPhotos.toList(),
         audioInString,
         pickedColor,
-        -1,
+        folderId,
         lastCreatedTime,
         lastOpenedTime,
         false,
@@ -148,7 +149,7 @@ class MakeNoteViewModel @Inject constructor(
             listOfPhotos.toList(),
             audioInString,
             pickedColor,
-            -1,
+            folderId,
             lastCreatedTime,
             lastOpenedTime,
             false,
@@ -176,7 +177,10 @@ class MakeNoteViewModel @Inject constructor(
     fun getImageFromCamera(cameraUri: String) {
         cameraInString = cameraUri
         listOfPhotos.addAndUpdate(PhotoModel(cameraInString))
+    }
 
+    fun setFolderId(id: Int) {
+        folderId = id
     }
 
     fun MutableList<PhotoModel>.addAndUpdate(newValue: PhotoModel) {

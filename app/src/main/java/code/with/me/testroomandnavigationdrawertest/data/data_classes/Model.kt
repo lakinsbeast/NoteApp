@@ -4,7 +4,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import code.with.me.testroomandnavigationdrawertest.Utils.randomId
+import code.with.me.testroomandnavigationdrawertest.data.Utils.randomId
 
 @Entity
 open class Model() : Parcelable {

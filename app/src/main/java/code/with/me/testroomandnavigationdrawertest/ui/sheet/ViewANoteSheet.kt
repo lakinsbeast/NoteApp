@@ -11,11 +11,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.AlertCreator
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
-import code.with.me.testroomandnavigationdrawertest.Utils.getDate
-import code.with.me.testroomandnavigationdrawertest.Utils.gone
-import code.with.me.testroomandnavigationdrawertest.Utils.mainScope
-import code.with.me.testroomandnavigationdrawertest.Utils.println
-import code.with.me.testroomandnavigationdrawertest.Utils.visible
+import code.with.me.testroomandnavigationdrawertest.data.Utils.getDate
+import code.with.me.testroomandnavigationdrawertest.data.Utils.gone
+import code.with.me.testroomandnavigationdrawertest.data.Utils.mainScope
+import code.with.me.testroomandnavigationdrawertest.data.Utils.println
+import code.with.me.testroomandnavigationdrawertest.data.Utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 import code.with.me.testroomandnavigationdrawertest.databinding.PhotoItemBinding
@@ -73,9 +73,9 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
                         titleText.text = value.titleNote
                         CoroutineScope(Dispatchers.IO).launch {
                             try {
-                                val parsedText = markdownParser.getParsedText(value.textNote)
+//                                val parsedText = markdownParser.getParsedText(value.textNote)
                                 mainScope {
-                                    text.text = parsedText
+                                    text.text = value.textNote
                                 }
                             } catch (e: Exception) {
                                 mainScope {

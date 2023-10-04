@@ -15,9 +15,9 @@ import android.view.animation.OvershootInterpolator
 import code.with.me.testroomandnavigationdrawertest.AlertCreator
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.PermissionController
-import code.with.me.testroomandnavigationdrawertest.Utils.println
-import code.with.me.testroomandnavigationdrawertest.Utils.setCancelButton
-import code.with.me.testroomandnavigationdrawertest.Utils.setRoundedCornersView
+import code.with.me.testroomandnavigationdrawertest.data.Utils.println
+import code.with.me.testroomandnavigationdrawertest.data.Utils.setCancelButton
+import code.with.me.testroomandnavigationdrawertest.data.Utils.setRoundedCornersView
 import code.with.me.testroomandnavigationdrawertest.audio.AudioController
 import code.with.me.testroomandnavigationdrawertest.databinding.AudioRecorderBinding
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity

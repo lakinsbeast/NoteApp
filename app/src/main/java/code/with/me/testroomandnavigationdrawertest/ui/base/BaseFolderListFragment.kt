@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.Slide
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
-import code.with.me.testroomandnavigationdrawertest.Utils.safeClickListener
+import code.with.me.testroomandnavigationdrawertest.data.Utils.safeClickListener
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Folder
 import code.with.me.testroomandnavigationdrawertest.databinding.FolderItemBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.FragmentFolderListBinding

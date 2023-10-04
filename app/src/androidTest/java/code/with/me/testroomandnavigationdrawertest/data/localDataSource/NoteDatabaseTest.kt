@@ -6,8 +6,8 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import code.with.me.testroomandnavigationdrawertest.Utils.launchAfterTimerMain
-import code.with.me.testroomandnavigationdrawertest.Utils.println
+import code.with.me.testroomandnavigationdrawertest.data.Utils.launchAfterTimerMain
+import code.with.me.testroomandnavigationdrawertest.data.Utils.println
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import junit.framework.TestCase
 import kotlinx.coroutines.CoroutineScope

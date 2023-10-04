@@ -18,8 +18,8 @@ import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.findNavController
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
-import code.with.me.testroomandnavigationdrawertest.Utils.println
-import code.with.me.testroomandnavigationdrawertest.Utils.providerName
+import code.with.me.testroomandnavigationdrawertest.data.Utils.println
+import code.with.me.testroomandnavigationdrawertest.data.Utils.providerName
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityPaintBinding
 import code.with.me.testroomandnavigationdrawertest.file.FilesController
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet

@@ -160,10 +160,11 @@
             </LinearLayout>
         </LinearLayout>
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/addFolderBtn"
+            android:id="@+id/closeBtn"
             style="@style/MaterialAddButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
             android:stateListAnimator="@null"
             android:text="@string/cancel"
             android:textColor="@color/black" />

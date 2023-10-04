@@ -1,7 +1,7 @@
 package code.with.me.testroomandnavigationdrawertest.ui.viewmodel
 
 import androidx.lifecycle.*
-import code.with.me.testroomandnavigationdrawertest.Utils.println
+import code.with.me.testroomandnavigationdrawertest.data.Utils.println
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 //import code.with.me.testroomandnavigationdrawertest.data.repos.NoteRepository
 import code.with.me.testroomandnavigationdrawertest.domain.repo.NoteRepository
@@ -37,7 +37,7 @@ class NoteViewModel @Inject constructor(
 
     fun getAllNotes(): Job {
         //после смены фрагмента в mainscreen продолжались доставаться данные
-        //из обеих flow с айди и без, принято решение сделать так:
+        //из обеих flow с айди и без, принял решение сделать так:
         if (::jobGetNote.isInitialized) {
             jobGetNote.cancel()
         }
@@ -51,7 +51,6 @@ class NoteViewModel @Inject constructor(
                     setState(NoteState.Error(e.localizedMessage))
                 }
             }
-
         }
         return jobGetNote
     }

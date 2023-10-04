@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
-import code.with.me.testroomandnavigationdrawertest.Utils.findActivity
+import code.with.me.testroomandnavigationdrawertest.data.Utils.findActivity
 
 abstract class BaseFragment<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?, Boolean) -> VB)) :
     Fragment() {

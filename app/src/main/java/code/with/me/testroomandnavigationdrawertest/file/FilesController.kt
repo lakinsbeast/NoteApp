@@ -3,7 +3,7 @@ package code.with.me.testroomandnavigationdrawertest.file
 import android.content.Context
 import android.net.Uri
 import androidx.core.content.FileProvider
-import code.with.me.testroomandnavigationdrawertest.Utils.println
+import code.with.me.testroomandnavigationdrawertest.data.Utils.println
 import java.io.File
 import java.io.FileOutputStream
 import java.util.Calendar
@@ -48,7 +48,7 @@ class FilesController @Inject constructor() {
     fun getUriForFile(
         context: Context,
         file: File,
-        providerName: String = code.with.me.testroomandnavigationdrawertest.Utils.providerName,
+        providerName: String = code.with.me.testroomandnavigationdrawertest.data.Utils.providerName,
     ): Uri? {
         return FileProvider.getUriForFile(
             context,

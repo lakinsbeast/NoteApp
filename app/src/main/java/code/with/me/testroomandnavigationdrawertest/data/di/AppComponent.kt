@@ -11,7 +11,6 @@ import code.with.me.testroomandnavigationdrawertest.ui.fragment.LastViewedFolder
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import code.with.me.testroomandnavigationdrawertest.ui.fragment.NoteHomeFragment
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFolderListFragment
-import code.with.me.testroomandnavigationdrawertest.ui.base.BaseNotesListFragment
 import code.with.me.testroomandnavigationdrawertest.ui.di.ApplicationModule
 import code.with.me.testroomandnavigationdrawertest.ui.di.AudioModule
 import code.with.me.testroomandnavigationdrawertest.ui.di.BindAppModule
@@ -58,7 +57,6 @@ interface AppComponent {
     fun inject(folderListFragment: FolderListFragment)
     fun inject(paintSheet: PaintSheet)
     fun inject(addFolderSheet: AddFolderSheet)
-    fun inject(baseNotesListFragment: BaseNotesListFragment)
     fun inject(addNoteTagSheetMenu: AddNoteTagSheetMenu)
     fun inject(makeNoteFragment: MakeNoteFragment)
     fun inject(renameFolderSheet: RenameFolderSheet)

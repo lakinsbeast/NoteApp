@@ -1,6 +1,5 @@
 package code.with.me.testroomandnavigationdrawertest.ui.di
 
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.audio.AudioController
@@ -13,8 +12,7 @@ import code.with.me.testroomandnavigationdrawertest.markdown.Formatter
 import code.with.me.testroomandnavigationdrawertest.markdown.IStringToMarkdownTextParser
 import code.with.me.testroomandnavigationdrawertest.markdown.StringToMarkdownTextParser
 import code.with.me.testroomandnavigationdrawertest.ui.FragmentBackStackManager
-import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
-import code.with.me.testroomandnavigationdrawertest.ui.SheetController
+import code.with.me.testroomandnavigationdrawertest.ui.controllers.SheetController
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.CloseFragmentImpl
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.FragmentController
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.GetFragmentImpl

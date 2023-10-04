@@ -1,20 +1,25 @@
 package code.with.me.testroomandnavigationdrawertest.ui.fragment
 
 import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.drawable.AnimationDrawable
+import android.graphics.drawable.GradientDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.forEachIndexed
 import androidx.core.view.get
+import androidx.core.view.isNotEmpty
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
-import code.with.me.testroomandnavigationdrawertest.Utils.gone
-import code.with.me.testroomandnavigationdrawertest.Utils.launchAfterTimerMain
-import code.with.me.testroomandnavigationdrawertest.Utils.println
-import code.with.me.testroomandnavigationdrawertest.Utils.visible
+import code.with.me.testroomandnavigationdrawertest.data.Utils.gone
+import code.with.me.testroomandnavigationdrawertest.data.Utils.launchAfterTimerMain
+import code.with.me.testroomandnavigationdrawertest.data.Utils.println
+import code.with.me.testroomandnavigationdrawertest.data.Utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Folder
 import code.with.me.testroomandnavigationdrawertest.databinding.MainScreenFragmentBinding
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
@@ -36,8 +41,7 @@ import com.google.android.material.R as MR
 class MainScreenFragment :
     BaseFragment<MainScreenFragmentBinding>(MainScreenFragmentBinding::inflate) {
 
-
-    private var selectedChip = 1
+    private var selectedChip = -1
     private var selectedChipFolderId = 1
 
     @Inject
@@ -57,17 +61,13 @@ class MainScreenFragment :
         listenViewModel()
         initClickListeners()
         openNotesListFragment()
-        println("fragmentTag saved: ${savedInstanceState?.getString("fragmentTag")}")
-        when (savedInstanceState?.getString("fragmentTag")) {
-            "MakeNoteFragment" -> {
-                openMakeNoteFragment()
-            }
-        }
+//        when (savedInstanceState?.getString("fragmentTag")) {
+//            "MakeNoteFragment" -> {
+//                openMakeNoteFragment()
+//            }
+//        }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         kotlin.io.println("onSaveInstanceState fragment tag ${fragmentManager?.fragments?.last()?.javaClass?.simpleName}")
@@ -180,17 +180,33 @@ class MainScreenFragment :
             )
         )
         chipCornerRadius = 15f
+        val chipGroup = binding.chipGroup
+        if (binding.chipGroup.isNotEmpty()) {
+            println("id setted! before: $id lastId: ${chipGroup.getChildAt(chipGroup.childCount - 1).id}")
+            id = chipGroup.getChildAt(chipGroup.childCount - 1).id + 1
+            println("id setted! after: $id")
+        }
         setOnClickListener { view ->
-            if (selectedChip == this.id) return@setOnClickListener
-            showProgressBar(true)
-            openNotesListFragment(it)
-            selectedChipFolderId = it.id
-            binding.chipGroup.forEachIndexed { index, view ->
-                (binding.chipGroup[index] as Chip).unsetSelected()
+            if (selectedChip == this.id) {
+                selectedChip = -1
+                selectedChipFolderId = 1
+                openNotesListFragment()
+                chipGroup.forEachIndexed { index, view ->
+                    (chipGroup[index] as Chip).unsetSelected()
+                }
+            } else {
+                showProgressBar(true)
+                openNotesListFragment(it)
+                selectedChipFolderId = it.id
+                chipGroup.forEachIndexed { index, view ->
+                    (chipGroup[index] as Chip).unsetSelected()
+                }
+                selectedChip = this.id
+                println("selectedChip: $selectedChip")
+                println("this.id: ${this.id}")
+                chipGroup.findViewById<Chip>(selectedChip).setSelected()
+//                (chipGroup[selectedChip - 1] as Chip).setSelected()
             }
-            selectedChip = this.id
-            println("selectedChip: $selectedChip")
-            (binding.chipGroup[selectedChip - 1] as Chip).setSelected()
         }
     }
 
