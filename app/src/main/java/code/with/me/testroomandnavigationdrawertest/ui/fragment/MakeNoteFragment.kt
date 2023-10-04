@@ -60,7 +60,6 @@ import javax.inject.Named
 
 
 class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBinding::inflate) {
-    //    private var currentPermission: TypeOfPermission = TypeOfPermission.EMPTY
     private var cameraUri: Uri? = null
 
     @Inject
