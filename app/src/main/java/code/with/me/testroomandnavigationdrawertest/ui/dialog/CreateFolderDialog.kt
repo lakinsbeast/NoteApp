@@ -53,7 +53,7 @@ class CreateFolderDialog(private val myContext: Context) :
             binding.apply {
                 text.println()
                 if (text != null) {
-                    findedTextGroupChip(text)
+                    findTextGroupChip(text)
                 }
             }
         }
@@ -76,6 +76,7 @@ class CreateFolderDialog(private val myContext: Context) :
         setUpDialogWindow()
         binding.cancelButton.setCancelButton()
         binding.confirmButton.setConfirmButton()
+        generateChip()
         clearAllSelectedChip()
 
     }
@@ -111,7 +112,7 @@ class CreateFolderDialog(private val myContext: Context) :
         }
     }
 
-    private fun findedTextGroupChip(text: CharSequence) {
+    private fun findTextGroupChip(text: CharSequence) {
         for (chip in 0 until binding.chipGroup.childCount) {
             val selectedChip = (binding.chipGroup.getChildAt(chip) as Chip)
             if (TextUtils.equals(selectedChip.text, text)) {
@@ -170,6 +171,40 @@ class CreateFolderDialog(private val myContext: Context) :
                 }
                 dismiss()
             }
+        }
+    }
+    val folderNames = mutableListOf(
+        "🏞️ Путешествия",
+        "🍽️ Еда и рецепты",
+        "🎥 Развлечения",
+        "💡 Идеи и планы",
+        "🚗 Транспорт",
+        "🎓 Образование",
+        "🎂 События и праздники",
+        "💰 Финансы",
+        "📅 Планирование",
+        "🎨 Творчество",
+        "📰 Новости",
+        "🏋️ Фитнес и здоровье",
+        "🏡 Дом и быт",
+        "🌍 Планы на путешествия",
+        "📚 Книги и чтение",
+        "🎯 Цели и достижения",
+        "🎵 Музыка",
+        "💼 Работа и задачи",
+        "🌆 Городская жизнь",
+        "🌱 Хобби и увлечения"
+    )
+
+    private fun generateChip() {
+        binding.chipGroup.removeAllViewsInLayout()
+        repeat(4) {
+            val chip = Chip(context)
+            chip.isCheckable = true
+            val index = folderNames.indices.random()
+            chip.text = folderNames[index]
+            folderNames.removeAt(index)
+            binding.chipGroup.addView(chip)
         }
     }
 
