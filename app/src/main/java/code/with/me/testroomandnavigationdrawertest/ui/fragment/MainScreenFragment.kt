@@ -88,9 +88,14 @@ class MainScreenFragment :
                 CreateFolderDialog(requireContext()).show()
             }
             settingsBtn.setOnClickListener {
-                Toast.makeText(context, "Settings Fragment", Toast.LENGTH_LONG)
-                    .show()
-                //TODO create SettingsFragment
+//                Toast.makeText(context, "Settings Fragment", Toast.LENGTH_LONG)
+//                    .show()
+                activity().fragmentController.openFragment(
+                    activity(),
+                    SettingsFragment(),
+                    fragmentOptionsBuilder {
+                        fragmentLayout = R.id.fragment_detail
+                    })
             }
             searchBtn.setOnClickListener {
                 Toast.makeText(context, "Search Fragment", Toast.LENGTH_LONG)
@@ -275,6 +280,7 @@ class MainScreenFragment :
     fun navigateToViewANoteSheet(id: Int) {
         try {
             val viewNoteSheet = ViewANoteSheet()
+            viewNoteSheet.setFullScreenSheet()
             val bundle = Bundle()
             viewNoteSheet.arguments = bundle.apply {
                 putInt("noteId", id)

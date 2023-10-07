@@ -1,14 +1,15 @@
 package code.with.me.testroomandnavigationdrawertest.ui.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
-import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.data.Utils.gone
 import code.with.me.testroomandnavigationdrawertest.data.Utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
@@ -20,6 +21,7 @@ import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.NoteMenuSheet
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteState
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NotesListUserAction
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.UserActionNote
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
@@ -73,11 +75,21 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
             }
         }
     }
-    private fun handleUserActionState(state: UserActionNote) {
+
+    private fun handleUserActionState(state: NotesListUserAction) {
         binding.apply {
             when (state) {
-                is UserActionNote.SavedNoteToDB -> {
-
+                is NotesListUserAction.ShareText<*> -> {
+                    println("SHARE!!")
+                    if (state.data.toString().isNotBlank()) {
+                        val intent = Intent()
+                        intent.action = Intent.ACTION_SEND
+                        intent.type = "text/plain"
+                        intent.putExtra(Intent.EXTRA_TEXT, state.data.toString())
+                        startActivity(Intent.createChooser(intent, "Share via"))   
+                    } else {
+                        Toast.makeText(context, "Пустой текст", Toast.LENGTH_SHORT).show()
+                    }
                 }
 
                 else -> {}
@@ -130,7 +142,7 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
     }
 
     private fun initViewModel() {
-        noteViewModel = ViewModelProvider(requireActivity(), factory)[NoteViewModel::class.java]
+        noteViewModel = ViewModelProvider(this, factory)[NoteViewModel::class.java]
     }
 
     private fun initRecyclerView(binding: FragmentNotesListBinding) {
@@ -174,35 +186,36 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
                     titleID.text = cutText(item.titleNote).checkEmptyTitle()
                     textID.text = cutText(item.textNote).checkEmptyText()
                     menuBtn.setOnClickListener {
-                        activity().sheetController.showSheet(activity(), NoteMenuSheet {
-                            when(it) {
+                        val sheet = NoteMenuSheet(item.second_id) {
+                            when (it) {
                                 NoteItemsCallback.SHARE -> {
-                                    println("SHARE")
+                                    noteViewModel.shareTextNote(item.second_id)
                                 }
+
                                 NoteItemsCallback.MOVE -> {
                                     println("MOVE")
                                 }
+
                                 NoteItemsCallback.FAVORITE -> {
                                     println("FAVORITE")
                                 }
+
                                 NoteItemsCallback.LOCK -> {
                                     println("LOCK")
                                 }
+
                                 NoteItemsCallback.DELETE -> {
                                     println("DELETE")
                                 }
                             }
-                        })
+                        }
+                        sheet.isDraggable = false
+                        activity().sheetController.showSheet(activity(), sheet)
                     }
                 }
             }
 
             private fun openDetailFragment(id: Int) {
-                // этот вариант не работает
-//                val fragment = activity?.supportFragmentManager?.fragments?.getOrNull(R.id.mainScreenFragment)
-//                if (fragment != null) {
-//                    (fragment as MainScreenFragment).navigateToViewANoteSheet(id)
-//                }
                 for (fragment in activity?.supportFragmentManager?.fragments!!) {
                     println("fragment: ${fragment.javaClass.simpleName}")
                     if (fragment is MainScreenFragment) {

@@ -137,6 +137,8 @@ class MakeNoteViewModel @Inject constructor(
             is UserActionNote.SavedNoteToDB -> {
                 _userActionsState.value = UserActionNote.SavedNoteToDB
             }
+
+            else -> {}
         }
     }
 
@@ -204,5 +206,4 @@ class MakeNoteViewModelFactory @Inject constructor(
         }
         throw IllegalArgumentException("ukn VM class")
     }
-
 }

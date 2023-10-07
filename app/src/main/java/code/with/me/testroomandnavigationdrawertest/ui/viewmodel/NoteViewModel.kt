@@ -1,13 +1,13 @@
 package code.with.me.testroomandnavigationdrawertest.ui.viewmodel
 
 import androidx.lifecycle.*
-import code.with.me.testroomandnavigationdrawertest.data.Utils.println
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 //import code.with.me.testroomandnavigationdrawertest.data.repos.NoteRepository
 import code.with.me.testroomandnavigationdrawertest.domain.repo.NoteRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.IllegalArgumentException
@@ -17,16 +17,13 @@ class NoteViewModel @Inject constructor(
     private val repoNote: NoteRepository
 ) : ViewModel() {
 
-    //MVI реализовал не самым лучшим способом, можно было наверно создать
-    //BaseViewModel<MviState, MviActions> и сделать проще
-
     //upd: i dont like this ☹️
 
     private val _state = MutableLiveData<NoteState>(NoteState.Loading)
-    private val _userActionsState = MutableLiveData<UserActionNote>()
+    private val _userActionsState = MutableLiveData<NotesListUserAction>()
     val state: LiveData<NoteState>
         get() = _state
-    val userActionState: LiveData<UserActionNote>
+    val userActionState: LiveData<NotesListUserAction>
         get() = _userActionsState
 
     private fun setState(state: NoteState) {
@@ -87,6 +84,21 @@ class NoteViewModel @Inject constructor(
         }
     }
 
+    fun shareTextNote(id: Int) {
+        viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
+            try {
+                val note = async {
+                    return@async repoNote.getNoteById(id)
+                }.await()
+                val title = note.titleNote
+                val text = note.textNote
+                _userActionsState.postValue(NotesListUserAction.ShareText("$title\n$text"))
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     fun insert(note: Note) = viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
         repoNote.insertNote(note)
     }
@@ -106,41 +118,14 @@ class NoteViewModel @Inject constructor(
     }
 
 
-    fun processUserActions(userAction: UserActionNote) {
+    fun processUserActions(userAction: NotesListUserAction) {
         when (userAction) {
-            is UserActionNote.GetImage -> {
-                _userActionsState.value = UserActionNote.GetImage
+            is NotesListUserAction.ShareText<*> -> {
+                _userActionsState.value = NotesListUserAction.ShareText(userAction.data)
             }
-
-            is UserActionNote.GetCamera -> {
-                _userActionsState.value = UserActionNote.GetCamera
-            }
-
-            is UserActionNote.GetMicrophone -> {
-                _userActionsState.value = UserActionNote.GetMicrophone
-            }
-
-            is UserActionNote.GetDraw -> {
-                _userActionsState.value = UserActionNote.GetDraw
-            }
-
-            is UserActionNote.SavedNoteToDB -> {
-                _userActionsState.value = UserActionNote.SavedNoteToDB
-            }
+            else -> {}
         }
     }
-
-    fun saveNote(
-        note: Note
-    ) {
-        if (note.titleNote.isNotEmpty() || note.textNote.isNotEmpty() || note.listOfImages.isNotEmpty()) {
-            viewModelScope.launch {
-                repoNote.updateNote(note)
-                processUserActions(UserActionNote.SavedNoteToDB)
-            }
-        }
-    }
-
 }
 
 sealed class NoteState {
@@ -150,6 +135,10 @@ sealed class NoteState {
     class Error<T>(val error: T) : NoteState()
 }
 
+sealed class NotesListUserAction {
+    class ShareText<String>(val data: String) : NotesListUserAction()
+
+}
 sealed class UserActionNote {
     data object SavedNoteToDB : UserActionNote()
     data object GetImage : UserActionNote()

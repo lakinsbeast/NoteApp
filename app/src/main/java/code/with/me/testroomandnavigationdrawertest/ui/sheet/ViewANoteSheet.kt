@@ -111,7 +111,6 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
         val appComponent = (requireActivity().application as NotesApplication).appComponent
         appComponent.inject(this)
         viewANoteViewModel = ViewModelProvider(this, factory)[ViewANoteViewModel::class.java]
-        setFullScreenSheet()
         viewANoteViewModel.setActivityToAudioController(activity())
     }
 

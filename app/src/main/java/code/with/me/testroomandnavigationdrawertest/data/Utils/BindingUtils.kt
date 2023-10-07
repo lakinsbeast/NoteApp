@@ -52,23 +52,18 @@ fun View.setRoundedCornersView(radius: Float, color: Int = Color.BLACK, strokeCo
     val backgroundDrawable = GradientDrawable().apply {
         cornerRadii = floatArrayOf(radius, radius, radius, radius, radius, radius, radius, radius)
     }
+    val shapeAppearanceModel = ShapeAppearanceModel.builder()
+        .setAllCorners(CornerFamily.ROUNDED, radius)
+        .build()
 
-    background = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        val shapeAppearanceModel = ShapeAppearanceModel.builder()
-            .setAllCorners(CornerFamily.ROUNDED, radius)
-            .build()
-
-        val shapeDrawable = MaterialShapeDrawable(shapeAppearanceModel)
-        shapeDrawable.fillColor = ColorStateList.valueOf(color)
-        if (strokeColor != null) {
-            shapeDrawable.setStroke(5f, ColorStateList.valueOf(strokeColor))
-        }
-
-        val layerDrawable = LayerDrawable(arrayOf(shapeDrawable))
-        layerDrawable
-    } else {
-        backgroundDrawable
+    val shapeDrawable = MaterialShapeDrawable(shapeAppearanceModel)
+    shapeDrawable.fillColor = ColorStateList.valueOf(color)
+    if (strokeColor != null) {
+        shapeDrawable.setStroke(5f, ColorStateList.valueOf(strokeColor))
     }
+
+    val layerDrawable = LayerDrawable(arrayOf(shapeDrawable))
+    background = layerDrawable
 }
 
 fun BottomNavigationView.setRoundedCorners(radius: Float) {

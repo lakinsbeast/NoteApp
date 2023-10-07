@@ -59,8 +59,12 @@ ext {
     retrofit_version = '2.9.0'
     audiovisualizer_version = '2.2.5'
     nav_version = "2.6.0"
+    lottieVersion = "6.1.0"
 }
 dependencies {
+    //lottie
+    implementation "com.airbnb.android:lottie:$lottieVersion"
+
 
     implementation 'jp.wasabeef:richeditor-android:2.0.0'
 

@@ -34,6 +34,9 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
 
     var behavior: BottomSheetBehavior<FrameLayout>? = null
     private var fullScreen: Boolean = false
+    var isDraggable = true
+    var isSheetCancelable = true
+    var doSheetBackShadowed = true
     var height: Int = -1
         set(value) {
             view?.let {
@@ -42,7 +45,9 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
             }
         }
     private var peekHeight: Int = 1100
-    private var canHide = true
+    var canHide = true
+    var isBackNeedBeBlurred = true
+    var halfExpandedRatio = 0.6f
     val binding get() = _binding!!
 
     var onSlide: ((Float) -> Unit) = {}
@@ -81,9 +86,20 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setUpDialogWindow()
+        if (isBackNeedBeBlurred) {
+            setUpDialogWindow()
+        }
         initProgressBar()
         addViewsToSheet()
+
+        //убирает закрытие sheet, после нажатия за пределами sheet
+        isCancelable = isSheetCancelable
+        //убирает затемнение позади sheet
+        if (!doSheetBackShadowed) {
+            dialog?.window?.setDimAmount(0.02f)
+        }
+        //убирает темный бэкграунд позади sheet, например, если поставить corner radius 64f, то будет видно затенение по краям
+        dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         behavior = BottomSheetBehavior.from(view.parent as FrameLayout)
         if (fullScreen) {
@@ -99,9 +115,10 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
                 behavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
             behavior.isHideable = canHide
+            behavior.isDraggable = isDraggable
             behavior.skipCollapsed = true
             behavior.isFitToContents = true
-            behavior.halfExpandedRatio = 0.6f
+            behavior.halfExpandedRatio = halfExpandedRatio
             behavior.addBottomSheetCallback(object :
                 BottomSheetBehavior.BottomSheetCallback() {
                 private var oldState: Int = BottomSheetBehavior.STATE_HALF_EXPANDED
@@ -157,8 +174,18 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
         setStateToBehavior()
     }
 
+    fun setStateHalfExpanded() {
+        state = BottomSheetBehavior.STATE_HALF_EXPANDED
+        setStateToBehavior()
+    }
+
     fun setStateHidden() {
         state = BottomSheetBehavior.STATE_HIDDEN
+        setStateToBehavior()
+    }
+
+    fun setStateCollapsed() {
+        state = BottomSheetBehavior.STATE_COLLAPSED
         setStateToBehavior()
     }
 

@@ -143,7 +143,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         val appComponent = (requireActivity().application as NotesApplication).appComponent
         appComponent.inject(this)
         makeNoteViewModel =
-            ViewModelProvider(requireActivity(), factory)[MakeNoteViewModel::class.java]
+            ViewModelProvider(this, factory)[MakeNoteViewModel::class.java]
         listenPaintSheetResult()
         if (arguments?.getInt("idFolder") != null && arguments?.getInt("idFolder") != -1) {
              makeNoteViewModel.setFolderId(arguments?.getInt("idFolder")!!)

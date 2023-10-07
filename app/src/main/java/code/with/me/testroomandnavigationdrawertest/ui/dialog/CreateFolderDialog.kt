@@ -77,7 +77,6 @@ class CreateFolderDialog(private val myContext: Context) :
         binding.cancelButton.setCancelButton()
         binding.confirmButton.setConfirmButton()
         generateChip()
-        clearAllSelectedChip()
 
     }
 
@@ -206,6 +205,7 @@ class CreateFolderDialog(private val myContext: Context) :
             folderNames.removeAt(index)
             binding.chipGroup.addView(chip)
         }
+        clearAllSelectedChip()
     }
 
 
