@@ -1,15 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
     android:id="@+id/mainLayout"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <include
         android:id="@+id/include2"
         layout="@layout/divider_line" />
 
+    <FrameLayout
+        android:id="@+id/topMenuLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/backBtn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_baseline_arrow_back_24"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/black" />
+
+        <TextView
+            android:id="@+id/textSettings"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="Настройки"
+            android:textSize="35sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </FrameLayout>
+
+
     <View
+        android:id="@+id/view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
@@ -20,6 +55,7 @@
         android:layout_margin="30dp"
         android:gravity="center"
         android:orientation="vertical"
+        android:paddingTop="30dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -31,11 +67,11 @@
             app:cardCornerRadius="15dp">
 
             <Switch
-                android:id="@+id/isFavoriteSwitch"
+                android:id="@+id/isUseFolderSettingsSwitch"
                 android:layout_width="match_parent"
                 android:layout_height="70dp"
                 android:paddingHorizontal="20dp"
-                android:text="@string/favorite_folder"
+                android:text="@string/useFolderSettings"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:thumb="@drawable/custom_switch_thumb"
@@ -64,10 +100,48 @@
             app:cardCornerRadius="15dp">
 
             <Switch
+                android:id="@+id/settingsTheFolderBtn"
                 android:layout_width="match_parent"
                 android:layout_height="70dp"
+                android:drawableRight="@drawable/small_play_arrow_btn"
+                android:gravity="center_vertical"
                 android:paddingHorizontal="20dp"
-                android:text="@string/favorite_folder"
+                android:text="@string/settingTheFolder"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:thumb="@drawable/custom_switch_thumb"
+
+                android:track="@drawable/custom_switch_track"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/chipGroup" />
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="30dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout6">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            app:cardBackgroundColor="@color/black"
+            app:cardCornerRadius="15dp">
+
+            <Switch
+                android:id="@+id/useABehindBlurSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:gravity="start|center"
+                android:paddingHorizontal="20dp"
+                android:text="@string/useABehindBlurQ"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:thumb="@drawable/custom_switch_thumb"
@@ -86,7 +160,7 @@
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout6">
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout5">
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -95,10 +169,12 @@
             app:cardCornerRadius="15dp">
 
             <Switch
+                android:id="@+id/useABackgroundBlurSwitch"
                 android:layout_width="match_parent"
                 android:layout_height="70dp"
+                android:gravity="start|center"
                 android:paddingHorizontal="20dp"
-                android:text="@string/favorite_folder"
+                android:text="@string/useABackgroundBlurQ"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:thumb="@drawable/custom_switch_thumb"

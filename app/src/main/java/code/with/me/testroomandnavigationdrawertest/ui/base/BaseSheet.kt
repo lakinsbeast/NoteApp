@@ -48,6 +48,15 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
     var canHide = true
     var isBackNeedBeBlurred = true
     var halfExpandedRatio = 0.6f
+
+    //если установить false, то будет работать halfExpanded state, а если true, то нет, но не будет различных багов
+    var isFitToContents = true
+        set(value) {
+            view?.let {
+                behavior?.isFitToContents = value
+            }
+            field = value
+        }
     val binding get() = _binding!!
 
     var onSlide: ((Float) -> Unit) = {}
@@ -112,11 +121,11 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
             if (fullScreen) {
                 behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
             } else {
-                behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                behavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
             behavior.isHideable = canHide
             behavior.isDraggable = isDraggable
-            behavior.skipCollapsed = true
+//            behavior.skipCollapsed = true
             behavior.isFitToContents = true
             behavior.halfExpandedRatio = halfExpandedRatio
             behavior.addBottomSheetCallback(object :

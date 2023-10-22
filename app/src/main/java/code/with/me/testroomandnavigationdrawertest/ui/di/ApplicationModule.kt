@@ -35,6 +35,7 @@ import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MakeNoteViewMod
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MakeNoteViewModelFactory
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteMenuSheetViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteMenuSheetViewModelFactory
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.SettingsViewModelFactory
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.ViewANoteViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.ViewANoteViewModelFactory
 import dagger.Binds
@@ -66,6 +67,11 @@ abstract class BindAppModule {
     @Singleton
     @Named("viewANoteVMFactory")
     abstract fun bindViewANoteVMFactory(factory: ViewANoteViewModelFactory): ViewModelProvider.Factory
+
+    @Binds
+    @Singleton
+    @Named("settingsVMFactory")
+    abstract fun bindSettingsVMFactoryFactory(factory: SettingsViewModelFactory): ViewModelProvider.Factory
 
     @Binds
     @Singleton

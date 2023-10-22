@@ -2,12 +2,15 @@ package code.with.me.testroomandnavigationdrawertest.ui.sheet
 
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.doOnLayout
 import androidx.lifecycle.ViewModelProvider
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.data.Utils.gone
+import code.with.me.testroomandnavigationdrawertest.data.Utils.setRoundedCornersView
+import code.with.me.testroomandnavigationdrawertest.data.Utils.setUpperRoundedCornersView
 import code.with.me.testroomandnavigationdrawertest.data.Utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.enums.NoteItemsCallback
 import code.with.me.testroomandnavigationdrawertest.databinding.NoteMenuSheetBinding
@@ -31,15 +34,23 @@ class NoteMenuSheet(private val idOfNote: Int, private val action: (NoteItemsCal
         super.onCreate(savedInstanceState)
         initAppComponent()
     }
+
     private fun initAppComponent() {
         activity?.let {
             val appComponent = (it.application as NotesApplication).appComponent
             appComponent.inject(this)
         }
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initAndListenViewModel()
+        binding.mainLayout.setUpperRoundedCornersView(
+            (1.0f) * 64f,
+            Color.WHITE,
+            Color.BLACK,
+            (1.0f) * 5f
+        )
         binding.apply {
 
             progressBar.playAnimation()
@@ -51,6 +62,7 @@ class NoteMenuSheet(private val idOfNote: Int, private val action: (NoteItemsCal
                 action.invoke(NoteItemsCallback.MOVE)
                 dismiss()
             }
+            //TODO сделать так, чтоб в зависимости от того в избранном он или нет менялся текст и иконка
             favoriteLay.setOnClickListener {
                 action.invoke(NoteItemsCallback.FAVORITE)
                 dismiss()
@@ -67,6 +79,7 @@ class NoteMenuSheet(private val idOfNote: Int, private val action: (NoteItemsCal
                 dismiss()
             }
         }
+        setStateCollapsed()
     }
 
     fun showCustomProgressBar(show: Boolean) {

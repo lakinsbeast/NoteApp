@@ -9,7 +9,7 @@ plugins {
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
     packagingOptions {
         resources {
             excludes += ['META-INF/DEPENDENCIES', 'META-INF/NOTICE', 'META-INF/LICENSE', 'META-INF/LICENSE.txt', 'META-INF/NOTICE.txt']
@@ -21,7 +21,7 @@ android {
     defaultConfig {
         applicationId "code.with.me.testroomandnavigationdrawertest"
         minSdk 24
-        targetSdk 33
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -150,7 +150,8 @@ dependencies {
     implementation 'com.google.android.gms:play-services-auth:20.6.0'
 
     implementation 'androidx.core:core-ktx:1.10.1'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+    //не повышать версию до 1.6.0! проблемы с nonnullable параметрами у gesturedetectorlistener
+    implementation 'androidx.appcompat:appcompat:1.5.0'
 //    implementation group: 'com.google.android.material', name: 'material', version: '1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 

@@ -85,7 +85,7 @@ class MainScreenFragment :
                 openMakeNoteFragment()
             }
             makeFolderBtn.setOnClickListener {
-                CreateFolderDialog(requireContext()).show()
+                CreateFolderDialog().show(activity().supportFragmentManager, "CreateFolderDialog")
             }
             settingsBtn.setOnClickListener {
 //                Toast.makeText(context, "Settings Fragment", Toast.LENGTH_LONG)
@@ -114,8 +114,14 @@ class MainScreenFragment :
 
     private fun listenViewModel() {
         lifecycleScope.launch {
+            mainScreenViewModel.isUseFolderEnabled.observe(viewLifecycleOwner) {
+                if (it) {
+                    binding.folderLayout.visible()
+                } else {
+                    binding.folderLayout.gone()
+                }
+            }
             mainScreenViewModel.getAllFolders().collect() {
-                println("getAllFolders size: ${it.size}")
                 binding.chipGroup.removeAllViewsInLayout()
                 val chip = Chip(
                     binding.chipGroup.context,
@@ -187,9 +193,7 @@ class MainScreenFragment :
         chipCornerRadius = 15f
         val chipGroup = binding.chipGroup
         if (binding.chipGroup.isNotEmpty()) {
-            println("id setted! before: $id lastId: ${chipGroup.getChildAt(chipGroup.childCount - 1).id}")
             id = chipGroup.getChildAt(chipGroup.childCount - 1).id + 1
-            println("id setted! after: $id")
         }
         setOnClickListener { view ->
             if (selectedChip == this.id) {
@@ -208,9 +212,9 @@ class MainScreenFragment :
                 }
                 selectedChip = this.id
                 println("selectedChip: $selectedChip")
+                println("selectedChipFolderId: $selectedChipFolderId")
                 println("this.id: ${this.id}")
                 chipGroup.findViewById<Chip>(selectedChip).setSelected()
-//                (chipGroup[selectedChip - 1] as Chip).setSelected()
             }
         }
     }
@@ -235,10 +239,11 @@ class MainScreenFragment :
         showProgressBar(false)
     }
 
-    private fun openMakeNoteFragment() {
+    fun openMakeNoteFragment(id: Int = -1) {
         val fragment = MakeNoteFragment()
         val bundle = Bundle()
         bundle.putInt("idFolder", selectedChipFolderId)
+        bundle.putInt("noteId", id)
         fragment.arguments = bundle
         (activity as MainActivity).fragmentController.openFragment(
             activity as MainActivity,

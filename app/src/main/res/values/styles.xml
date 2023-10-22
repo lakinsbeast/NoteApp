@@ -24,4 +24,12 @@
         <item name="background">@drawable/all_rounded_corners</item>
     </style>
 
+    <style name="BlurryDialog">
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+
+    <style name="DialogAnimationEnterExit">
+        <item name="android:windowEnterAnimation">@anim/slide_in_left</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_right</item>
+    </style>
 </resources>

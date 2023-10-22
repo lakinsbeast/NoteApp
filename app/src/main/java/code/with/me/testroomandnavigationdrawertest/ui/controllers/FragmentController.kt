@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import code.with.me.testroomandnavigationdrawertest.ui.FragmentBackStackManager
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import javax.inject.Inject
 
 // под чем я был, когда писал это?
@@ -21,6 +22,14 @@ class FragmentController @Inject constructor(
     fun replaceFragment(activity: MainActivity, fragment: Fragment, options: FragmentOptions) {
         replaceFragmentImpl.replaceFragment(activity, fragment, options)
     }
+
+    fun closeFragment(
+        activity: MainActivity, fragment: String
+    ) {
+        closeFragmentImpl.closeFragment(activity, fragment)
+    }
+
+
 }
 
 // https://kotlinexpertise.com/java-builders-kotlin-dsls/
@@ -95,6 +104,13 @@ class OpenFragmentImpl @Inject constructor(
             .add(options.fragmentLayout, fragment, fragment.javaClass.simpleName)
             .addToBackStack(if (options.addToBackStack) fragment.javaClass.simpleName else null)
             .commit()
+    }
+
+    fun showSheet(
+        activity: MainActivity,
+        sheet: BottomSheetDialogFragment
+    ) {
+        sheet.show(activity.supportFragmentManager, sheet.javaClass.simpleName)
     }
 }
 

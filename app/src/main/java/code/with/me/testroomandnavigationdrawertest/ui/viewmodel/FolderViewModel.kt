@@ -4,16 +4,20 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Folder
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
+import code.with.me.testroomandnavigationdrawertest.data.localDataSource.DataStoreManager
 import code.with.me.testroomandnavigationdrawertest.domain.repo.FolderRepository
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
 import javax.inject.Inject
 
 class FolderViewModel @Inject constructor(
-    private val repo: FolderRepository
+    private val repo: FolderRepository,
+    private val dataStoreManager: DataStoreManager
 ) : BaseViewModel() {
 
     private val _state = MutableLiveData<FolderVMState>(FolderVMState.Loading)
@@ -22,6 +26,24 @@ class FolderViewModel @Inject constructor(
 
     private fun setState(state: FolderVMState) {
         _state.postValue(state)
+    }
+    private val _isUseBehindBlurEnabled = MutableLiveData<Boolean>()
+    val isUseBehindBlurEnabled = _isUseBehindBlurEnabled
+
+    private val _isUseBackgroundBlurEnabled = MutableLiveData<Boolean>()
+    val isUseBackgroundBlurEnabled = _isUseBackgroundBlurEnabled
+
+    init {
+        viewModelScope.launch {
+            dataStoreManager.useBehindBlurFlow.collect() {
+                _isUseBehindBlurEnabled.postValue(it)
+            }
+        }
+        viewModelScope.launch {
+            dataStoreManager.useBackgroundBlurFlow.collect() {
+                _isUseBackgroundBlurEnabled.postValue(it)
+            }
+        }
     }
 
     fun getAllFolders(): Flow<List<Folder>> = repo.getAllFolders()
@@ -61,13 +83,15 @@ sealed class FolderVMState {
 }
 
 class FolderViewModelFactory @Inject constructor(
-    private val repo: FolderRepository
+    private val repo: FolderRepository,
+    private val dataStoreManager: DataStoreManager
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(FolderViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return FolderViewModel(
-                repo
+                repo,
+                dataStoreManager
             ) as T
         }
         throw IllegalArgumentException("ukn VM class")

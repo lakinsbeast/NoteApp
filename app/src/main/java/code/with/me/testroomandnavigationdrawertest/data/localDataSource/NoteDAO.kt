@@ -34,20 +34,35 @@ interface NoteDAO {
     @Throws(SQLiteException::class)
     suspend fun insertNote(note: Note)
 
+    @Query("UPDATE Note SET isFavorite = CASE WHEN isFavorite = 1 THEN 0 ELSE 1 END WHERE second_id = :id")
+    suspend fun setToFavorite(id: Int)
+
     @Delete
     @Throws(SQLiteException::class)
     suspend fun deleteNote(note: Note): Int
 
-    //    update ne working
-    @Update
+    //    update not working
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateNote(note: Note)
 
     @Query("$SELECT_NOTE ORDER BY second_id DESC LIMIT 1")
     fun getLastCustomer(): Long
+    @Query("SELECT COUNT(*) FROM Note")
+    fun getNoteCount(): Long
+    @Query("$SELECT_NOTE ORDER BY second_id ASC LIMIT 1")
+    fun getFirstCustomer(): Long
+
+    @Query("SELECT second_id FROM Note WHERE second_id > :currentId ORDER BY second_id ASC LIMIT 1")
+    fun getNextAvailableId(currentId: Int): Int?
+
+    @Query("SELECT second_id FROM Note WHERE second_id < :currentId ORDER BY second_id DESC LIMIT 1")
+    fun getPreviousAvailableId(currentId: Int): Int?
+
 
     companion object {
         private const val INSERT_NOTE = ""
-        private const val SELECT_NOTE = "SELECT * FROM note "
+        private const val SELECT_NOTE = "SELECT * FROM note"
+        private const val UPDATE_NOTE = "UPDATE Note SET"
     }
 
 

@@ -18,11 +18,11 @@ import code.with.me.testroomandnavigationdrawertest.databinding.FragmentNotesLis
 import code.with.me.testroomandnavigationdrawertest.databinding.NoteItemBinding
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
+import code.with.me.testroomandnavigationdrawertest.ui.dialog.PreviewNoteDialog
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.NoteMenuSheet
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteState
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NotesListUserAction
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.UserActionNote
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -86,7 +86,7 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
                         intent.action = Intent.ACTION_SEND
                         intent.type = "text/plain"
                         intent.putExtra(Intent.EXTRA_TEXT, state.data.toString())
-                        startActivity(Intent.createChooser(intent, "Share via"))   
+                        startActivity(Intent.createChooser(intent, "Share via"))
                     } else {
                         Toast.makeText(context, "Пустой текст", Toast.LENGTH_SHORT).show()
                     }
@@ -163,6 +163,32 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
                     val item = getItem(it.layoutPosition) as Note
                     openDetailFragment(item.second_id)
                 }
+                onLongClickListener = {
+                    selected0 = it.layoutPosition
+                    val item = getItem(it.layoutPosition) as Note
+
+
+//                    val location = IntArray(2)
+//                    val v = it.itemView
+//                    v.getLocationOnScreen(location)
+//                    val x: Int = location[0] + v.width / 2
+//                    val y: Int = location[1] + v.height / 2
+
+
+                    openPreviewDialog(item.second_id /*x, y*/)
+                }
+            }
+
+            private fun openPreviewDialog(id: Int /*x: Int, y: Int*/) {
+                val bundle = Bundle()
+                val dialog = PreviewNoteDialog()
+                dialog.arguments = bundle.apply {
+                    putInt("noteId", id)
+//                    putInt("x", x)
+//                    putInt("y", y)
+                }
+
+                dialog.show(activity().supportFragmentManager, "CreateFolderDialog")
             }
 
             override fun onCreateViewHolder(
@@ -173,6 +199,10 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
                 val holder = BaseViewHolder(binding)
                 holder.itemView.setOnClickListener {
                     clickListener?.invoke(holder)
+                }
+                holder.itemView.setOnLongClickListener {
+                    onLongClickListener?.invoke(holder)
+                    true
                 }
                 return holder
             }
@@ -197,7 +227,7 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
                                 }
 
                                 NoteItemsCallback.FAVORITE -> {
-                                    println("FAVORITE")
+                                    noteViewModel.setToFavorite(item.second_id)
                                 }
 
                                 NoteItemsCallback.LOCK -> {
@@ -205,7 +235,7 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
                                 }
 
                                 NoteItemsCallback.DELETE -> {
-                                    println("DELETE")
+                                    noteViewModel.delete(item)
                                 }
                             }
                         }
@@ -219,7 +249,8 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
                 for (fragment in activity?.supportFragmentManager?.fragments!!) {
                     println("fragment: ${fragment.javaClass.simpleName}")
                     if (fragment is MainScreenFragment) {
-                        fragment.navigateToViewANoteSheet(id)
+//                        fragment.navigateToViewANoteSheet(id)
+                        fragment.openMakeNoteFragment(id)
                         break
                     }
                 }

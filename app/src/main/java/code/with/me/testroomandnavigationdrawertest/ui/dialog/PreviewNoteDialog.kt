@@ -1,35 +1,39 @@
-package code.with.me.testroomandnavigationdrawertest.ui.sheet
+package code.with.me.testroomandnavigationdrawertest.ui.dialog
 
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.view.GestureDetector
+import android.view.GestureDetector.SimpleOnGestureListener
+import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.TranslateAnimation
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import code.with.me.testroomandnavigationdrawertest.AlertCreator
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.data.Utils.getDate
+import code.with.me.testroomandnavigationdrawertest.data.Utils.getDisplayMetrics
 import code.with.me.testroomandnavigationdrawertest.data.Utils.gone
+import code.with.me.testroomandnavigationdrawertest.data.Utils.launchAfterTimerIO
 import code.with.me.testroomandnavigationdrawertest.data.Utils.mainScope
 import code.with.me.testroomandnavigationdrawertest.data.Utils.println
 import code.with.me.testroomandnavigationdrawertest.data.Utils.setRoundedCornersView
+import code.with.me.testroomandnavigationdrawertest.data.Utils.setTouchListenerForAllViews
 import code.with.me.testroomandnavigationdrawertest.data.Utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 import code.with.me.testroomandnavigationdrawertest.databinding.PhotoItemBinding
-import code.with.me.testroomandnavigationdrawertest.databinding.ViewNoteDetailSheetBinding
-import code.with.me.testroomandnavigationdrawertest.file.FilesController
-import code.with.me.testroomandnavigationdrawertest.markdown.StringToMarkdownTextParser
-import code.with.me.testroomandnavigationdrawertest.ui.SnackbarCreator
+import code.with.me.testroomandnavigationdrawertest.databinding.ViewNoteDetailDialogPreviewBinding
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
-import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.AudioPlayerState
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.UserActionAudioState
+import code.with.me.testroomandnavigationdrawertest.ui.base.BaseDialog
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteState
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.UserActionAudioState
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.ViewANoteViewModel
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
@@ -45,19 +49,16 @@ import javax.inject.Inject
 import javax.inject.Named
 
 
-class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheetBinding::inflate) {
+class PreviewNoteDialog() :
+    BaseDialog<ViewNoteDetailDialogPreviewBinding>(ViewNoteDetailDialogPreviewBinding::inflate) {
 
-    /**
-     * Нет обработки ошибок у MediaPlayer во viewModel
-     **/
+    //TODO сделать максимальный и минимальный размер диалога
+
 
     @Inject
     @Named("viewANoteVMFactory")
     lateinit var factory: ViewModelProvider.Factory
     private lateinit var viewANoteViewModel: ViewANoteViewModel
-
-    @Inject
-    lateinit var markdownParser: StringToMarkdownTextParser
 
     lateinit var adapter: BaseAdapter<PhotoModel, PhotoItemBinding>
     private lateinit var photoItem: PhotoItemBinding
@@ -105,10 +106,54 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
                         adapter.submitList(ArrayList(value.listOfImages))
                         adapter.notifyDataSetChanged()
                     }
+                    viewANoteViewModel.getNextAvailableId(value.second_id)
+                    viewANoteViewModel.getPreviousAvailableId(value.second_id)
                 }
             }
         }
 
+
+    override fun onStart() {
+        super.onStart()
+        dialog?.window?.setWindowAnimations(R.style.DialogAnimationEnterExit)
+
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val x = arguments?.getInt("x")
+        val y = arguments?.getInt("y")
+        val rootView: View =
+            inflater.inflate(R.layout.view_note_detail_dialog_preview, container, false)
+
+//        dialog!!.window!!.setLayout(
+//            ViewGroup.LayoutParams.MATCH_PARENT,
+//            ViewGroup.LayoutParams.MATCH_PARENT
+//        )
+//        dialog!!.window!!.setGravity(Gravity.START or Gravity.TOP)
+
+        // Настройте анимацию для позиционирования DialogFragment
+
+        // Настройте анимацию для позиционирования DialogFragment
+//        dialog!!.window!!.decorView.x = x!!.toFloat()
+//        dialog!!.window!!.decorView.y = y!!.toFloat()
+
+//        rootView.alpha = 0.0f
+//        rootView.scaleX = 0.0f
+//        rootView.scaleY = 0.0f
+//        rootView.animate()
+//            .alpha(1.0f)
+//            .scaleX(1.0f)
+//            .scaleY(1.0f)
+//            .setDuration(300)
+//            .setInterpolator(AccelerateDecelerateInterpolator())
+
+//        return rootView
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -116,6 +161,7 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
         appComponent.inject(this)
         viewANoteViewModel = ViewModelProvider(this, factory)[ViewANoteViewModel::class.java]
         viewANoteViewModel.setActivityToAudioController(activity())
+        idIntent = arguments?.getInt("noteId") ?: 0
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -125,29 +171,126 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
         initViewModel()
         initClickListeners()
         setWaveformProgressCallback()
-        setRoundedCornersAndCallback()
+        isBehindNeedBlurred = true
+        binding.root.setRoundedCornersView(56f, Color.WHITE)
+        setSizeParams()
+
+        binding.text.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+            kotlin.io.println()
+        }
+        binding.root.setTouchListenerForAllViews { v, event ->
+            if (event != null) {
+                gestureD.onTouchEvent(event)
+            }
+            true
+        }
+        //это нужно добавить потому что не будет скроллиться scrollview
+        binding.scrollView.setOnTouchListener { v, event ->
+            gestureD.onTouchEvent(event)
+            false // разрешает ScrollView прокручивать контент
+        }
+
+
     }
 
-    private fun setRoundedCornersAndCallback() {
-        binding.include2.root.alpha = 1.0f
-        binding.mainLayout.setRoundedCornersView(
-            (1.0f) * 64f,
-            Color.WHITE,
-            Color.BLACK,
-            (1.0f) * 5f
-        )
-        onSlide = {
-            binding.include2.root.alpha = 1.0f - it
-            //проверка надо, что бы не уменьшался радиус угла после halfexpanded
-            if (it >= 0) {
-                binding.mainLayout.setRoundedCornersView(
-                    (1.0f - it) * 64f,
-                    Color.WHITE,
-                    Color.BLACK,
-                    (1.0f - it) * 5f
-                )
-            }
+    var idIntent = 0
+        set(value) {
+            field = value
         }
+
+    private var lastId = 0
+    private var firstId = 0
+
+    private var lastAvailableId = 0
+    private var nextAvailableId = 0
+
+    //Избавиться от магических чисел
+    private var gestureD = GestureDetector(context, object : SimpleOnGestureListener() {
+        //false - разрешить скролл
+        override fun onScroll(
+            e1: MotionEvent?,
+            e2: MotionEvent,
+            distanceX: Float,
+            distanceY: Float
+        ): Boolean {
+            e1?.rawX?.let { rawX ->
+                when (rawX) {
+                    in 300f..800f -> {
+                        return false
+                    }
+
+                    else -> {
+                        return true
+                    }
+                }
+            }
+
+            return false
+        }
+
+        override fun onFling(
+            e1: MotionEvent?,
+            e2: MotionEvent,
+            velocityX: Float,
+            velocityY: Float
+        ): Boolean {
+            e1?.rawX?.let { rawX ->
+                when (rawX) {
+                    in 800f..1500f -> {
+                        idIntent = nextAvailableId
+                        println("idIntent: $idIntent")
+                        println("nextAvailableId: $nextAvailableId")
+                        println("lastAvailableId: $lastAvailableId")
+                        println("firstId: $firstId")
+                        println("lastId: $lastId")
+//                        idIntent += 1
+                        if (idIntent in firstId..<lastId) {
+                            viewANoteViewModel.getNoteById(idIntent)
+                        } else {
+                            idIntent = currentNote?.second_id ?: 0
+                            makeMeShake(binding.root, 50, 15)
+                        }
+                        return true
+                    }
+
+                    in 0f..300f -> {
+                        idIntent = lastAvailableId
+                        if (idIntent in firstId..<lastId) {
+                            viewANoteViewModel.getNoteById(idIntent)
+                        } else {
+                            idIntent = currentNote?.second_id ?: 0
+                            makeMeShake(binding.root, 50, 15)
+                        }
+                        return true
+                    }
+
+                    else -> {
+                        return false
+                    }
+                }
+            }
+            return false
+        }
+    })
+
+    //test
+    fun makeMeShake(view: View, duration: Int, offset: Int): View? {
+        val anim: Animation = TranslateAnimation(-offset.toFloat(), offset.toFloat(), 0f, 0f)
+        anim.duration = duration.toLong()
+        anim.repeatMode = Animation.REVERSE
+        anim.repeatCount = 5
+        view.startAnimation(anim)
+        return view
+    }
+
+
+    private fun setSizeParams() {
+        binding.root.minimumHeight = getDisplayMetrics(activity()).heightPixels / 3
+        val viewParam = binding.root.layoutParams
+        viewParam.height = getDisplayMetrics(activity()).heightPixels / 2
+        viewParam.width = getDisplayMetrics(activity()).widthPixels
+        binding.root.layoutParams = viewParam
+        binding.root.minimumWidth = getDisplayMetrics(activity()).widthPixels
     }
 
     private fun setWaveformProgressCallback() {
@@ -195,7 +338,7 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
      **/
     private fun initClickListeners() {
         binding.apply {
-            playAudio.setOnClickListener {
+            playPauseBtn.setOnClickListener {
                 if (viewANoteViewModel.isAudioPlaying()) {
                     sendViewAction(UserActionAudioState.PausePlaying)
                 } else {
@@ -218,43 +361,55 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
     }
 
     private fun initViewModel() {
-        val idIntent = arguments?.getInt("noteId") ?: 0
-        "id: $idIntent".println()
+//        val idIntent = arguments?.getInt("noteId") ?: 0
+//        "id: $idIntent".println()
         viewANoteViewModel.getNoteById(idIntent)
         viewANoteViewModel.state.observe(viewLifecycleOwner) { state ->
             handleViewState(state)
         }
+        viewANoteViewModel.getFirstCustomer()
+        viewANoteViewModel.getLastCustomer()
         viewANoteViewModel.waveFormProgress.observe(viewLifecycleOwner) { progress ->
             binding.waveForm.progress = progress
         }
         viewANoteViewModel.userActionAudioState.observe(viewLifecycleOwner) {
+            println("userActionAudioState: $it")
             if (it is UserActionAudioState.Error<*>) {
                 Toast.makeText(activity(), it.error.toString(), Toast.LENGTH_SHORT).show()
             }
-        }
 
-        viewANoteViewModel.getAudioPlaybackStateLiveData().observe(viewLifecycleOwner) { state ->
-            when (state) {
-//                is AudioPlayerState.Idle -> {
-//                    binding.playAudio.setImageResource(R.drawable.small_play_arrow_btn)
-//                }
-
-                is AudioPlayerState.Playing -> {
-                    binding.playAudio.setImageResource(R.drawable.small_pause_btn)
-                }
-
-                is AudioPlayerState.Paused -> {
-                    binding.playAudio.setImageResource(R.drawable.small_play_arrow_btn)
-                }
-
-                AudioPlayerState.Completed -> {
-                    binding.playAudio.setImageResource(R.drawable.small_play_arrow_btn)
-                }
-
-                is AudioPlayerState.Error<*> -> {
-                    Toast.makeText(activity(), state.error.toString(), Toast.LENGTH_SHORT).show()
-                }
+            if (binding.playPauseBtn.isAnimating) {
+                binding.playPauseBtn.clearAnimation()
             }
+
+            when (it) {
+                is UserActionAudioState.StartPlaying -> {
+                    binding.playPauseBtn.setAnimation(R.raw.play_anim)
+                }
+
+                is UserActionAudioState.PausePlaying -> {
+                    binding.playPauseBtn.setAnimation(R.raw.pause_anim)
+                }
+
+                is UserActionAudioState.Error<*> -> {
+                    Toast.makeText(activity(), it.error.toString(), Toast.LENGTH_SHORT).show()
+                }
+
+                else -> {}
+            }
+            binding.playPauseBtn.playAnimation()
+        }
+        viewANoteViewModel.lastIdOfNotes.observe(viewLifecycleOwner) {
+            lastId = it
+        }
+        viewANoteViewModel.firstIdOfNotes.observe(viewLifecycleOwner) {
+            firstId = it
+        }
+        viewANoteViewModel.previousIdNote.observe(viewLifecycleOwner) {
+            lastAvailableId = it
+        }
+        viewANoteViewModel.nextIdNote.observe(viewLifecycleOwner) {
+            nextAvailableId = it
         }
 
     }
@@ -262,19 +417,19 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
     private fun handleViewState(state: NoteState) {
         when (state) {
             is NoteState.Loading -> {
-                showProgressBar(true)
+//                showProgressBar(true)
             }
 
             is NoteState.Result<*> -> {
                 binding.apply {
-                    currentNote = state.data as Note
                     println("note: ${state.data}")
+                    currentNote = state.data as Note
                 }
-                showProgressBar(false)
+//                showProgressBar(false)
             }
 
             is NoteState.Error<*> -> {
-                showProgressBar(false)
+//                showProgressBar(false)
                 dialog?.window?.decorView?.let { window ->
                     Snackbar.make(
                         window, //binding.root is not work :(
@@ -286,7 +441,7 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
             }
 
             is NoteState.EmptyResult -> {
-                showProgressBar(false)
+//                showProgressBar(false)
             }
 
         }
@@ -334,13 +489,13 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
                     val item = getItem(position)
                     "item.path: ${item.path}".println()
 
-                    Glide.with(this@ViewANoteSheet)
+                    Glide.with(this@PreviewNoteDialog)
                         .load(Uri.parse(item.path)).into(image)
                 }
             }
         }.apply {
-            this@ViewANoteSheet.binding.photoList.adapter = this
-            this@ViewANoteSheet.binding.photoList.apply {
+            this@PreviewNoteDialog.binding.photoList.adapter = this
+            this@PreviewNoteDialog.binding.photoList.apply {
                 setHasFixedSize(false)
                 layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
             }

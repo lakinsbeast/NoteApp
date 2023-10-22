@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainLayout"
+    android:transitionName="test"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="wrap_content"
+
+        android:layout_height="wrap_content">
+
+        <FrameLayout
+            android:id="@+id/standard_bottom_sheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/dateText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="" />
+                </LinearLayout>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="@color/transparent"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="0dp">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/photoList"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </androidx.cardview.widget.CardView>
+
+                <FrameLayout
+                    android:id="@+id/audioLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="71dp"
+                        android:layout_gravity="center"
+                        android:layout_marginVertical="25dp"
+                        android:background="@drawable/rounded_19dp"
+                        android:backgroundTint="@color/pale_golden" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="71dp"
+                        android:layout_marginHorizontal="5dp"
+                        android:layout_marginVertical="25dp"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <com.airbnb.lottie.LottieAnimationView
+                            android:id="@+id/playPauseBtn"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
+                            android:layout_gravity="center"
+                            app:lottie_rawRes="@raw/pause_anim" />
+
+                        <com.masoudss.lib.WaveformSeekBar
+                            android:id="@+id/waveForm"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            app:marker_color="@color/black"
+                            app:marker_text_color="@color/design_default_color_error"
+                            app:marker_text_padding="2dp"
+                            app:marker_text_size="12dp"
+                            app:marker_width="1dp"
+                            app:wave_background_color="@color/black"
+                            app:wave_corner_radius="2dp"
+                            app:wave_gap="2dp"
+                            app:wave_gravity="center"
+                            app:wave_max_progress="100"
+                            app:wave_min_height="5dp"
+                            app:wave_padding_Bottom="2dp"
+                            app:wave_padding_left="2dp"
+                            app:wave_padding_right="2dp"
+                            app:wave_padding_top="2dp"
+                            app:wave_progress="0"
+                            app:wave_progress_color="@color/light_blue_600"
+                            app:wave_width="3dp"
+
+                            />
+                    </LinearLayout>
+                </FrameLayout>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/titleText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:text=""
+                    android:textSize="35sp"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginTop="20dp"
+                    android:text=""
+                    android:textSize="25sp" />
+            </LinearLayout>
+        </FrameLayout>
+    </ScrollView>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+</FrameLayout>

@@ -13,11 +13,19 @@ interface NoteRepository {
     suspend fun insertOrUpdate(note: Note)
 
     suspend fun deleteNote(note: Note): Int
+    suspend fun setToFavorite(id: Int)
 
     suspend fun updateNote(note: Note)
 
     fun getLastCustomer(): Long
 
+    fun getNoteCount(): Long
+
+    fun getFirstCustomer(): Long
+
     fun getListOfNotes(id: Int): Flow<List<Note>>
+
+    suspend fun getNextAvailableId(currentId: Int): Int?
+    fun getPreviousAvailableId(currentId: Int): Int?
 
 }

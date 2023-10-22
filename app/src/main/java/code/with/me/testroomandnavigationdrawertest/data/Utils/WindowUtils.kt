@@ -17,10 +17,8 @@ fun getDisplayMetrics(activity: MainActivity): DisplayMetrics {
     } else {
         wm.defaultDisplay.height
     }
-    
 
     val dm = activity.resources.displayMetrics
-
 
     return dm
 }

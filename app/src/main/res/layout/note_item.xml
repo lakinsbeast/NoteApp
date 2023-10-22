@@ -4,6 +4,7 @@
     android:id="@+id/RecycleCardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:transitionName="test"
     android:background="@drawable/custom_ripple"
     android:orientation="vertical">
 

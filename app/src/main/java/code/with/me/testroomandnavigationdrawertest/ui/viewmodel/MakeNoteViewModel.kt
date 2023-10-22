@@ -26,17 +26,52 @@ class MakeNoteViewModel @Inject constructor(
     private var imageInString: String = ""
     private var lastCreatedTime: Long = 0L
     private var lastOpenedTime: Long = 0L
+    var title = ""
+        set(value) {
+            if (field != value) {
+                field = value
+                saveNote()
+            }
 
-    private var lastSaveID = 0L
+        }
+    var textNote = ""
+        set(value) {
+            if (field != value) {
+                field = value
+                saveNote()
+            }
+
+        }
+
+    private var lastSaveID = 0
 
     private var pickedColor: String = "#FFFFFFFF"
     private var folderId = -1
+    var noteId = -1
+        set(value) {
+            if (field != value) {
+                lastSaveID = field
+                viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
+                    val note = async {
+                        repoNote.getNoteById(value)
+                    }.await()
+                    _note.postValue(note)
+                    audioInString = note.audioUrl
+                }
+            }
+            field = value
+        }
+
+    private var _note = MutableLiveData<Note>()
+    var noteObs: LiveData<Note> = _note
 
     private var listOfPhotos = mutableListOf<PhotoModel>()
 
     private var _titleText = MutableLiveData("")
     val titleText: LiveData<String>
-        get() = _titleText
+        get() {
+            return _titleText
+        }
 
     private var _text = MutableLiveData("")
     val text: LiveData<String>
@@ -57,21 +92,34 @@ class MakeNoteViewModel @Inject constructor(
         lastOpenedTime = System.currentTimeMillis()
 
         viewModelScope.launch(Dispatchers.IO) {
-            async {
-                lastSaveID = getLastCustomer()
-                lastSaveID += 1
+            var count = async {
+                repoNote.getNoteCount()
             }.await()
-            launch {
-                insert(note)
-            }
-        }
+            async {
+                if (count == 0L) {
+                    lastSaveID = 0
+                } else {
+                    lastSaveID = getLastCustomer().toInt()
+                    lastSaveID += 1
+                }
 
+            }.await()
+//            launch {
+//                insert(note)
+//            }
+        }
+    }
+
+    fun insertNote() {
+        viewModelScope.launch(Dispatchers.IO) {
+            insert(note)
+        }
     }
 
     private var note: Note = Note(
         lastSaveID.toInt(),
-        titleText.value.toString(),
-        text.value.toString(),
+        title.toString(),
+        textNote.toString(),
         listOfPhotos.toList(),
         audioInString,
         pickedColor,
@@ -145,9 +193,9 @@ class MakeNoteViewModel @Inject constructor(
 
     fun saveNote() {
         val newNote = Note(
-            lastSaveID.toInt(),
-            titleText.value.toString(),
-            text.value.toString(),
+            lastSaveID,
+            title,
+            textNote,
             listOfPhotos.toList(),
             audioInString,
             pickedColor,
@@ -157,9 +205,14 @@ class MakeNoteViewModel @Inject constructor(
             false,
             "-1"
         )
+        println("newNote: $newNote")
         if (newNote.titleNote.isNotEmpty() || newNote.textNote.isNotEmpty() || newNote.listOfImages.isNotEmpty()) {
             viewModelScope.launch {
-                repoNote.updateNote(newNote)
+                try {
+                    repoNote.updateNote(newNote)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         }
     }
@@ -184,6 +237,7 @@ class MakeNoteViewModel @Inject constructor(
     fun setFolderId(id: Int) {
         folderId = id
     }
+
 
     fun MutableList<PhotoModel>.addAndUpdate(newValue: PhotoModel) {
         this.add(newValue)

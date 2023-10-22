@@ -113,6 +113,10 @@ class NoteViewModel @Inject constructor(
         repoNote.deleteNote(note)
     }
 
+    fun setToFavorite(id: Int, boolean: Boolean = true) = viewModelScope.launch {
+        repoNote.setToFavorite(id)
+    }
+
     fun update(note: Note) = viewModelScope.launch {
         repoNote.updateNote(note)
     }
@@ -123,6 +127,7 @@ class NoteViewModel @Inject constructor(
             is NotesListUserAction.ShareText<*> -> {
                 _userActionsState.value = NotesListUserAction.ShareText(userAction.data)
             }
+
             else -> {}
         }
     }
@@ -139,6 +144,7 @@ sealed class NotesListUserAction {
     class ShareText<String>(val data: String) : NotesListUserAction()
 
 }
+
 sealed class UserActionNote {
     data object SavedNoteToDB : UserActionNote()
     data object GetImage : UserActionNote()

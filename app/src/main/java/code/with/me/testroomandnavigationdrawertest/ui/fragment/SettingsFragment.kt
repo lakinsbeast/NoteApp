@@ -32,7 +32,6 @@ class SettingsFragment : BaseFragment<SettingsFragmentBinding>(SettingsFragmentB
         sheet.apply {
             canHide = false
             isBackNeedBeBlurred = false
-            isSheetCancelable = true
             doSheetBackShadowed = false
             isSheetCancelable = false
         }

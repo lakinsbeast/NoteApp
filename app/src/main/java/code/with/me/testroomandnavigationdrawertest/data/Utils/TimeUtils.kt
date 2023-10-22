@@ -1,16 +1,10 @@
 package code.with.me.testroomandnavigationdrawertest.data.Utils
 
 
-import android.icu.text.SimpleDateFormat
-import android.icu.util.Calendar
-import android.text.format.DateFormat
-import java.util.Locale
+import android.content.Context
+import android.text.format.DateUtils
 
 
-fun getDate(time: Long): String? {
-    val cal: Calendar = Calendar.getInstance()
-//    cal.timeInMillis = time * 1000
-//    val time = cal.time
-    val sdf = SimpleDateFormat("dd/mm/yyyy")
-    return sdf.format(time)
+fun getDate(context: Context, time: Long): String? {
+    return DateUtils.formatDateTime(context, time, DateUtils.FORMAT_SHOW_YEAR)
 }

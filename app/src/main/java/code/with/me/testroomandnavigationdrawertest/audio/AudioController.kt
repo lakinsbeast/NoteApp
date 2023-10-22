@@ -25,6 +25,8 @@ import kotlin.math.min
  **/
 class AudioController @Inject constructor() {
 
+    //TODO перенести на exoplayer, много проблем с MediaPlayer
+
     var player: MediaPlayer? = null
     private var recorder: MediaRecorder? = null
     var activity: MainActivity? = null
@@ -177,7 +179,7 @@ class AudioController @Inject constructor() {
     fun stopPlaying() {
         player?.release()
         player = null
-        audioPlaybackStateLiveData.postValue(AudioPlayerState.Completed)
+//        audioPlaybackStateLiveData.postValue(AudioPlayerState.Completed)
     }
 
 

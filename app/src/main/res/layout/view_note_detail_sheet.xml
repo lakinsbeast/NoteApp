@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:background="@color/white"
+    android:id="@+id/mainLayout"
     android:layout_height="match_parent">
-    <include layout="@layout/divider_line" />
-
+    <include android:id="@+id/include2" layout="@layout/divider_line" />
     <FrameLayout
         android:id="@+id/standard_bottom_sheet"
         android:layout_width="match_parent"

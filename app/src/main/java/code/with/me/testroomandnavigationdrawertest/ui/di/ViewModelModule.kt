@@ -1,10 +1,12 @@
 package code.with.me.testroomandnavigationdrawertest.ui.di
 
 import code.with.me.testroomandnavigationdrawertest.audio.AudioController
+import code.with.me.testroomandnavigationdrawertest.data.localDataSource.DataStoreManager
 import code.with.me.testroomandnavigationdrawertest.data.repos.FolderRepositoryImpl
 import code.with.me.testroomandnavigationdrawertest.data.repos.FolderTagRepositoryImpl
 import code.with.me.testroomandnavigationdrawertest.data.repos.NoteRepositoryImpl
 import code.with.me.testroomandnavigationdrawertest.data.repos.NoteTagRepositoryImpl
+import code.with.me.testroomandnavigationdrawertest.data.repos.SettingsRepositoryImpl
 import code.with.me.testroomandnavigationdrawertest.markdown.Formatter
 import code.with.me.testroomandnavigationdrawertest.markdown.IStringToMarkdownTextParser
 import code.with.me.testroomandnavigationdrawertest.markdown.StringToMarkdownTextParser
@@ -14,6 +16,7 @@ import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MakeNoteViewMod
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteMenuSheetViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteTagViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.SettingsViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.ViewANoteViewModel
 import dagger.Module
 import dagger.Provides
@@ -49,14 +52,19 @@ class ViewModelModule {
 
     @Provides
     fun provideFolderViewModel(
-        repo: FolderRepositoryImpl
-    ) = FolderViewModel(repo)
+        repo: FolderRepositoryImpl,
+        dataStore: DataStoreManager
+    ) = FolderViewModel(repo, dataStore)
 
     @Provides
     fun provideFolderTagViewModel(
         repo: FolderTagRepositoryImpl
     ) = FolderTagViewModel(repo)
 
+    @Provides
+    fun provideSettingsViewModel(
+        dataStore: DataStoreManager
+    ) = SettingsViewModel(dataStore)
 
     @Provides
     fun provideStringToMarkdownTextParser(vararg formatters: Formatter): IStringToMarkdownTextParser {

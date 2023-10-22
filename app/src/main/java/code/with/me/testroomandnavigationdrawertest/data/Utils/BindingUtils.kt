@@ -12,12 +12,14 @@ import android.os.Build
 import android.os.SystemClock
 import android.view.Gravity
 import android.view.View
+import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.forEach
 import androidx.core.view.forEachIndexed
 import androidx.core.view.get
 import code.with.me.testroomandnavigationdrawertest.R
@@ -48,7 +50,12 @@ fun findActivity(context: Context): MainActivity {
 }
 
 
-fun View.setRoundedCornersView(radius: Float, color: Int = Color.BLACK, strokeColor: Int? = null) {
+fun View.setRoundedCornersView(
+    radius: Float,
+    color: Int = Color.BLACK,
+    strokeColor: Int? = null,
+    strokeWidth: Float = 5f
+) {
     val backgroundDrawable = GradientDrawable().apply {
         cornerRadii = floatArrayOf(radius, radius, radius, radius, radius, radius, radius, radius)
     }
@@ -59,7 +66,29 @@ fun View.setRoundedCornersView(radius: Float, color: Int = Color.BLACK, strokeCo
     val shapeDrawable = MaterialShapeDrawable(shapeAppearanceModel)
     shapeDrawable.fillColor = ColorStateList.valueOf(color)
     if (strokeColor != null) {
-        shapeDrawable.setStroke(5f, ColorStateList.valueOf(strokeColor))
+        shapeDrawable.setStroke(strokeWidth, ColorStateList.valueOf(strokeColor))
+    }
+
+    val layerDrawable = LayerDrawable(arrayOf(shapeDrawable))
+    background = layerDrawable
+}
+
+fun View.setUpperRoundedCornersView(
+    radius: Float,
+    color: Int = Color.BLACK,
+    strokeColor: Int? = null,
+    strokeWidth: Float = 5f
+) {
+    val shapeAppearanceModel = ShapeAppearanceModel.builder()
+//        .setAllCorners(CornerFamily.ROUNDED, radius)
+        .setTopLeftCorner(CornerFamily.ROUNDED, radius)
+        .setTopRightCorner(CornerFamily.ROUNDED, radius)
+        .build()
+
+    val shapeDrawable = MaterialShapeDrawable(shapeAppearanceModel)
+    shapeDrawable.fillColor = ColorStateList.valueOf(color)
+    if (strokeColor != null) {
+        shapeDrawable.setStroke(strokeWidth, ColorStateList.valueOf(strokeColor))
     }
 
     val layerDrawable = LayerDrawable(arrayOf(shapeDrawable))
@@ -135,6 +164,16 @@ fun getViewGroup(view: View): ViewGroup? {
 
     }
     return null
+}
+
+fun View.setTouchListenerForAllViews(touch: OnTouchListener) {
+    this.setOnTouchListener(touch)
+    if (this is ViewGroup) {
+        this.forEachIndexed { index, view ->
+            val child = this.getChildAt(index)
+            child.setOnTouchListener(touch)
+        }
+    }
 }
 
 fun Button.setCancelButton() {

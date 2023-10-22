@@ -131,7 +131,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         }
 
     private val requestAudioPermission =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { it ->}
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { it -> }
 
     companion object {
         const val paintResultKey = "paintResultKey"
@@ -145,8 +145,17 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         makeNoteViewModel =
             ViewModelProvider(this, factory)[MakeNoteViewModel::class.java]
         listenPaintSheetResult()
+        //TODO иногда не создает в папках заметки
         if (arguments?.getInt("idFolder") != null && arguments?.getInt("idFolder") != -1) {
-             makeNoteViewModel.setFolderId(arguments?.getInt("idFolder")!!)
+            makeNoteViewModel.setFolderId(arguments?.getInt("idFolder")!!)
+        } else {
+            println("idFolder is null!")
+        }
+
+        if (arguments?.getInt("noteId") != null && arguments?.getInt("noteId") != -1) {
+            makeNoteViewModel.noteId = arguments?.getInt("noteId")!!
+        } else {
+            makeNoteViewModel.insertNote()
         }
     }
 
@@ -180,6 +189,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
     private fun initOnEditorActionListener() {
         binding.apply {
 
+            //not work
             textEdit.setOnEditorActionListener { v, actionId, event ->
                 when (actionId) {
                     EditorInfo.IME_ACTION_DONE -> {
@@ -252,11 +262,9 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
             titleEdit.addTextChangedListener {
 //                makeNoteViewModel.titleText = it.toString()
                 makeNoteViewModel.setTitleText(it.toString())
-                saveNote()
             }
             textEdit.addTextChangedListener {
                 makeNoteViewModel.setText(it.toString())
-                saveNote()
             }
         }
     }
@@ -273,10 +281,21 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
             if (it != binding.titleEdit.text.toString()) {
                 binding.titleEdit.setText(it)
             }
+            makeNoteViewModel.title = it
         }
         makeNoteViewModel.text.observe(viewLifecycleOwner) {
             if (it != binding.textEdit.text.toString()) {
                 binding.textEdit.setText(it)
+            }
+            makeNoteViewModel.textNote = it
+        }
+        makeNoteViewModel.noteObs.observe(viewLifecycleOwner) {
+            binding.apply {
+                titleEdit.setText(it.titleNote)
+                textEdit.setText(it.textNote)
+                adapter.submitList(it.listOfImages.toMutableList())
+                adapter.notifyDataSetChanged()
+
             }
         }
     }

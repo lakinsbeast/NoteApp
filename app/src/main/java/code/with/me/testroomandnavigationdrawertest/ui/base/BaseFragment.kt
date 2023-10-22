@@ -15,7 +15,6 @@ abstract class BaseFragment<VB : ViewBinding>(val get: ((LayoutInflater, ViewGro
     val binding get() = _binding!!
 
 
-
     fun activity() = findActivity(requireContext())
 
     override fun onCreateView(
@@ -25,6 +24,10 @@ abstract class BaseFragment<VB : ViewBinding>(val get: ((LayoutInflater, ViewGro
     ): View? {
         _binding = get(inflater, container, false)
         return binding.root
+    }
+
+    fun closeFragment() {
+        parentFragmentManager.beginTransaction().remove(this).commit()
     }
 
 

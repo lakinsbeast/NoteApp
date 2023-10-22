@@ -12,4 +12,11 @@ class SheetController @Inject constructor() {
     ) {
         sheet.show(activity.supportFragmentManager, sheet.javaClass.simpleName)
     }
+
+    fun closeSheet(
+        activity: MainActivity,
+        sheet: BottomSheetDialogFragment
+    ) {
+        sheet.dismiss()
+    }
 }

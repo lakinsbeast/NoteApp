@@ -25,4 +25,8 @@
     <string name="audioRecordRunning">Идет запись аудио...</string>
     <string name="write_folder_name">Введите название папки</string>
     <string name="favorite_folder">Избранная папка</string>
+    <string name="useFolderSettings">Использовать папки?</string>
+    <string name="settingTheFolder">Настроить папки</string>
+    <string name="useABehindBlurQ">Использовать размытие за окнами?</string>
+    <string name="useABackgroundBlurQ">Использовать размытие фона? (пока не работает)</string>
 </resources>

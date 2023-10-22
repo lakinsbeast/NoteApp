@@ -1,6 +1,7 @@
 package code.with.me.testroomandnavigationdrawertest.ui.viewmodel
 
 import android.media.MediaPlayer
+import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,6 +14,7 @@ import code.with.me.testroomandnavigationdrawertest.audio.AudioController
 import code.with.me.testroomandnavigationdrawertest.domain.repo.NoteRepository
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -32,7 +34,7 @@ class ViewANoteViewModel @Inject constructor(
     private val _userActionAudioState =
         MutableLiveData<UserActionAudioState>(UserActionAudioState.Loading)
     private val _audioPlayerState =
-        MutableLiveData<AudioPlayerState>(AudioPlayerState.Idle)
+        MutableLiveData<AudioPlayerState>(AudioPlayerState.Paused)
 
     private val _waveFormProgress = MutableLiveData(0f)
 
@@ -49,6 +51,24 @@ class ViewANoteViewModel @Inject constructor(
         get() = _audioPlayerState
     val waveFormProgress: LiveData<Float>
         get() = _waveFormProgress
+
+
+    private val _lastIdOfNotes = MutableLiveData<Int>()
+    val lastIdOfNotes: LiveData<Int>
+        get() = _lastIdOfNotes
+
+    private val _previousIdNote = MutableLiveData<Int>()
+    val previousIdNote: LiveData<Int>
+        get() = _previousIdNote
+
+    private val _nextIdNote = MutableLiveData<Int>()
+    val nextIdNote: LiveData<Int>
+        get() = _nextIdNote
+
+
+    private val _firstIdOfNotes = MutableLiveData<Int>()
+    val firstIdOfNotes: LiveData<Int>
+        get() = _firstIdOfNotes
 
     private fun setState(state: NoteState) {
         _state.postValue(state)
@@ -108,7 +128,9 @@ class ViewANoteViewModel @Inject constructor(
                             audioController.startPlaying(userAction.audioUri)
                         }
                         viewModelScope.launch {
+                            //TODO currentPosition всегда меньше duration и если поставить на паузу в конце, то он будет считаться завершенным
                             while (true) {
+//                                println("currentPos: $currentPos duration ${audioController.player?.duration}")
                                 try {
                                     if (audioController.player != null) {
                                         val player = audioController.player!!
@@ -151,13 +173,6 @@ class ViewANoteViewModel @Inject constructor(
             else -> {
 
             }
-//            UserActionAudioState.Loading -> {}
-//            is UserActionAudioState.SeekTo -> {
-//
-//            }
-//
-//            is UserActionAudioState.StartPlayingAt -> {}
-//            is UserActionAudioState.InitPlayer -> {}
         }
     }
 
@@ -172,6 +187,42 @@ class ViewANoteViewModel @Inject constructor(
             } catch (e: Exception) {
                 setState(NoteState.Error(e.localizedMessage))
             }
+        }
+    }
+
+    fun getLastCustomer() {
+        viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
+            val lastId = async {
+                return@async repoNote.getLastCustomer()
+            }.await()
+            _lastIdOfNotes.postValue(lastId.toInt())
+        }
+    }
+
+    fun getPreviousAvailableId(id: Int) {
+        viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
+            val lastId = async {
+                return@async repoNote.getPreviousAvailableId(id)
+            }.await()
+            _previousIdNote.postValue(lastId ?: 0)
+        }
+    }
+
+    fun getNextAvailableId(id: Int) {
+        viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
+            val lastId = async {
+                return@async repoNote.getNextAvailableId(id)
+            }.await()
+            _nextIdNote.postValue(lastId ?: 0)
+        }
+    }
+
+    fun getFirstCustomer() {
+        viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
+            val firstId = async {
+                return@async repoNote.getFirstCustomer()
+            }.await()
+            _firstIdOfNotes.postValue(firstId.toInt())
         }
     }
 
@@ -196,7 +247,7 @@ sealed class UserActionAudioState {
 }
 
 sealed class AudioPlayerState {
-    data object Idle : AudioPlayerState()
+    //    data object Idle : AudioPlayerState()
     data object Playing : AudioPlayerState()
     data object Paused : AudioPlayerState()
     data object Completed : AudioPlayerState()
