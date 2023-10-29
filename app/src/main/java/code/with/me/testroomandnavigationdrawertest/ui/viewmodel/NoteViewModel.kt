@@ -52,7 +52,7 @@ class NoteViewModel @Inject constructor(
         return jobGetNote
     }
 
-    fun getAllNotes(id: Int): Job {
+    fun getAllNotes(id: Long): Job {
         if (::jobGetNote.isInitialized) {
             jobGetNote.cancel()
         }
@@ -71,7 +71,7 @@ class NoteViewModel @Inject constructor(
     }
 
 
-    fun getNoteById(id: Int) {
+    fun getNoteById(id: Long) {
         viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
             try {
                 setState(NoteState.Loading)
@@ -84,7 +84,7 @@ class NoteViewModel @Inject constructor(
         }
     }
 
-    fun shareTextNote(id: Int) {
+    fun shareTextNote(id: Long) {
         viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
             try {
                 val note = async {
@@ -113,7 +113,7 @@ class NoteViewModel @Inject constructor(
         repoNote.deleteNote(note)
     }
 
-    fun setToFavorite(id: Int, boolean: Boolean = true) = viewModelScope.launch {
+    fun setToFavorite(id: Long, boolean: Boolean = true) = viewModelScope.launch {
         repoNote.setToFavorite(id)
     }
 

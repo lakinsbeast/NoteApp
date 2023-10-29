@@ -20,7 +20,7 @@ class NoteMenuSheetViewModel @Inject constructor(
     private var _shareTextLiveData = MutableLiveData<String>()
     var shareTextLiveData = _shareTextLiveData
 
-    fun shareText(id: Int) {
+    fun shareText(id: Long) {
         viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
             async {
                 note = repoNote.getNoteById(id)

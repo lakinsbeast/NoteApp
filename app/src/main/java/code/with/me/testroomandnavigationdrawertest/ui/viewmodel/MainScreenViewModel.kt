@@ -36,7 +36,7 @@ class MainScreenViewModel(
 
     fun getAllNotes() = repoNote.getListOfNotes()
 
-    fun getAllNotes(id: Int) = repoNote.getListOfNotes(id)
+    fun getAllNotes(id: Long) = repoNote.getListOfNotes(id)
 }
 
 class MainScreenViewModelFactory @Inject constructor(

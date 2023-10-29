@@ -42,7 +42,7 @@ class MainScreenFragment :
     BaseFragment<MainScreenFragmentBinding>(MainScreenFragmentBinding::inflate) {
 
     private var selectedChip = -1
-    private var selectedChipFolderId = 1
+    private var selectedChipFolderId = 1L
 
     @Inject
     @Named("mainScreenVMFactory")
@@ -98,9 +98,12 @@ class MainScreenFragment :
                     })
             }
             searchBtn.setOnClickListener {
-                Toast.makeText(context, "Search Fragment", Toast.LENGTH_LONG)
-                    .show()
-                //TODO create SearchFragment
+                activity().fragmentController.openFragment(
+                    activity(),
+                    SearchFragment(),
+                    fragmentOptionsBuilder {
+                        fragmentLayout = R.id.fragment_detail
+                    })
             }
         }
     }
@@ -222,9 +225,9 @@ class MainScreenFragment :
     private fun openNotesListFragment(it: Folder? = null) {
         val bundle = Bundle()
         if (it == null) {
-            bundle.putInt("idFolder", -1)
+            bundle.putLong("idFolder", -1)
         } else {
-            bundle.putInt("idFolder", it.id)
+            bundle.putLong("idFolder", it.id)
         }
         val notesListFragment = NotesListFragment()
         notesListFragment.arguments = bundle
@@ -239,11 +242,11 @@ class MainScreenFragment :
         showProgressBar(false)
     }
 
-    fun openMakeNoteFragment(id: Int = -1) {
+    fun openMakeNoteFragment(id: Long = -1) {
         val fragment = MakeNoteFragment()
         val bundle = Bundle()
-        bundle.putInt("idFolder", selectedChipFolderId)
-        bundle.putInt("noteId", id)
+        bundle.putLong("idFolder", selectedChipFolderId)
+        bundle.putLong("noteId", id)
         fragment.arguments = bundle
         (activity as MainActivity).fragmentController.openFragment(
             activity as MainActivity,
@@ -282,13 +285,13 @@ class MainScreenFragment :
             )[MainScreenViewModel::class.java]
     }
 
-    fun navigateToViewANoteSheet(id: Int) {
+    fun navigateToViewANoteSheet(id: Long) {
         try {
             val viewNoteSheet = ViewANoteSheet()
             viewNoteSheet.setFullScreenSheet()
             val bundle = Bundle()
             viewNoteSheet.arguments = bundle.apply {
-                putInt("noteId", id)
+                putLong("noteId", id)
             }
             (activity as MainActivity).let { activity ->
                 activity.sheetController.showSheet(activity, viewNoteSheet)

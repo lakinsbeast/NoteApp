@@ -1,15 +1,12 @@
 package code.with.me.testroomandnavigationdrawertest.ui.viewmodel
 
 import android.media.MediaPlayer
-import android.util.Log
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.audio.AudioController
 import code.with.me.testroomandnavigationdrawertest.domain.repo.NoteRepository
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
@@ -57,12 +54,12 @@ class ViewANoteViewModel @Inject constructor(
     val lastIdOfNotes: LiveData<Int>
         get() = _lastIdOfNotes
 
-    private val _previousIdNote = MutableLiveData<Int>()
-    val previousIdNote: LiveData<Int>
+    private val _previousIdNote = MutableLiveData<Long>()
+    val previousIdNote: LiveData<Long>
         get() = _previousIdNote
 
-    private val _nextIdNote = MutableLiveData<Int>()
-    val nextIdNote: LiveData<Int>
+    private val _nextIdNote = MutableLiveData<Long>()
+    val nextIdNote: LiveData<Long>
         get() = _nextIdNote
 
 
@@ -177,7 +174,7 @@ class ViewANoteViewModel @Inject constructor(
     }
 
 
-    fun getNoteById(id: Int) {
+    fun getNoteById(id: Long) {
         viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
             try {
                 setState(NoteState.Loading)
@@ -199,21 +196,21 @@ class ViewANoteViewModel @Inject constructor(
         }
     }
 
-    fun getPreviousAvailableId(id: Int) {
+    fun getPreviousAvailableId(id: Long) {
         viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
             val lastId = async {
                 return@async repoNote.getPreviousAvailableId(id)
             }.await()
-            _previousIdNote.postValue(lastId ?: 0)
+            _previousIdNote.postValue(lastId ?: 0L)
         }
     }
 
-    fun getNextAvailableId(id: Int) {
+    fun getNextAvailableId(id: Long) {
         viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
             val lastId = async {
                 return@async repoNote.getNextAvailableId(id)
             }.await()
-            _nextIdNote.postValue(lastId ?: 0)
+            _nextIdNote.postValue(lastId ?: 0L)
         }
     }
 

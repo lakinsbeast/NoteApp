@@ -4,9 +4,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
-import code.with.me.testroomandnavigationdrawertest.data.data_classes.Model
+import code.with.me.testroomandnavigationdrawertest.data.data_classes.Identifiable
 
-open class BaseAdapter<T : Model, A : ViewBinding>(val binding: A) :
+open class BaseAdapter<T : Identifiable, A : ViewBinding>(val binding: A) :
     ListAdapter<T, BaseAdapter.BaseViewHolder<A>>(
         code.with.me.testroomandnavigationdrawertest.ui.DiffUtil()
     ) {

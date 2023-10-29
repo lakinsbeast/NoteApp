@@ -29,6 +29,7 @@ class SettingsFragment : BaseFragment<SettingsFragmentBinding>(SettingsFragmentB
                 width = ((1.0f - it) * 650).toInt()
             }
         }
+        binding.imageView.playAnimation()
         sheet.apply {
             canHide = false
             isBackNeedBeBlurred = false

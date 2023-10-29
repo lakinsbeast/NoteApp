@@ -106,8 +106,8 @@ class PreviewNoteDialog() :
                         adapter.submitList(ArrayList(value.listOfImages))
                         adapter.notifyDataSetChanged()
                     }
-                    viewANoteViewModel.getNextAvailableId(value.second_id)
-                    viewANoteViewModel.getPreviousAvailableId(value.second_id)
+                    viewANoteViewModel.getNextAvailableId(value.id)
+                    viewANoteViewModel.getPreviousAvailableId(value.id)
                 }
             }
         }
@@ -119,49 +119,13 @@ class PreviewNoteDialog() :
 
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val x = arguments?.getInt("x")
-        val y = arguments?.getInt("y")
-        val rootView: View =
-            inflater.inflate(R.layout.view_note_detail_dialog_preview, container, false)
-
-//        dialog!!.window!!.setLayout(
-//            ViewGroup.LayoutParams.MATCH_PARENT,
-//            ViewGroup.LayoutParams.MATCH_PARENT
-//        )
-//        dialog!!.window!!.setGravity(Gravity.START or Gravity.TOP)
-
-        // Настройте анимацию для позиционирования DialogFragment
-
-        // Настройте анимацию для позиционирования DialogFragment
-//        dialog!!.window!!.decorView.x = x!!.toFloat()
-//        dialog!!.window!!.decorView.y = y!!.toFloat()
-
-//        rootView.alpha = 0.0f
-//        rootView.scaleX = 0.0f
-//        rootView.scaleY = 0.0f
-//        rootView.animate()
-//            .alpha(1.0f)
-//            .scaleX(1.0f)
-//            .scaleY(1.0f)
-//            .setDuration(300)
-//            .setInterpolator(AccelerateDecelerateInterpolator())
-
-//        return rootView
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val appComponent = (requireActivity().application as NotesApplication).appComponent
         appComponent.inject(this)
         viewANoteViewModel = ViewModelProvider(this, factory)[ViewANoteViewModel::class.java]
         viewANoteViewModel.setActivityToAudioController(activity())
-        idIntent = arguments?.getInt("noteId") ?: 0
+        idIntent = arguments?.getLong("noteId") ?: 0
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -193,7 +157,7 @@ class PreviewNoteDialog() :
 
     }
 
-    var idIntent = 0
+    var idIntent = 0L
         set(value) {
             field = value
         }
@@ -201,8 +165,8 @@ class PreviewNoteDialog() :
     private var lastId = 0
     private var firstId = 0
 
-    private var lastAvailableId = 0
-    private var nextAvailableId = 0
+    private var lastAvailableId = 0L
+    private var nextAvailableId = 0L
 
     //Избавиться от магических чисел
     private var gestureD = GestureDetector(context, object : SimpleOnGestureListener() {
@@ -247,7 +211,7 @@ class PreviewNoteDialog() :
                         if (idIntent in firstId..<lastId) {
                             viewANoteViewModel.getNoteById(idIntent)
                         } else {
-                            idIntent = currentNote?.second_id ?: 0
+                            idIntent = currentNote?.id ?: 0L
                             makeMeShake(binding.root, 50, 15)
                         }
                         return true
@@ -258,7 +222,7 @@ class PreviewNoteDialog() :
                         if (idIntent in firstId..<lastId) {
                             viewANoteViewModel.getNoteById(idIntent)
                         } else {
-                            idIntent = currentNote?.second_id ?: 0
+                            idIntent = currentNote?.id ?: 0
                             makeMeShake(binding.root, 50, 15)
                         }
                         return true

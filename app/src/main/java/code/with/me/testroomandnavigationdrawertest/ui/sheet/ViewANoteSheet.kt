@@ -218,7 +218,7 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
     }
 
     private fun initViewModel() {
-        val idIntent = arguments?.getInt("noteId") ?: 0
+        val idIntent = arguments?.getLong("noteId") ?: 0L
         "id: $idIntent".println()
         viewANoteViewModel.getNoteById(idIntent)
         viewANoteViewModel.state.observe(viewLifecycleOwner) { state ->

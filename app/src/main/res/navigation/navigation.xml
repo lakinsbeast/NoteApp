@@ -11,7 +11,7 @@
         tools:layout="@layout/fragment_notes_list" >
         <argument
             android:name="idFolder"
-            app:argType="integer" />
+            app:argType="long" />
         <action
             android:id="@+id/action_notesListFragment2_to_makeANoteSheet"
             app:destination="@id/makeANoteSheet" />
@@ -45,7 +45,7 @@
         android:label="RenameFolderSheet" >
         <argument
             android:name="idFolder"
-            app:argType="integer" />
+            app:argType="long" />
     </dialog>
     <dialog
         android:id="@+id/selectFolderDestinationSheet"
@@ -53,7 +53,7 @@
         android:label="SelectFolderDestinationSheet" >
         <argument
             android:name="idFolder"
-            app:argType="integer" />
+            app:argType="long" />
         <action
             android:id="@+id/action_selectFolderDestinationSheet_to_renameFolderSheet"
             app:destination="@id/renameFolderSheet"
@@ -101,7 +101,7 @@
         android:label="NoteHomeFragment" >
         <argument
             android:name="idFolder"
-            app:argType="integer" />
+            app:argType="long" />
         <action
             android:id="@+id/action_noteHomeFragment_to_addNoteTagSheetMenu"
             app:destination="@id/addNoteTagSheetMenu" />
@@ -126,8 +126,8 @@
         android:label="ViewANoteSheet" >
         <argument
             android:name="noteId"
-            app:argType="integer"
-            android:defaultValue="0" />
+            app:argType="long"
+            android:defaultValue="0L" />
     </dialog>
     <dialog
         android:id="@+id/makeANoteSheet"
@@ -135,7 +135,7 @@
         android:label="MakeANoteSheet" >
         <argument
             android:name="idFolder"
-            app:argType="integer" />
+            app:argType="long" />
         <action
             android:id="@+id/action_makeANoteSheet_to_notesListFragment2"
             app:destination="@id/notesListFragment2" />

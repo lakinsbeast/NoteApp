@@ -35,7 +35,7 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
     lateinit var adapter: BaseAdapter<Note, NoteItemBinding>
     private lateinit var itemsBinding: NoteItemBinding
 
-    var idFolder = -1
+    var idFolder = -1L
 
     @Inject
     @Named("noteVMFactory")
@@ -47,7 +47,7 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
         super.onCreate(savedInstanceState)
         val appComponent = (requireActivity().application as NotesApplication).appComponent
         appComponent.inject(this)
-        idFolder = arguments?.getInt("idFolder") ?: -1
+        idFolder = arguments?.getLong("idFolder") ?: -1
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -68,7 +68,7 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
             noteViewModel.userActionState.observe(viewLifecycleOwner) { state ->
                 handleUserActionState(state)
             }
-            if (idFolder == -1) {
+            if (idFolder == -1L) {
                 noteViewModel.getAllNotes()
             } else {
                 noteViewModel.getAllNotes(idFolder)
@@ -161,7 +161,7 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
                 clickListener = {
                     selected0 = it.layoutPosition
                     val item = getItem(it.layoutPosition) as Note
-                    openDetailFragment(item.second_id)
+                    openDetailFragment(item.id)
                 }
                 onLongClickListener = {
                     selected0 = it.layoutPosition
@@ -175,15 +175,15 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
 //                    val y: Int = location[1] + v.height / 2
 
 
-                    openPreviewDialog(item.second_id /*x, y*/)
+                    openPreviewDialog(item.id /*x, y*/)
                 }
             }
 
-            private fun openPreviewDialog(id: Int /*x: Int, y: Int*/) {
+            private fun openPreviewDialog(id: Long /*x: Int, y: Int*/) {
                 val bundle = Bundle()
                 val dialog = PreviewNoteDialog()
                 dialog.arguments = bundle.apply {
-                    putInt("noteId", id)
+                    putLong("noteId", id)
 //                    putInt("x", x)
 //                    putInt("y", y)
                 }
@@ -216,10 +216,10 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
                     titleID.text = cutText(item.titleNote).checkEmptyTitle()
                     textID.text = cutText(item.textNote).checkEmptyText()
                     menuBtn.setOnClickListener {
-                        val sheet = NoteMenuSheet(item.second_id) {
+                        val sheet = NoteMenuSheet(item.id) {
                             when (it) {
                                 NoteItemsCallback.SHARE -> {
-                                    noteViewModel.shareTextNote(item.second_id)
+                                    noteViewModel.shareTextNote(item.id)
                                 }
 
                                 NoteItemsCallback.MOVE -> {
@@ -227,7 +227,7 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
                                 }
 
                                 NoteItemsCallback.FAVORITE -> {
-                                    noteViewModel.setToFavorite(item.second_id)
+                                    noteViewModel.setToFavorite(item.id)
                                 }
 
                                 NoteItemsCallback.LOCK -> {
@@ -245,7 +245,7 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
                 }
             }
 
-            private fun openDetailFragment(id: Int) {
+            private fun openDetailFragment(id: Long) {
                 for (fragment in activity?.supportFragmentManager?.fragments!!) {
                     println("fragment: ${fragment.javaClass.simpleName}")
                     if (fragment is MainScreenFragment) {

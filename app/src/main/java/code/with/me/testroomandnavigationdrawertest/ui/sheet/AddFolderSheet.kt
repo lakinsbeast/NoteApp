@@ -35,7 +35,7 @@ class AddFolderSheet : BaseSheet<AddFolderBottomSheetBinding>(AddFolderBottomShe
     lateinit var folderVmFactory: ViewModelProvider.Factory
     private lateinit var folderViewModel: FolderViewModel
 
-    private val selectedChips = mutableListOf<Int>()
+    private val selectedChips = mutableListOf<Long>()
     private val isFavorite = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -113,12 +113,12 @@ class AddFolderSheet : BaseSheet<AddFolderBottomSheetBinding>(AddFolderBottomShe
             launch {
                 folderViewModel.insertFolder(
                     Folder(
-                        text.toString(),
-                        System.currentTimeMillis(),
-                        System.currentTimeMillis(),
-                        System.currentTimeMillis(),
-                        selectedChips.joinToString(","),
-                        isFavorite
+                        name = text.toString(),
+                        lastTimestampCreate= System.currentTimeMillis(),
+                        lastTimestampEdit = System.currentTimeMillis(),
+                        lastTimestampOpen = System.currentTimeMillis(),
+                        tags = selectedChips.joinToString(","),
+                        isFavorite = isFavorite
                     )
                 )
             }

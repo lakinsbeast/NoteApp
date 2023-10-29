@@ -146,16 +146,16 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
             ViewModelProvider(this, factory)[MakeNoteViewModel::class.java]
         listenPaintSheetResult()
         //TODO иногда не создает в папках заметки
-        if (arguments?.getInt("idFolder") != null && arguments?.getInt("idFolder") != -1) {
-            makeNoteViewModel.setFolderId(arguments?.getInt("idFolder")!!)
+        if (arguments?.getLong("idFolder") != null && arguments?.getLong("idFolder") != -1L) {
+            makeNoteViewModel.setFolderId(arguments?.getLong("idFolder")!!)
         } else {
             println("idFolder is null!")
         }
 
-        if (arguments?.getInt("noteId") != null && arguments?.getInt("noteId") != -1) {
-            makeNoteViewModel.noteId = arguments?.getInt("noteId")!!
+        if (arguments?.getLong("noteId") != null && arguments?.getLong("noteId") != -1L) {
+            kotlin.io.println("noteId: ${arguments?.getLong("noteId")!!}")
+            makeNoteViewModel.noteId = arguments?.getLong("noteId")!!
         } else {
-            makeNoteViewModel.insertNote()
         }
     }
 

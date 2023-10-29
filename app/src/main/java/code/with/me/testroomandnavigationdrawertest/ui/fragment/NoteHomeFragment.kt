@@ -34,7 +34,7 @@ class NoteHomeFragment :
     private var fragmentList = mutableListOf<Fragment>()
     private var listOfFolderTags = mutableListOf<NoteTag>()
 
-    private var idFolder by Delegates.notNull<Int>()
+    private var idFolder by Delegates.notNull<Long>()
 
     @Inject
     @Named("noteTagVMFactory")
@@ -83,7 +83,7 @@ class NoteHomeFragment :
     }
 
     private fun initViewPager() {
-        idFolder = arguments?.getInt("idFolder") ?: 0
+        idFolder = arguments?.getLong("idFolder") ?: 0L
         viewPager = binding.viewPager
 
         fragmentList.apply {
@@ -91,7 +91,7 @@ class NoteHomeFragment :
             add(
                 NotesListFragment().apply {
                     arguments = Bundle().apply {
-                        putInt("idFolder", this@NoteHomeFragment.idFolder)
+                        putLong("idFolder", this@NoteHomeFragment.idFolder)
                     }
                 }
             )
@@ -128,7 +128,7 @@ class NoteHomeFragment :
                 {
                     findNavController().navigate(
                         NoteHomeFragmentDirections.actionNoteHomeFragmentToMakeANoteSheet(
-                            arguments?.getInt("idFolder") ?: 0
+                            arguments?.getLong("idFolder") ?: 0L
                         )
                     )
                 })
@@ -139,7 +139,7 @@ class NoteHomeFragment :
         binding.chipGroupScrollable.gone()
     }
 
-    fun navigateToNotesListFragment(id: Int) {
+    fun navigateToNotesListFragment(id: Long) {
         val action =
             NoteHomeFragmentDirections.actionNoteHomeFragmentToViewANoteSheet(id)
         findNavController().navigate(action)

@@ -14,7 +14,7 @@ class FolderRepositoryImpl @Inject constructor(
 ) : FolderRepository {
     override fun getAllFolders(): Flow<List<Folder>> = fDao.getAllFolders()
 
-    override fun getNotesInFolder(folderId: Int): Flow<List<Note>> = fDao.getNotesInFolder(folderId)
+    override fun getNotesInFolder(folderId: Long): Flow<List<Note>> = fDao.getNotesInFolder(folderId)
     override fun getAllFoldersSortByNameASC(): Flow<List<Folder>> =
         fDao.getAllFoldersSortByNameASC()
 
@@ -33,7 +33,7 @@ class FolderRepositoryImpl @Inject constructor(
     override fun getAllFoldersLastEditedOldest(): Flow<List<Folder>> =
         fDao.getAllFoldersLastEditedOldest()
 
-    override fun updateLastOpenedFolder(time: Long, folderId: Int) = fDao.updateLastOpenedFolder(time, folderId)
+    override fun updateLastOpenedFolder(time: Long, folderId: Long) = fDao.updateLastOpenedFolder(time, folderId)
 
     override suspend fun getAllFoldersFavorite(): Flow<List<Folder>> = fDao.getAllFoldersFavorite()
 

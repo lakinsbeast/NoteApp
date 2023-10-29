@@ -142,7 +142,7 @@ abstract class BaseFolderListFragment :
         }
     }
 
-    private fun openDetailFragment(id: Int) {
+    private fun openDetailFragment(id: Long) {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
                 async {

@@ -22,7 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 import javax.inject.Named
 
-class NoteMenuSheet(private val idOfNote: Int, private val action: (NoteItemsCallback) -> Unit) :
+class NoteMenuSheet(private val idOfNote: Long, private val action: (NoteItemsCallback) -> Unit) :
     BaseSheet<NoteMenuSheetBinding>(NoteMenuSheetBinding::inflate) {
 
     @Inject

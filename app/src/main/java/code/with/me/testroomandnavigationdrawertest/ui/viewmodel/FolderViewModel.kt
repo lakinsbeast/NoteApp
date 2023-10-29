@@ -27,6 +27,7 @@ class FolderViewModel @Inject constructor(
     private fun setState(state: FolderVMState) {
         _state.postValue(state)
     }
+
     private val _isUseBehindBlurEnabled = MutableLiveData<Boolean>()
     val isUseBehindBlurEnabled = _isUseBehindBlurEnabled
 
@@ -47,7 +48,7 @@ class FolderViewModel @Inject constructor(
     }
 
     fun getAllFolders(): Flow<List<Folder>> = repo.getAllFolders()
-    fun getNotesInFolder(folderId: Int): Flow<List<Note>> = repo.getNotesInFolder(folderId)
+    fun getNotesInFolder(folderId: Long): Flow<List<Note>> = repo.getNotesInFolder(folderId)
 
     fun getAllFoldersSortByNameASC(): Flow<List<Folder>> = repo.getAllFoldersSortByNameASC()
 
@@ -66,7 +67,7 @@ class FolderViewModel @Inject constructor(
 
     fun getFolderByTag(tag: String): Flow<List<Folder>> = repo.getFolderByTag(tag)
 
-    fun updateLastOpenedFolder(time: Long, folderId: Int) =
+    fun updateLastOpenedFolder(time: Long, folderId: Long) =
         repo.updateLastOpenedFolder(time, folderId)
 
     suspend fun insertFolder(folder: Folder): Long = repo.insertFolder(folder)

@@ -23,6 +23,7 @@ import code.with.me.testroomandnavigationdrawertest.ui.dialog.CreateFolderDialog
 import code.with.me.testroomandnavigationdrawertest.ui.dialog.PreviewNoteDialog
 import code.with.me.testroomandnavigationdrawertest.ui.fragment.MainScreenFragment
 import code.with.me.testroomandnavigationdrawertest.ui.fragment.MakeNoteFragment
+import code.with.me.testroomandnavigationdrawertest.ui.fragment.SearchFragment
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.AddFolderSheet
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.AddFolderTagSheetMenu
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.AddNoteTagSheetMenu
@@ -64,6 +65,8 @@ interface AppComponent {
     fun inject(paintSheet: PaintSheet)
     fun inject(addFolderSheet: AddFolderSheet)
     fun inject(noteMenuSheet: NoteMenuSheet)
+    fun inject(fragment: SearchFragment)
+
     fun inject(addNoteTagSheetMenu: AddNoteTagSheetMenu)
     fun inject(makeNoteFragment: MakeNoteFragment)
     fun inject(renameFolderSheet: RenameFolderSheet)

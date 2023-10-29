@@ -34,7 +34,7 @@ class FolderHomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding
 
     private var fragmentList = mutableListOf<Fragment>()
     private var listOfFolderTags = mutableListOf<FolderTag>()
-    private var checkedChips = mutableListOf<Int>()
+    private var checkedChips = mutableListOf<Long>()
 
     @Inject
     @Named("folderTagVMFactory")
@@ -171,14 +171,14 @@ class FolderHomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding
         }
     }
 
-    fun navigateToNotesListFragment(folderId: Int) {
+    fun navigateToNotesListFragment(folderId: Long) {
         val action = FolderHomeFragmentDirections.actionHomeFragmentToNoteHomeFragment(folderId)
         findNavController().navigate(
             action
         )
     }
 
-    fun navigateToSelectFolderDestintationSheet(idFolder: Int) {
+    fun navigateToSelectFolderDestintationSheet(idFolder: Long) {
         val action =
             FolderHomeFragmentDirections.actionHomeFragmentToSelectFolderDestinationSheet(
                 idFolder

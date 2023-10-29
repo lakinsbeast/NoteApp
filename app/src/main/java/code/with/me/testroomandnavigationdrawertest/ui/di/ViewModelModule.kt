@@ -16,6 +16,7 @@ import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MakeNoteViewMod
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteMenuSheetViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteTagViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.SearchViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.SettingsViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.ViewANoteViewModel
 import dagger.Module
@@ -28,6 +29,11 @@ class ViewModelModule {
     fun provideNoteViewModel(
         repo: NoteRepositoryImpl
     ) = NoteViewModel(repo)
+
+    @Provides
+    fun provideSearchViewModel(
+        repo: NoteRepositoryImpl
+    ) = SearchViewModel(repo)
 
     @Provides
     fun provideMakeNoteViewModel(
@@ -65,6 +71,8 @@ class ViewModelModule {
     fun provideSettingsViewModel(
         dataStore: DataStoreManager
     ) = SettingsViewModel(dataStore)
+
+
 
     @Provides
     fun provideStringToMarkdownTextParser(vararg formatters: Formatter): IStringToMarkdownTextParser {

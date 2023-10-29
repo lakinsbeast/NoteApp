@@ -16,7 +16,7 @@ interface FolderDAO {
     fun getAllFolders(): Flow<List<Folder>>
 
     @Query("SELECT * FROM note WHERE folderId = :folderId")
-    fun getNotesInFolder(folderId: Int): Flow<List<Note>>
+    fun getNotesInFolder(folderId: Long): Flow<List<Note>>
 
     @Query("SELECT * FROM folder ORDER BY name ASC")
     fun getAllFoldersSortByNameASC(): Flow<List<Folder>>
@@ -40,7 +40,7 @@ interface FolderDAO {
     fun getAllFoldersFavorite(): Flow<List<Folder>>
 
     @Query("UPDATE folder SET lastTimestampOpen = :time WHERE id = :folderId")
-    fun updateLastOpenedFolder(time: Long, folderId: Int)
+    fun updateLastOpenedFolder(time: Long, folderId: Long)
 
     @Query("SELECT * FROM folder WHERE tags LIKE :tag")
     fun getFolderByTag(tag: String): Flow<List<Folder>>

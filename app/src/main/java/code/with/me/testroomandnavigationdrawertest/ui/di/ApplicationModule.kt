@@ -35,6 +35,7 @@ import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MakeNoteViewMod
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MakeNoteViewModelFactory
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteMenuSheetViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteMenuSheetViewModelFactory
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.SearchViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.SettingsViewModelFactory
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.ViewANoteViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.ViewANoteViewModelFactory
@@ -51,6 +52,11 @@ abstract class BindAppModule {
     @Singleton
     @Named("noteVMFactory")
     abstract fun bindNoteVMFactory(factory: NoteViewModelFactory): ViewModelProvider.Factory
+
+    @Binds
+    @Singleton
+    @Named("searchVMFactory")
+    abstract fun bindSearchVMFactory(factory: SearchViewModel.Companion.SearchViewModelFactory): ViewModelProvider.Factory
 
     @Binds
     @Singleton
