@@ -1,7 +1,9 @@
 <h1 align="center">NotesApp</h1>
 <h2 align="center">Приложение в разработке, планов на это приложение много</h2>
 
-https://github.com/lakinsbeast/NoteApp/assets/45600625/0268f009-7281-4ea2-a44a-df6588b662a8
+https://github.com/lakinsbeast/NoteApp/assets/45600625/9e79e1a3-07df-437f-8fa9-59ade10bd00b
+
+
 
 Особенности:
 <ul>
