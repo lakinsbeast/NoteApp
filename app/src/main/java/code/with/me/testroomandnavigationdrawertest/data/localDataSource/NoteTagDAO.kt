@@ -12,7 +12,6 @@ interface NoteTagDAO {
     @Query("SELECT * FROM notetag")
     fun getAllTags(): Flow<List<NoteTag>>
 
-
     @Insert
     @Throws(SQLiteException::class)
     suspend fun insertTag(noteTag: NoteTag)

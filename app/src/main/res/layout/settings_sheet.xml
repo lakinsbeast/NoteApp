@@ -27,7 +27,7 @@
             android:src="@drawable/ic_baseline_arrow_back_24"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/black" />
+            app:tint="@color/black_overlay" />
 
         <TextView
             android:id="@+id/textSettings"
@@ -60,11 +60,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="70dp"
-            app:cardBackgroundColor="@color/black"
-            app:cardCornerRadius="15dp">
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="15dp"
+            app:strokeColor="@color/black_overlay"
+            app:strokeWidth="2dp">
 
             <Switch
                 android:id="@+id/isUseFolderSettingsSwitch"
@@ -72,14 +74,14 @@
                 android:layout_height="70dp"
                 android:paddingHorizontal="20dp"
                 android:text="@string/useFolderSettings"
-                android:textColor="@color/white"
+                android:textColor="@color/black"
                 android:textSize="20sp"
                 android:thumb="@drawable/custom_switch_thumb"
                 android:track="@drawable/custom_switch_track"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/chipGroup" />
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
     <LinearLayout
@@ -93,11 +95,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout4">
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="70dp"
-            app:cardBackgroundColor="@color/black"
-            app:cardCornerRadius="15dp">
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="15dp"
+            app:strokeColor="@color/black_overlay"
+            app:strokeWidth="2dp">
 
             <Switch
                 android:id="@+id/settingsTheFolderBtn"
@@ -107,7 +111,7 @@
                 android:gravity="center_vertical"
                 android:paddingHorizontal="20dp"
                 android:text="@string/settingTheFolder"
-                android:textColor="@color/white"
+                android:textColor="@color/black"
                 android:textSize="20sp"
                 android:thumb="@drawable/custom_switch_thumb"
 
@@ -115,7 +119,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/chipGroup" />
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
     <LinearLayout
@@ -129,11 +133,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout6">
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="70dp"
-            app:cardBackgroundColor="@color/black"
-            app:cardCornerRadius="15dp">
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="15dp"
+            app:strokeColor="@color/black_overlay"
+            app:strokeWidth="2dp">
 
             <Switch
                 android:id="@+id/useABehindBlurSwitch"
@@ -142,14 +148,14 @@
                 android:gravity="start|center"
                 android:paddingHorizontal="20dp"
                 android:text="@string/useABehindBlurQ"
-                android:textColor="@color/white"
+                android:textColor="@color/black"
                 android:textSize="20sp"
                 android:thumb="@drawable/custom_switch_thumb"
                 android:track="@drawable/custom_switch_track"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/chipGroup" />
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
     <LinearLayout
@@ -162,11 +168,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout5">
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="70dp"
-            app:cardBackgroundColor="@color/black"
-            app:cardCornerRadius="15dp">
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="15dp"
+            app:strokeColor="@color/black_overlay"
+            app:strokeWidth="2dp">
 
             <Switch
                 android:id="@+id/useABackgroundBlurSwitch"
@@ -175,14 +183,14 @@
                 android:gravity="start|center"
                 android:paddingHorizontal="20dp"
                 android:text="@string/useABackgroundBlurQ"
-                android:textColor="@color/white"
+                android:textColor="@color/black"
                 android:textSize="20sp"
                 android:thumb="@drawable/custom_switch_thumb"
                 android:track="@drawable/custom_switch_track"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/chipGroup" />
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

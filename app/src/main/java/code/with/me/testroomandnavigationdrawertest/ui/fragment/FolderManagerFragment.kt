@@ -4,9 +4,4 @@ import code.with.me.testroomandnavigationdrawertest.databinding.ActivityAddNoteB
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
 
 class FolderManagerFragment :
-    BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBinding::inflate) {
-
-
-
-
-}
+    BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBinding::inflate)

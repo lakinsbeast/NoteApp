@@ -1,6 +1,5 @@
 package code.with.me.testroomandnavigationdrawertest.data.data_classes
 
-
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -17,5 +16,5 @@ data class DropboxTokenDTO(
     @SerialName("token_type")
     val tokenType: String,
     @SerialName("uid")
-    val uid: String
+    val uid: String,
 )

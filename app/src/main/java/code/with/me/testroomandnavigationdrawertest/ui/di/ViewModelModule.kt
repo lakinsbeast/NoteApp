@@ -6,7 +6,6 @@ import code.with.me.testroomandnavigationdrawertest.data.repos.FolderRepositoryI
 import code.with.me.testroomandnavigationdrawertest.data.repos.FolderTagRepositoryImpl
 import code.with.me.testroomandnavigationdrawertest.data.repos.NoteRepositoryImpl
 import code.with.me.testroomandnavigationdrawertest.data.repos.NoteTagRepositoryImpl
-import code.with.me.testroomandnavigationdrawertest.data.repos.SettingsRepositoryImpl
 import code.with.me.testroomandnavigationdrawertest.markdown.Formatter
 import code.with.me.testroomandnavigationdrawertest.markdown.IStringToMarkdownTextParser
 import code.with.me.testroomandnavigationdrawertest.markdown.StringToMarkdownTextParser
@@ -24,55 +23,38 @@ import dagger.Provides
 
 @Module
 class ViewModelModule {
+    @Provides
+    fun provideNoteViewModel(repo: NoteRepositoryImpl) = NoteViewModel(repo)
 
     @Provides
-    fun provideNoteViewModel(
-        repo: NoteRepositoryImpl
-    ) = NoteViewModel(repo)
+    fun provideSearchViewModel(repo: NoteRepositoryImpl) = SearchViewModel(repo)
 
     @Provides
-    fun provideSearchViewModel(
-        repo: NoteRepositoryImpl
-    ) = SearchViewModel(repo)
+    fun provideMakeNoteViewModel(repo: NoteRepositoryImpl) = MakeNoteViewModel(repo)
 
     @Provides
-    fun provideMakeNoteViewModel(
-        repo: NoteRepositoryImpl
-    ) = MakeNoteViewModel(repo)
-
-    @Provides
-    fun provideNoteMenuSheetViewModel(
-        repo: NoteRepositoryImpl
-    ) = NoteMenuSheetViewModel(repo)
+    fun provideNoteMenuSheetViewModel(repo: NoteRepositoryImpl) = NoteMenuSheetViewModel(repo)
 
     @Provides
     fun provideViewANoteViewModel(
         repo: NoteRepositoryImpl,
-        audioController: AudioController
+        audioController: AudioController,
     ) = ViewANoteViewModel(repo, audioController)
 
     @Provides
-    fun provideNoteTagViewModel(
-        repo: NoteTagRepositoryImpl
-    ) = NoteTagViewModel(repo)
+    fun provideNoteTagViewModel(repo: NoteTagRepositoryImpl) = NoteTagViewModel(repo)
 
     @Provides
     fun provideFolderViewModel(
         repo: FolderRepositoryImpl,
-        dataStore: DataStoreManager
+        dataStore: DataStoreManager,
     ) = FolderViewModel(repo, dataStore)
 
     @Provides
-    fun provideFolderTagViewModel(
-        repo: FolderTagRepositoryImpl
-    ) = FolderTagViewModel(repo)
+    fun provideFolderTagViewModel(repo: FolderTagRepositoryImpl) = FolderTagViewModel(repo)
 
     @Provides
-    fun provideSettingsViewModel(
-        dataStore: DataStoreManager
-    ) = SettingsViewModel(dataStore)
-
-
+    fun provideSettingsViewModel(dataStore: DataStoreManager) = SettingsViewModel(dataStore)
 
     @Provides
     fun provideStringToMarkdownTextParser(vararg formatters: Formatter): IStringToMarkdownTextParser {

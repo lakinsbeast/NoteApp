@@ -2,8 +2,8 @@ package code.with.me.testroomandnavigationdrawertest.data.localDataSource
 
 import androidx.room.*
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Folder
-import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.FolderTag
+import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.NoteFTS
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.NoteTag
 import code.with.me.testroomandnavigationdrawertest.data.localDataSource.converters.PhotoModelListConverter
@@ -11,7 +11,7 @@ import code.with.me.testroomandnavigationdrawertest.data.localDataSource.convert
 @Database(
     entities = [Note::class, Folder::class, FolderTag::class, NoteTag::class, NoteFTS::class],
     exportSchema = false,
-    version = 15
+    version = 15,
 )
 @TypeConverters(value = [PhotoModelListConverter::class])
 abstract class NoteDatabase : RoomDatabase() {
@@ -22,5 +22,4 @@ abstract class NoteDatabase : RoomDatabase() {
     abstract fun folderTagDAO(): FolderTagDAO
 
     abstract fun noteTagDAO(): NoteTagDAO
-
 }

@@ -28,7 +28,6 @@ import javax.inject.Inject
 import javax.inject.Named
 
 class FolderHomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::inflate) {
-
     private lateinit var viewPager: ViewPager2
     private lateinit var tabLayout: TabLayout
 
@@ -41,8 +40,10 @@ class FolderHomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding
     lateinit var tagVmFactory: ViewModelProvider.Factory
     private lateinit var folderTagViewModel: FolderTagViewModel
 
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         initAppComponent()
         initViewModel()
@@ -79,18 +80,19 @@ class FolderHomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding
     private fun initClickListeners() {
         binding.apply {
             addFolderBtn.setOnClickListener {
-                AlertCreator.createAddFolderMenu(requireContext(),
+                AlertCreator.createAddFolderMenu(
+                    requireContext(),
                     {
                         findNavController().navigate(FolderHomeFragmentDirections.actionHomeFragmentToAddFolderTagSheetMenu())
                     },
                     {
                         findNavController().navigate(
                             FolderHomeFragmentDirections.actionHomeFragmentToAddFolderSheet(
-                                listOfFolderTags.toTypedArray()
-                            )
+                                listOfFolderTags.toTypedArray(),
+                            ),
                         )
-                    })
-
+                    },
+                )
             }
         }
     }
@@ -113,30 +115,32 @@ class FolderHomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding
     private fun initViewModel() {
         folderTagViewModel = ViewModelProvider(this, tagVmFactory)[FolderTagViewModel::class.java]
         lifecycleScope.launch {
-            folderTagViewModel.getAllTags().collect() {
+            folderTagViewModel.getAllTags().collect {
                 listOfFolderTags.clear()
                 listOfFolderTags = it.toMutableList()
                 if (it.isNotEmpty()) {
                     binding.chipGroup.removeAllViews()
                     binding.chipGroup.visible()
                     it.forEach {
-                        val chip = Chip(
-                            binding.chipGroup.context,
-                            null,
-                            com.google.android.material.R.style.Widget_MaterialComponents_Chip_Filter
-                        )
+                        val chip =
+                            Chip(
+                                binding.chipGroup.context,
+                                null,
+                                com.google.android.material.R.style.Widget_MaterialComponents_Chip_Filter,
+                            )
                         chip.text = it.name
                         chip.isClickable = true
                         chip.isCheckable = false
-                        //если установить в стиле, то не работает
+                        // если установить в стиле, то не работает
                         chip.setChipBackgroundColorResource(R.color.white)
                         chip.chipStrokeWidth = 2f
-                        chip.chipStrokeColor = ColorStateList.valueOf(
-                            ContextCompat.getColor(
-                                requireContext(),
-                                R.color.black
+                        chip.chipStrokeColor =
+                            ColorStateList.valueOf(
+                                ContextCompat.getColor(
+                                    requireContext(),
+                                    R.color.black,
+                                ),
                             )
-                        )
                         chip.chipCornerRadius = 15f
                         chip.setOnClickListener { view ->
                             if (checkedChips.contains(it.id)) {
@@ -150,8 +154,8 @@ class FolderHomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding
                                 val folderListFragment = fragmentList[0] as? FolderListFragment
                                 folderListFragment?.updateRecyclerViewData(
                                     checkedChips.joinToString(
-                                        ","
-                                    )
+                                        ",",
+                                    ),
                                 )
                             }
                         }
@@ -174,14 +178,14 @@ class FolderHomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding
     fun navigateToNotesListFragment(folderId: Long) {
         val action = FolderHomeFragmentDirections.actionHomeFragmentToNoteHomeFragment(folderId)
         findNavController().navigate(
-            action
+            action,
         )
     }
 
     fun navigateToSelectFolderDestintationSheet(idFolder: Long) {
         val action =
             FolderHomeFragmentDirections.actionHomeFragmentToSelectFolderDestinationSheet(
-                idFolder
+                idFolder,
             )
         findNavController().navigate(action)
     }

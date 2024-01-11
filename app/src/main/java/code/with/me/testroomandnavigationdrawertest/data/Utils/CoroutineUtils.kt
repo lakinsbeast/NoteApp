@@ -8,12 +8,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-
 private var scope = CoroutineScope(Dispatchers.Main.immediate + Job())
 private var ioScope = CoroutineScope(Dispatchers.IO + Job())
 
-//todo надо изменить, дичь какая-то
-fun launchAfterTimerMain(time: Long, block: suspend () -> Unit) {
+// todo надо изменить, дичь какая-то
+fun launchAfterTimerMain(
+    time: Long,
+    block: suspend () -> Unit,
+) {
     scope.cancel()
     scope = CoroutineScope(Dispatchers.Main + Job())
     scope.launch {
@@ -22,7 +24,10 @@ fun launchAfterTimerMain(time: Long, block: suspend () -> Unit) {
     }
 }
 
-fun launchAfterTimerIO(time: Long, block: suspend () -> Unit) {
+fun launchAfterTimerIO(
+    time: Long,
+    block: suspend () -> Unit,
+) {
     ioScope.cancel()
     ioScope = CoroutineScope(Dispatchers.IO + Job())
     ioScope.launch {

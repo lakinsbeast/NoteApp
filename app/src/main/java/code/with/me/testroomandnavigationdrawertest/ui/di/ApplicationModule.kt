@@ -3,16 +3,8 @@ package code.with.me.testroomandnavigationdrawertest.ui.di
 import androidx.lifecycle.ViewModelProvider
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.audio.AudioController
-import code.with.me.testroomandnavigationdrawertest.data.repos.FolderRepositoryImpl
-import code.with.me.testroomandnavigationdrawertest.data.repos.NoteRepositoryImpl
-import code.with.me.testroomandnavigationdrawertest.data.repos.FolderTagRepositoryImpl
-import code.with.me.testroomandnavigationdrawertest.data.repos.NoteTagRepositoryImpl
 import code.with.me.testroomandnavigationdrawertest.file.FilesController
-import code.with.me.testroomandnavigationdrawertest.markdown.Formatter
-import code.with.me.testroomandnavigationdrawertest.markdown.IStringToMarkdownTextParser
-import code.with.me.testroomandnavigationdrawertest.markdown.StringToMarkdownTextParser
 import code.with.me.testroomandnavigationdrawertest.ui.FragmentBackStackManager
-import code.with.me.testroomandnavigationdrawertest.ui.controllers.SheetController
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.CloseFragmentImpl
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.FragmentController
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.GetFragmentImpl
@@ -22,29 +14,22 @@ import code.with.me.testroomandnavigationdrawertest.ui.controllers.IOpenFragment
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.IReplaceFragment
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.OpenFragmentImpl
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.ReplaceFragmentImpl
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderViewModel
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderViewModelFactory
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteTagViewModel
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteTagViewModelFactory
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModelFactory
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderTagViewModel
+import code.with.me.testroomandnavigationdrawertest.ui.controllers.SheetController
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderTagViewModelFactory
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderViewModelFactory
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MainScreenViewModelFactory
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MakeNoteViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MakeNoteViewModelFactory
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteMenuSheetViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteMenuSheetViewModelFactory
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteTagViewModelFactory
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModelFactory
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.SearchViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.SettingsViewModelFactory
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.ViewANoteViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.ViewANoteViewModelFactory
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import javax.inject.Named
 import javax.inject.Singleton
-
 
 @Module
 abstract class BindAppModule {
@@ -67,7 +52,6 @@ abstract class BindAppModule {
     @Singleton
     @Named("noteMenuSheetVMFactory")
     abstract fun bindNoteMenuSheetVMFactory(factory: NoteMenuSheetViewModelFactory): ViewModelProvider.Factory
-
 
     @Binds
     @Singleton
@@ -102,7 +86,6 @@ abstract class BindAppModule {
 
 @Module
 class ApplicationModule(private val application: NotesApplication) {
-
     @Provides
     @Singleton
     fun provideApp(): NotesApplication = application
@@ -111,12 +94,10 @@ class ApplicationModule(private val application: NotesApplication) {
 //    fun provideStringToMarkdownTextParser(vararg formatters: Formatter): IStringToMarkdownTextParser {
 //        return StringToMarkdownTextParser(*formatters)
 //    }
-
 }
 
 @Module
 class ControllerModule {
-
     @Provides
     fun provideFragmentBackStackManager(): FragmentBackStackManager = FragmentBackStackManager()
 
@@ -124,38 +105,32 @@ class ControllerModule {
     fun provideGetFragmentImpl(): IGetFragment = GetFragmentImpl()
 
     @Provides
-    fun provideOpenFragmentImpl(
-        fragmentBackStackManager: FragmentBackStackManager
-    ): IOpenFragment = OpenFragmentImpl(fragmentBackStackManager)
+    fun provideOpenFragmentImpl(fragmentBackStackManager: FragmentBackStackManager): IOpenFragment =
+        OpenFragmentImpl(fragmentBackStackManager)
 
     @Provides
-    fun provideReplaceFragmentImpl(
-        fragmentBackStackManager: FragmentBackStackManager
-    ): IReplaceFragment = ReplaceFragmentImpl(fragmentBackStackManager)
+    fun provideReplaceFragmentImpl(fragmentBackStackManager: FragmentBackStackManager): IReplaceFragment =
+        ReplaceFragmentImpl(fragmentBackStackManager)
 
     @Provides
-    fun provideCloseFragmentImpl(getFragment: IGetFragment): ICloseFragment =
-        CloseFragmentImpl(getFragment)
+    fun provideCloseFragmentImpl(getFragment: IGetFragment): ICloseFragment = CloseFragmentImpl(getFragment)
 
     @Provides
     fun provideFragmentController(
         getFragmentImpl: IGetFragment,
         openFragmentImpl: IOpenFragment,
         replaceFragmentImpl: IReplaceFragment,
-        closeFragmentImpl: ICloseFragment
+        closeFragmentImpl: ICloseFragment,
     ) = FragmentController(
         getFragmentImpl,
         openFragmentImpl,
         replaceFragmentImpl,
-        closeFragmentImpl
+        closeFragmentImpl,
     )
 
     @Provides
     fun provideSheetController() = SheetController()
-
-
 }
-
 
 @Module
 class AudioModule {

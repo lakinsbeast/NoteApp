@@ -8,27 +8,28 @@ import code.with.me.testroomandnavigationdrawertest.ui.base.BaseViewModel
 import java.lang.IllegalArgumentException
 import javax.inject.Inject
 
-class NoteTagViewModel @Inject constructor(
-    private val repo: NoteTagRepository
-) : BaseViewModel() {
+class NoteTagViewModel
+    @Inject
+    constructor(
+        private val repo: NoteTagRepository,
+    ) : BaseViewModel() {
+        fun getAllTags() = repo.getAllTags()
 
-    fun getAllTags() = repo.getAllTags()
-
-    suspend fun insertTag(noteTag: NoteTag) = repo.insertTag(noteTag)
-
-}
-
-class NoteTagViewModelFactory @Inject constructor(
-    private val repo: NoteTagRepository
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(NoteTagViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return NoteTagViewModel(
-                repo
-            ) as T
-        }
-        throw IllegalArgumentException("ukn VM class")
+        suspend fun insertTag(noteTag: NoteTag) = repo.insertTag(noteTag)
     }
 
-}
+class NoteTagViewModelFactory
+    @Inject
+    constructor(
+        private val repo: NoteTagRepository,
+    ) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(NoteTagViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return NoteTagViewModel(
+                    repo,
+                ) as T
+            }
+            throw IllegalArgumentException("ukn VM class")
+        }
+    }

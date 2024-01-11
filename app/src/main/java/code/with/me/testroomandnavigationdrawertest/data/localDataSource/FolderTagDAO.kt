@@ -12,7 +12,6 @@ interface FolderTagDAO {
     @Query("SELECT * FROM foldertag")
     fun getAllTags(): Flow<List<FolderTag>>
 
-
     @Insert
     @Throws(SQLiteException::class)
     suspend fun insertTag(folderTag: FolderTag)

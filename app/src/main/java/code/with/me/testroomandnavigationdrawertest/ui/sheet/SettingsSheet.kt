@@ -17,8 +17,7 @@ import javax.inject.Named
 
 class SettingsSheet(val slide: (Float) -> Unit) :
     BaseSheet<SettingsSheetBinding>(SettingsSheetBinding::inflate) {
-
-    //TODO: Добавить превьюдиалога для настроек и добавить возможность настраивать значения dimAmount и blurBehind
+    // TODO: Добавить превьюдиалога для настроек и добавить возможность настраивать значения dimAmount и blurBehind
 
     @Inject
     @Named("settingsVMFactory")
@@ -32,7 +31,10 @@ class SettingsSheet(val slide: (Float) -> Unit) :
         settingsViewModel = ViewModelProvider(this, factory)[SettingsViewModel::class.java]
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         settingsViewModel.isUseFolderEnabled.observe(viewLifecycleOwner) {
@@ -49,7 +51,7 @@ class SettingsSheet(val slide: (Float) -> Unit) :
             (1.0f) * 64f,
             Color.WHITE,
             Color.BLACK,
-            (1.0f) * 5f
+            (1.0f) * 5f,
         )
 
         onSlide = {
@@ -60,7 +62,7 @@ class SettingsSheet(val slide: (Float) -> Unit) :
                     (1.0f - it) * 64f,
                     Color.WHITE,
                     Color.BLACK,
-                    (1.0f - it) * 5f
+                    (1.0f - it) * 5f,
                 )
                 if (it > 0.01f) {
                     topMenuLayout.visible()
@@ -83,7 +85,6 @@ class SettingsSheet(val slide: (Float) -> Unit) :
             useABackgroundBlurSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
                 settingsViewModel.applyUseBackgroundBlur(isChecked)
             }
-
         }
         setStateCollapsed()
         setBackPressed()
@@ -94,7 +95,7 @@ class SettingsSheet(val slide: (Float) -> Unit) :
         activity().fragmentController.closeFragment(activity(), "SettingsFragment")
     }
 
-    //onbackpressed нет, поэтому реализовал такую штуку
+    // onbackpressed нет, поэтому реализовал такую штуку
     private fun setBackPressed() {
         dialog?.setOnKeyListener { dialog, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -105,6 +106,4 @@ class SettingsSheet(val slide: (Float) -> Unit) :
             }
         }
     }
-
-
 }

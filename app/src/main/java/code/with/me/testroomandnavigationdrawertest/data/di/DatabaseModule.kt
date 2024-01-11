@@ -3,9 +3,9 @@ package code.with.me.testroomandnavigationdrawertest.data.di
 import androidx.room.Room
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.data.localDataSource.FolderDAO
+import code.with.me.testroomandnavigationdrawertest.data.localDataSource.FolderTagDAO
 import code.with.me.testroomandnavigationdrawertest.data.localDataSource.NoteDAO
 import code.with.me.testroomandnavigationdrawertest.data.localDataSource.NoteDatabase
-import code.with.me.testroomandnavigationdrawertest.data.localDataSource.FolderTagDAO
 import code.with.me.testroomandnavigationdrawertest.data.localDataSource.NoteTagDAO
 import dagger.Module
 import dagger.Provides
@@ -13,7 +13,6 @@ import javax.inject.Singleton
 
 @Module
 class DatabaseModule(private val application: NotesApplication) {
-
     @Provides
     @Singleton
     fun provideDatabase(): NoteDatabase =

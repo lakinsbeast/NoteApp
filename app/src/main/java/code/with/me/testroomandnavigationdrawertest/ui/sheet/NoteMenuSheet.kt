@@ -1,30 +1,23 @@
 package code.with.me.testroomandnavigationdrawertest.ui.sheet
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import androidx.core.view.doOnLayout
 import androidx.lifecycle.ViewModelProvider
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.data.Utils.gone
-import code.with.me.testroomandnavigationdrawertest.data.Utils.setRoundedCornersView
 import code.with.me.testroomandnavigationdrawertest.data.Utils.setUpperRoundedCornersView
 import code.with.me.testroomandnavigationdrawertest.data.Utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.enums.NoteItemsCallback
 import code.with.me.testroomandnavigationdrawertest.databinding.NoteMenuSheetBinding
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MakeNoteViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteMenuSheetViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 import javax.inject.Named
 
 class NoteMenuSheet(private val idOfNote: Long, private val action: (NoteItemsCallback) -> Unit) :
     BaseSheet<NoteMenuSheetBinding>(NoteMenuSheetBinding::inflate) {
-
     @Inject
     @Named("noteMenuSheetVMFactory")
     lateinit var factory: ViewModelProvider.Factory
@@ -42,17 +35,19 @@ class NoteMenuSheet(private val idOfNote: Long, private val action: (NoteItemsCa
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         initAndListenViewModel()
         binding.mainLayout.setUpperRoundedCornersView(
             (1.0f) * 64f,
             Color.WHITE,
             Color.BLACK,
-            (1.0f) * 5f
+            (1.0f) * 5f,
         )
         binding.apply {
-
             progressBar.playAnimation()
             shareLay.setOnClickListener {
                 showCustomProgressBar(true)
@@ -62,7 +57,7 @@ class NoteMenuSheet(private val idOfNote: Long, private val action: (NoteItemsCa
                 action.invoke(NoteItemsCallback.MOVE)
                 dismiss()
             }
-            //TODO сделать так, чтоб в зависимости от того в избранном он или нет менялся текст и иконка
+            // TODO сделать так, чтоб в зависимости от того в избранном он или нет менялся текст и иконка
             favoriteLay.setOnClickListener {
                 action.invoke(NoteItemsCallback.FAVORITE)
                 dismiss()

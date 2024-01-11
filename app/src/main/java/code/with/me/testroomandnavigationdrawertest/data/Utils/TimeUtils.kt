@@ -1,10 +1,11 @@
 package code.with.me.testroomandnavigationdrawertest.data.Utils
 
-
 import android.content.Context
 import android.text.format.DateUtils
 
-
-fun getDate(context: Context, time: Long): String? {
+fun getDate(
+    context: Context,
+    time: Long,
+): String? {
     return DateUtils.formatDateTime(context, time, DateUtils.FORMAT_SHOW_YEAR)
 }

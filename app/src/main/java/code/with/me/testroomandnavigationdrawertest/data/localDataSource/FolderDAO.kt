@@ -40,7 +40,10 @@ interface FolderDAO {
     fun getAllFoldersFavorite(): Flow<List<Folder>>
 
     @Query("UPDATE folder SET lastTimestampOpen = :time WHERE id = :folderId")
-    fun updateLastOpenedFolder(time: Long, folderId: Long)
+    fun updateLastOpenedFolder(
+        time: Long,
+        folderId: Long,
+    )
 
     @Query("SELECT * FROM folder WHERE tags LIKE :tag")
     fun getFolderByTag(tag: String): Flow<List<Folder>>

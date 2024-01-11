@@ -29,7 +29,7 @@
     </style>
 
     <style name="DialogAnimationEnterExit">
-        <item name="android:windowEnterAnimation">@anim/slide_in_left</item>
-        <item name="android:windowExitAnimation">@anim/slide_out_right</item>
+        <item name="android:windowEnterAnimation">@anim/open_dialog_anim</item>
+        <item name="android:windowExitAnimation">@anim/close_dialog_anim</item>
     </style>
 </resources>

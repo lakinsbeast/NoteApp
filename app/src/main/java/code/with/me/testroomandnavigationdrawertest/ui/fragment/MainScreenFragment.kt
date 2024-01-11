@@ -1,12 +1,13 @@
 package code.with.me.testroomandnavigationdrawertest.ui.fragment
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
 import android.content.res.ColorStateList
-import android.graphics.Color
-import android.graphics.drawable.AnimationDrawable
-import android.graphics.drawable.GradientDrawable
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.forEachIndexed
@@ -16,31 +17,27 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
+import code.with.me.testroomandnavigationdrawertest.data.Utils.getDisplayMetrics
 import code.with.me.testroomandnavigationdrawertest.data.Utils.gone
 import code.with.me.testroomandnavigationdrawertest.data.Utils.launchAfterTimerMain
-import code.with.me.testroomandnavigationdrawertest.data.Utils.println
 import code.with.me.testroomandnavigationdrawertest.data.Utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Folder
 import code.with.me.testroomandnavigationdrawertest.databinding.MainScreenFragmentBinding
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
-import code.with.me.testroomandnavigationdrawertest.ui.controllers.FragmentOptions
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.fragmentOptionsBuilder
 import code.with.me.testroomandnavigationdrawertest.ui.dialog.CreateFolderDialog
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.AddFolderSheet
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.ViewANoteSheet
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MainScreenViewModel
 import com.google.android.material.chip.Chip
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Named
 import com.google.android.material.R as MR
 
 class MainScreenFragment :
     BaseFragment<MainScreenFragmentBinding>(MainScreenFragmentBinding::inflate) {
-
     private var selectedChip = -1
     private var selectedChipFolderId = 1L
 
@@ -49,14 +46,16 @@ class MainScreenFragment :
     lateinit var mainScreenVMFactory: ViewModelProvider.Factory
     private lateinit var mainScreenViewModel: MainScreenViewModel
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initAppComponent()
         initViewModel()
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         listenViewModel()
         initClickListeners()
@@ -68,16 +67,14 @@ class MainScreenFragment :
 //        }
     }
 
-
     override fun onSaveInstanceState(outState: Bundle) {
         kotlin.io.println("onSaveInstanceState fragment tag ${fragmentManager?.fragments?.last()?.javaClass?.simpleName}")
         outState.putString(
             "fragmentTag",
-            fragmentManager?.fragments?.last()?.javaClass?.simpleName
+            fragmentManager?.fragments?.last()?.javaClass?.simpleName,
         )
         super.onSaveInstanceState(outState)
     }
-
 
     private fun initClickListeners() {
         binding.apply {
@@ -88,14 +85,15 @@ class MainScreenFragment :
                 CreateFolderDialog().show(activity().supportFragmentManager, "CreateFolderDialog")
             }
             settingsBtn.setOnClickListener {
-//                Toast.makeText(context, "Settings Fragment", Toast.LENGTH_LONG)
-//                    .show()
                 activity().fragmentController.openFragment(
                     activity(),
                     SettingsFragment(),
                     fragmentOptionsBuilder {
                         fragmentLayout = R.id.fragment_detail
-                    })
+                    },
+                    R.anim.enter_from_right,
+                    R.anim.exit_to_left
+                )
             }
             searchBtn.setOnClickListener {
                 activity().fragmentController.openFragment(
@@ -103,7 +101,10 @@ class MainScreenFragment :
                     SearchFragment(),
                     fragmentOptionsBuilder {
                         fragmentLayout = R.id.fragment_detail
-                    })
+                    },
+                    R.anim.enter_from_right,
+                    R.anim.exit_to_left
+                )
             }
         }
     }
@@ -124,21 +125,23 @@ class MainScreenFragment :
                     binding.folderLayout.gone()
                 }
             }
-            mainScreenViewModel.getAllFolders().collect() {
+            mainScreenViewModel.getAllFolders().collect {
                 binding.chipGroup.removeAllViewsInLayout()
-                val chip = Chip(
-                    binding.chipGroup.context,
-                    null,
-                    MR.style.Widget_MaterialComponents_Chip_Filter
-                )
+                val chip =
+                    Chip(
+                        binding.chipGroup.context,
+                        null,
+                        MR.style.Widget_MaterialComponents_Chip_Filter,
+                    )
                 chip.setUpFirstChip()
                 if (it.isNotEmpty()) {
                     it.forEach { folder ->
-                        val chip = Chip(
-                            binding.chipGroup.context,
-                            null,
-                            MR.style.Widget_MaterialComponents_Chip_Filter
-                        )
+                        val chip =
+                            Chip(
+                                binding.chipGroup.context,
+                                null,
+                                MR.style.Widget_MaterialComponents_Chip_Filter,
+                            )
                         chip.setUpChip(folder)
                         binding.chipGroup.addView(chip)
                     }
@@ -154,15 +157,16 @@ class MainScreenFragment :
         text = getString(R.string.allNotes)
         isClickable = true
         isCheckable = false
-        //если установить в стиле, то не работает
+        // если установить в стиле, то не работает
         setChipBackgroundColorResource(R.color.white)
         chipStrokeWidth = 2f
-        chipStrokeColor = ColorStateList.valueOf(
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.black
+        chipStrokeColor =
+            ColorStateList.valueOf(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.black,
+                ),
             )
-        )
 
         selectedChip = this.id
         chipCornerRadius = 15f
@@ -184,15 +188,16 @@ class MainScreenFragment :
         text = it.name
         isClickable = true
         isCheckable = false
-        //если установить в стиле, то не работает
+        // если установить в стиле, то не работает
         setChipBackgroundColorResource(R.color.white)
         chipStrokeWidth = 2f
-        chipStrokeColor = ColorStateList.valueOf(
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.black
+        chipStrokeColor =
+            ColorStateList.valueOf(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.black,
+                ),
             )
-        )
         chipCornerRadius = 15f
         val chipGroup = binding.chipGroup
         if (binding.chipGroup.isNotEmpty()) {
@@ -237,23 +242,101 @@ class MainScreenFragment :
             fragmentOptionsBuilder {
                 fragmentLayout = R.id.fragment_container
                 clearBackStack = true
-            }
+            },
         )
         showProgressBar(false)
     }
 
-    fun openMakeNoteFragment(id: Long = -1) {
-        val fragment = MakeNoteFragment()
-        val bundle = Bundle()
-        bundle.putLong("idFolder", selectedChipFolderId)
-        bundle.putLong("noteId", id)
-        fragment.arguments = bundle
-        (activity as MainActivity).fragmentController.openFragment(
-            activity as MainActivity,
-            fragment, fragmentOptionsBuilder {
-                fragmentLayout = R.id.fragment_detail
+    fun openMakeNoteFragment(id: Long = -1, view: View? = null) {
+        //TODO доделать анимацию
+        if (view != null) {
+            val expandedView = View(activity()).apply {
+                setBackgroundColor(resources.getColor(R.color.white, null))
             }
-        )
+
+            var height = getDisplayMetrics(activity()).heightPixels
+            var width = getDisplayMetrics(activity()).widthPixels
+
+            val startX = view.x
+            val startY = view.y
+            val startWidth = width
+            val startHeight = view.height
+
+            expandedView.x = startX
+            expandedView.y = startY
+            expandedView.layoutParams = FrameLayout.LayoutParams(startWidth, startHeight)
+
+            val container =
+                binding.root // Замените на ID вашего контейнера
+            container.addView(expandedView)
+
+
+            // Вычисляем конечные координаты и размеры (на весь экран)
+            val finalX = 0f
+            val finalY = 0f
+            val finalWidth = width
+            val finalHeight = height
+
+            val anim = ValueAnimator.ofInt(0, 100)
+            anim.interpolator = AccelerateDecelerateInterpolator()
+            anim.addUpdateListener { animation ->
+                val fraction = animation.animatedValue as Int / 100f
+                val newX = startX + fraction * (finalX - startX)
+                val newY = startY + fraction * (finalY - startY)
+                val newWidth = startWidth + (finalWidth - startWidth) * fraction
+                val newHeight = startHeight + (finalHeight - startHeight) * fraction
+
+                expandedView.x = newX
+                expandedView.y = newY
+                expandedView.layoutParams.width = newWidth.toInt()
+                expandedView.layoutParams.height = newHeight.toInt()
+                expandedView.requestLayout()
+            }
+
+            anim.addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    val fragment = MakeNoteFragment()
+                    fragment.arguments = Bundle().apply {
+                        putLong("idFolder", selectedChipFolderId)
+                        putLong("noteId", id)
+                    }
+                    (activity as MainActivity).fragmentController.openFragment(
+                        activity as MainActivity,
+                        fragment,
+                        fragmentOptionsBuilder {
+                            fragmentLayout = R.id.fragment_detail
+                        },
+                        R.anim.enter_from_right,
+                        R.anim.exit_to_left
+                    )
+                    launchAfterTimerMain(50) {
+                        container.removeView(expandedView)
+                    }
+                }
+            })
+
+            anim.duration = 300 // Длительность анимации в миллисекундах
+            anim.start()
+
+
+        } else {
+            val fragment = MakeNoteFragment()
+            fragment.arguments = Bundle().apply {
+                putLong("idFolder", selectedChipFolderId)
+                putLong("noteId", id)
+            }
+            (activity as MainActivity).fragmentController.openFragment(
+                activity as MainActivity,
+                fragment,
+                fragmentOptionsBuilder {
+                    fragmentLayout = R.id.fragment_detail
+                },
+                R.anim.enter_from_right,
+                R.anim.exit_to_left
+            )
+        }
+
+
     }
 
     private fun openMakeFolderSheet() {
@@ -281,7 +364,7 @@ class MainScreenFragment :
         mainScreenViewModel =
             ViewModelProvider(
                 this,
-                mainScreenVMFactory
+                mainScreenVMFactory,
             )[MainScreenViewModel::class.java]
     }
 
@@ -290,9 +373,10 @@ class MainScreenFragment :
             val viewNoteSheet = ViewANoteSheet()
             viewNoteSheet.setFullScreenSheet()
             val bundle = Bundle()
-            viewNoteSheet.arguments = bundle.apply {
-                putLong("noteId", id)
-            }
+            viewNoteSheet.arguments =
+                bundle.apply {
+                    putLong("noteId", id)
+                }
             (activity as MainActivity).let { activity ->
                 activity.sheetController.showSheet(activity, viewNoteSheet)
             }
@@ -300,5 +384,4 @@ class MainScreenFragment :
             Toast.makeText(activity, e.localizedMessage, Toast.LENGTH_LONG).show()
         }
     }
-
 }

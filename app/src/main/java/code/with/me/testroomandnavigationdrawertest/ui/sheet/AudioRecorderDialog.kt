@@ -1,24 +1,19 @@
 package code.with.me.testroomandnavigationdrawertest.ui.sheet
 
-import android.Manifest
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.media.MediaRecorder
 import android.os.Build
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.WindowManager
 import android.view.animation.OvershootInterpolator
-import code.with.me.testroomandnavigationdrawertest.AlertCreator
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
-import code.with.me.testroomandnavigationdrawertest.PermissionController
-import code.with.me.testroomandnavigationdrawertest.data.Utils.println
+import code.with.me.testroomandnavigationdrawertest.audio.AudioController
 import code.with.me.testroomandnavigationdrawertest.data.Utils.setCancelButton
 import code.with.me.testroomandnavigationdrawertest.data.Utils.setRoundedCornersView
-import code.with.me.testroomandnavigationdrawertest.audio.AudioController
 import code.with.me.testroomandnavigationdrawertest.databinding.AudioRecorderBinding
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import kotlinx.coroutines.CoroutineScope
@@ -31,7 +26,6 @@ import javax.inject.Inject
 
 class AudioRecorderDialog(private val myContext: Context, private val result: (String) -> Unit) :
     Dialog(myContext) {
-
     private lateinit var binding: AudioRecorderBinding
 
     private var timer: Job? = null
@@ -40,8 +34,7 @@ class AudioRecorderDialog(private val myContext: Context, private val result: (S
     @Inject
     lateinit var audioController: AudioController
 
-
-    //need refactor
+    // need refactor
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initAppComponent()
@@ -66,7 +59,6 @@ class AudioRecorderDialog(private val myContext: Context, private val result: (S
         setUpDialogWindow()
     }
 
-
     private fun initAppComponent() {
         val appComponent =
             ((myContext as MainActivity).application as NotesApplication).appComponent
@@ -85,15 +77,16 @@ class AudioRecorderDialog(private val myContext: Context, private val result: (S
     }
 
     private fun launchTimer() {
-        timer = CoroutineScope(Dispatchers.IO.limitedParallelism(1)).launch {
-            while (true) {
-                withContext(Dispatchers.Main) {
-                    binding.recordTime.text = DateUtils.formatElapsedTime(seconds)
+        timer =
+            CoroutineScope(Dispatchers.IO.limitedParallelism(1)).launch {
+                while (true) {
+                    withContext(Dispatchers.Main) {
+                        binding.recordTime.text = DateUtils.formatElapsedTime(seconds)
+                    }
+                    delay(1000)
+                    seconds++
                 }
-                delay(1000)
-                seconds++
             }
-        }
     }
 
     private fun setUpDialogWindow() {
@@ -104,7 +97,6 @@ class AudioRecorderDialog(private val myContext: Context, private val result: (S
             this.window?.attributes?.blurBehindRadius = 10
         }
     }
-
 
     override fun onDetachedFromWindow() {
         audioController.apply {

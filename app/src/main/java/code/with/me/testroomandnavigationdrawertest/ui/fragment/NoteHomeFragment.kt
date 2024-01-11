@@ -27,7 +27,6 @@ import kotlin.properties.Delegates
 
 class NoteHomeFragment :
     BaseFragment<FolderHomeFragmentBinding>(FolderHomeFragmentBinding::inflate) {
-
     private lateinit var viewPager: ViewPager2
     private lateinit var tabLayout: TabLayout
 
@@ -41,7 +40,10 @@ class NoteHomeFragment :
     lateinit var noteVmFactory: ViewModelProvider.Factory
     private lateinit var noteTagViewModel: NoteTagViewModel
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         initAppComponent()
         initViewModel()
@@ -90,20 +92,22 @@ class NoteHomeFragment :
             clear()
             add(
                 NotesListFragment().apply {
-                    arguments = Bundle().apply {
-                        putLong("idFolder", this@NoteHomeFragment.idFolder)
-                    }
-                }
+                    arguments =
+                        Bundle().apply {
+                            putLong("idFolder", this@NoteHomeFragment.idFolder)
+                        }
+                },
             )
         }
 
-        viewPager.adapter = object : FragmentStateAdapter(this) {
-            override fun getItemCount(): Int = fragmentList.size
+        viewPager.adapter =
+            object : FragmentStateAdapter(this) {
+                override fun getItemCount(): Int = fragmentList.size
 
-            override fun createFragment(position: Int): Fragment {
-                return fragmentList[position]
+                override fun createFragment(position: Int): Fragment {
+                    return fragmentList[position]
+                }
             }
-        }
     }
 
     private fun initTabLayout() {
@@ -121,21 +125,26 @@ class NoteHomeFragment :
 
     private fun initClickListeners() {
         binding.fab.setOnClickListener {
-            AlertCreator.createAddNoteMenu(requireContext(),
+            AlertCreator.createAddNoteMenu(
+                requireContext(),
                 {
                     findNavController().navigate(NoteHomeFragmentDirections.actionNoteHomeFragmentToAddNoteTagSheetMenu())
                 },
                 {
                     findNavController().navigate(
                         NoteHomeFragmentDirections.actionNoteHomeFragmentToMakeANoteSheet(
-                            arguments?.getLong("idFolder") ?: 0L
-                        )
+                            arguments?.getLong("idFolder") ?: 0L,
+                        ),
                     )
-                })
+                },
+            )
         }
     }
 
-    fun changeUiOnRvUpdate(binding: FolderHomeFragmentBinding, notes: List<Note>) {
+    fun changeUiOnRvUpdate(
+        binding: FolderHomeFragmentBinding,
+        notes: List<Note>,
+    ) {
         binding.chipGroupScrollable.gone()
     }
 

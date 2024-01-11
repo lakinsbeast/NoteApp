@@ -2,33 +2,23 @@ package code.with.me.testroomandnavigationdrawertest.ui.base
 
 import android.annotation.SuppressLint
 import android.graphics.Color
-import android.graphics.RenderEffect
-import android.graphics.Shader
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
 import android.view.WindowManager
-import androidx.annotation.AnimRes
-import androidx.annotation.LayoutRes
 import androidx.fragment.app.DialogFragment
 import androidx.viewbinding.ViewBinding
-import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.data.Utils.findActivity
 import code.with.me.testroomandnavigationdrawertest.data.Utils.setRoundedCornersView
 
-
-//лучше использовать DialogFragment, вместо Dialog
+// лучше использовать DialogFragment, вместо Dialog
 @SuppressLint("ResourceType")
 abstract class BaseDialog<VB : ViewBinding>(
-    val get: ((LayoutInflater, ViewGroup?, Boolean) -> VB)
+    val get: ((LayoutInflater, ViewGroup?, Boolean) -> VB),
 ) : DialogFragment() {
-
-
-
     private var _binding: VB? = null
     val binding get() = _binding!!
 
@@ -55,12 +45,12 @@ abstract class BaseDialog<VB : ViewBinding>(
                     dialog?.window?.attributes?.blurBehindRadius = 0
                 }
             }
-            //если не добавить эту строку, то не применится блюр, пока я хз почему так
+            // если не добавить эту строку, то не применится блюр, пока я хз почему так
             dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             field = value
         }
 
-    //не работает
+    // не работает
     var isBackgroundNeedBlurred = true
         set(value) {
             println("value: $value")
@@ -79,10 +69,9 @@ abstract class BaseDialog<VB : ViewBinding>(
             } else {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     dialog?.window?.setBackgroundBlurRadius(0)
-
                 }
             }
-            //если не добавить эту строку, то не применится блюр, пока я хз почему так
+            // если не добавить эту строку, то не применится блюр, пока я хз почему так
             dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             field = value
         }
@@ -92,13 +81,16 @@ abstract class BaseDialog<VB : ViewBinding>(
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         _binding = get(inflater, container, false)
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 //        dialog?.window?.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
@@ -108,10 +100,8 @@ abstract class BaseDialog<VB : ViewBinding>(
         view.setRoundedCornersView(56f)
     }
 
-
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
     }
-
 }

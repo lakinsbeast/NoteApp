@@ -12,41 +12,43 @@ import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
 import javax.inject.Inject
 
-class SearchViewModel @Inject constructor(
-    private val repoNote: NoteRepository
-) : ViewModel() {
+class SearchViewModel
+    @Inject
+    constructor(
+        private val repoNote: NoteRepository,
+    ) : ViewModel() {
+        private var _noteList = MutableLiveData<List<NoteFTS>>()
+        val noteList: LiveData<List<NoteFTS>>
+            get() = _noteList
 
-    private var _noteList = MutableLiveData<List<NoteFTS>>()
-    val noteList: LiveData<List<NoteFTS>>
-        get() = _noteList
-
-    fun search(text: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val list = repoNote.searchNotes("$text*")
-            println("--------")
-            list.forEach {
-                println("NoteFTS: $it")
-            }
-            println("--------")
-
-            _noteList.postValue(list)
-        }
-    }
-
-    companion object {
-        class SearchViewModelFactory @Inject constructor(
-            private val repo: NoteRepository
-        ) : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                if (modelClass.isAssignableFrom(SearchViewModel::class.java)) {
-                    @Suppress("UNCHECKED_CAST")
-                    return SearchViewModel(
-                        repo
-                    ) as T
+        fun search(text: String) {
+            viewModelScope.launch(Dispatchers.IO) {
+                val list = repoNote.searchNotes("$text*")
+                println("--------")
+                list.forEach {
+                    println("NoteFTS: $it")
                 }
-                throw IllegalArgumentException("ukn VM class")
-            }
+                println("--------")
 
+                _noteList.postValue(list)
+            }
+        }
+
+        companion object {
+            class SearchViewModelFactory
+                @Inject
+                constructor(
+                    private val repo: NoteRepository,
+                ) : ViewModelProvider.Factory {
+                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                        if (modelClass.isAssignableFrom(SearchViewModel::class.java)) {
+                            @Suppress("UNCHECKED_CAST")
+                            return SearchViewModel(
+                                repo,
+                            ) as T
+                        }
+                        throw IllegalArgumentException("ukn VM class")
+                    }
+                }
         }
     }
-}

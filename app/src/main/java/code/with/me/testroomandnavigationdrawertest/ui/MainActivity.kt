@@ -28,9 +28,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val fragment = MainScreenFragment()
-        fragmentController.openFragment(this, fragment, fragmentOptionsBuilder {
-            fragmentLayout = R.id.fragment_detail
-        })
+        fragmentController.openFragment(
+            this,
+            fragment,
+            fragmentOptionsBuilder {
+                fragmentLayout = R.id.fragment_detail
+            },
+
+        )
     }
 
     override fun onDestroy() {
@@ -38,7 +43,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-
         super.onSaveInstanceState(outState)
     }
 

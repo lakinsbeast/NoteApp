@@ -1,6 +1,6 @@
 package code.with.me.testroomandnavigationdrawertest.markdown
 
-//interface ITextChecker {
+// interface ITextChecker {
 //    fun checkWhichStar(text: String, index: Int): Star
 //    fun checkToStrikethrough(text: String, index: Int): Boolean
 //    fun checkHeading(text: String, index: Int): Heading
@@ -8,14 +8,20 @@ package code.with.me.testroomandnavigationdrawertest.markdown
 //    fun checkFirstNewLine(text: String, index: Int): Int
 //    fun checkFirstSpace(text: String, index: Int): Int
 //
-//}
+// }
 
 interface ITextCheckerT<T> {
-    fun checkText(text: String, index: Int): T
+    fun checkText(
+        text: String,
+        index: Int,
+    ): T
 }
 
 class StarTextCheckerImpl : ITextCheckerT<Star> {
-    override fun checkText(text: String, index: Int): Star {
+    override fun checkText(
+        text: String,
+        index: Int,
+    ): Star {
         if (text.getOrNull(index - 1) != null) {
             if (text[index - 1] == '\\') {
                 return Star.Empty
@@ -35,7 +41,10 @@ class StarTextCheckerImpl : ITextCheckerT<Star> {
 }
 
 class StrikethroughTextCheckerImpl : ITextCheckerT<Boolean> {
-    override fun checkText(text: String, index: Int): Boolean {
+    override fun checkText(
+        text: String,
+        index: Int,
+    ): Boolean {
         if (text.getOrNull(index + 1) != null) {
             if (text[index + 1] == '~') {
                 return true
@@ -46,12 +55,23 @@ class StrikethroughTextCheckerImpl : ITextCheckerT<Boolean> {
 }
 
 interface IHeadingChecker : ITextCheckerT<Heading> {
-    override fun checkText(text: String, index: Int): Heading
-    fun checkHeadingIsAvailable(text: String, fromIndex: Int, toIndex: Int): Int
+    override fun checkText(
+        text: String,
+        index: Int,
+    ): Heading
+
+    fun checkHeadingIsAvailable(
+        text: String,
+        fromIndex: Int,
+        toIndex: Int,
+    ): Int
 }
 
 class HeadingTextCheckerImpl : IHeadingChecker {
-    override fun checkText(text: String, index: Int): Heading {
+    override fun checkText(
+        text: String,
+        index: Int,
+    ): Heading {
         when (checkHeadingIsAvailable(text, index, index + 5)) {
             6 -> {
                 return Heading.SixthHeading
@@ -62,7 +82,6 @@ class HeadingTextCheckerImpl : IHeadingChecker {
             }
 
             4 -> {
-
                 return Heading.FourthHeading
             }
 
@@ -84,7 +103,11 @@ class HeadingTextCheckerImpl : IHeadingChecker {
         }
     }
 
-    override fun checkHeadingIsAvailable(text: String, fromIndex: Int, toIndex: Int): Int {
+    override fun checkHeadingIsAvailable(
+        text: String,
+        fromIndex: Int,
+        toIndex: Int,
+    ): Int {
         var fromI = fromIndex
         var count = 0
         while (fromI <= toIndex) {
@@ -105,7 +128,10 @@ class HeadingTextCheckerImpl : IHeadingChecker {
 }
 
 class FirstNewLineTextCheckerImpl : ITextCheckerT<Int> {
-    override fun checkText(text: String, index: Int): Int {
+    override fun checkText(
+        text: String,
+        index: Int,
+    ): Int {
         var i = index
         while (i < text.length - 1) {
             if (text[i] == '\n') {
@@ -118,7 +144,10 @@ class FirstNewLineTextCheckerImpl : ITextCheckerT<Int> {
 }
 
 class FirstSpaceTextCheckerImpl : ITextCheckerT<Int> {
-    override fun checkText(text: String, index: Int): Int {
+    override fun checkText(
+        text: String,
+        index: Int,
+    ): Int {
         var i = index
         while (i < text.length - 1) {
             if (text[i] == ' ') {
@@ -129,4 +158,3 @@ class FirstSpaceTextCheckerImpl : ITextCheckerT<Int> {
         return i
     }
 }
-

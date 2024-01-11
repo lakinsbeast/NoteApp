@@ -1,6 +1,5 @@
 package code.with.me.testroomandnavigationdrawertest.domain.repo
 
-import code.with.me.testroomandnavigationdrawertest.data.data_classes.FolderTag
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.NoteTag
 import kotlinx.coroutines.flow.Flow
 

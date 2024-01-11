@@ -5,9 +5,8 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import code.with.me.testroomandnavigationdrawertest.data.const.const
 
-
 val Context.dataStoreInit by preferencesDataStore(
-    name = const.appSettings
+    name = const.appSettings,
 )
 
 object DropboxInfo {
@@ -15,6 +14,4 @@ object DropboxInfo {
     val CLIENT_APP = "qbfifjaqizhpc5t"
     val CLIENT_SECRET = "83njhmsgvfr2lht"
     val GET_TOKEN_URL = "https://api.dropboxapi.com/"
-
-
 }

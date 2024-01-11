@@ -6,20 +6,16 @@ import android.graphics.Color
 import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.FileProvider
 import androidx.core.view.drawToBitmap
 import androidx.fragment.app.setFragmentResult
-import androidx.navigation.fragment.findNavController
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.data.Utils.println
-import code.with.me.testroomandnavigationdrawertest.data.Utils.providerName
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityPaintBinding
 import code.with.me.testroomandnavigationdrawertest.file.FilesController
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
@@ -27,13 +23,10 @@ import code.with.me.testroomandnavigationdrawertest.ui.fragment.MakeNoteFragment
 import com.flask.colorpicker.ColorPickerView
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import java.io.ByteArrayOutputStream
-import java.io.File
 import java.io.FileOutputStream
 import java.lang.Exception
 import java.util.*
 import javax.inject.Inject
-
 
 class PaintSheet : BaseSheet<ActivityPaintBinding>(ActivityPaintBinding::inflate) {
     private var drawuri: Uri? = null
@@ -44,7 +37,10 @@ class PaintSheet : BaseSheet<ActivityPaintBinding>(ActivityPaintBinding::inflate
     @Inject
     lateinit var filesController: FilesController
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         initAppComponent()
         super.onViewCreated(view, savedInstanceState)
         setUpClickListeners()
@@ -87,32 +83,34 @@ class PaintSheet : BaseSheet<ActivityPaintBinding>(ActivityPaintBinding::inflate
             try {
                 val bitmap: Bitmap = binding.paintCanvas.drawToBitmap()
 
-                val file = filesController.saveToInternalStorage(
-                    requireContext(),
-                    "draw_${Calendar.getInstance().timeInMillis}_${
-                        SimpleDateFormat(
-                            "yyyyMMddHHmmSS",
-                            Locale.getDefault()
-                        ).format(Date())
-                    }.jpg"
-                )
+                val file =
+                    filesController.saveToInternalStorage(
+                        requireContext(),
+                        "draw_${Calendar.getInstance().timeInMillis}_${
+                            SimpleDateFormat(
+                                "yyyyMMddHHmmSS",
+                                Locale.getDefault(),
+                            ).format(Date())
+                        }.jpg",
+                    )
                 FileOutputStream(file).use { outputStream ->
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream)
                     outputStream.flush()
                 }
-                drawuri = filesController.getUriForFile(
-                    requireContext(),
-                    file!!
-                )
+                drawuri =
+                    filesController.getUriForFile(
+                        requireContext(),
+                        file!!,
+                    )
 
-                val resultIntent = Bundle().apply {
-                    this.putString("pathBitmap", drawuri.toString())
-                }
+                val resultIntent =
+                    Bundle().apply {
+                        this.putString("pathBitmap", drawuri.toString())
+                    }
                 setFragmentResult(paintResultKey, resultIntent)
                 dismiss()
-
             } catch (e: Exception) {
-                println("Error in ${javaClass.simpleName} error is ${e}")
+                println("Error in ${javaClass.simpleName} error is $e")
                 Toast.makeText(context, "Something went wrong", Toast.LENGTH_LONG).show()
                 e.printStackTrace()
             }
@@ -153,24 +151,26 @@ class PaintSheet : BaseSheet<ActivityPaintBinding>(ActivityPaintBinding::inflate
         binding.strokeWidth.setOnClickListener {
             if (!isClicked) {
                 binding.brushLayout.visibility = View.VISIBLE
-                binding.seekBar.setOnSeekBarChangeListener(object :
-                    SeekBar.OnSeekBarChangeListener {
-                    override fun onProgressChanged(
-                        seekBar: SeekBar?,
-                        progress: Int,
-                        fromUser: Boolean
-                    ) {
-                        binding.paintCanvas.setStrokeWidth(progress.toFloat())
-                        binding.brushSize.requestLayout()
-                        brushSizeForUndo = progress.toFloat()
-                        binding.brushSize.layoutParams.width = progress.toFloat().toInt() + 5
-                        binding.brushSize.layoutParams.height = progress.toFloat().toInt() + 5
-                    }
+                binding.seekBar.setOnSeekBarChangeListener(
+                    object :
+                        SeekBar.OnSeekBarChangeListener {
+                        override fun onProgressChanged(
+                            seekBar: SeekBar?,
+                            progress: Int,
+                            fromUser: Boolean,
+                        ) {
+                            binding.paintCanvas.setStrokeWidth(progress.toFloat())
+                            binding.brushSize.requestLayout()
+                            brushSizeForUndo = progress.toFloat()
+                            binding.brushSize.layoutParams.width = progress.toFloat().toInt() + 5
+                            binding.brushSize.layoutParams.height = progress.toFloat().toInt() + 5
+                        }
 
-                    override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+                        override fun onStartTrackingTouch(seekBar: SeekBar?) {}
 
-                    override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-                })
+                        override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+                    },
+                )
                 isClicked = true
             } else {
                 binding.brushLayout.visibility = View.INVISIBLE
@@ -188,7 +188,7 @@ class PaintSheet : BaseSheet<ActivityPaintBinding>(ActivityPaintBinding::inflate
                     Toast.makeText(
                         requireContext(),
                         "Вы выбрали  \"нет\"",
-                        Toast.LENGTH_SHORT
+                        Toast.LENGTH_SHORT,
                     ).show()
                 }.show()
         }
@@ -208,7 +208,6 @@ class PaintSheet : BaseSheet<ActivityPaintBinding>(ActivityPaintBinding::inflate
                     colorBrush = selectedColor
                 }
                 .setPositiveButton("ok") { _, _, _ ->
-
                 }
                 .setNegativeButton("cancel") { _, _ -> }
                 .build()
@@ -223,6 +222,5 @@ class PaintSheet : BaseSheet<ActivityPaintBinding>(ActivityPaintBinding::inflate
             canUserDraw(true)
         }
         binding.paintBtn.setBackgroundColor(R.drawable.roundcorners)
-
     }
 }

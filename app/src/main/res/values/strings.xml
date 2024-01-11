@@ -28,5 +28,6 @@
     <string name="useFolderSettings">Использовать папки?</string>
     <string name="settingTheFolder">Настроить папки</string>
     <string name="useABehindBlurQ">Использовать размытие за окнами?</string>
-    <string name="useABackgroundBlurQ">Использовать размытие фона? (пока не работает)</string>
+    <string name="useABackgroundBlurQ">Использовать размытие фона?</string>
+    <string name="search">Поиск:</string>
 </resources>

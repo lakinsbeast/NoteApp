@@ -13,14 +13,15 @@ class FolderTag(
     val lastTimestampOpen: Long,
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0,
-
-    ) : Identifiable, Parcelable {
-
+) : Identifiable, Parcelable {
     override fun describeContents(): Int {
         return 0
     }
 
-    override fun writeToParcel(dest: Parcel, flags: Int) {
+    override fun writeToParcel(
+        dest: Parcel,
+        flags: Int,
+    ) {
         dest.writeString(name)
         dest.writeLong(lastTimestampCreate)
         dest.writeLong(lastTimestampEdited)

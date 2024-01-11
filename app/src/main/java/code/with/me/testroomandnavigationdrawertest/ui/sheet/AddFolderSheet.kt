@@ -13,8 +13,8 @@ import code.with.me.testroomandnavigationdrawertest.data.Utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Folder
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.FolderTag
 import code.with.me.testroomandnavigationdrawertest.databinding.AddFolderBottomSheetBinding
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderViewModel
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +26,8 @@ import javax.inject.Inject
 import javax.inject.Named
 import kotlin.coroutines.CoroutineContext
 
-class AddFolderSheet : BaseSheet<AddFolderBottomSheetBinding>(AddFolderBottomSheetBinding::inflate),
+class AddFolderSheet :
+    BaseSheet<AddFolderBottomSheetBinding>(AddFolderBottomSheetBinding::inflate),
     CoroutineScope {
     private val TAG = "AddFolderSheet"
 
@@ -38,7 +39,10 @@ class AddFolderSheet : BaseSheet<AddFolderBottomSheetBinding>(AddFolderBottomShe
     private val selectedChips = mutableListOf<Long>()
     private val isFavorite = false
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         initAppComponent()
         initViewModel()
@@ -67,22 +71,24 @@ class AddFolderSheet : BaseSheet<AddFolderBottomSheetBinding>(AddFolderBottomShe
             listTags?.forEach { parcel ->
                 val folderTag = parcel as? FolderTag
                 folderTag?.let {
-                    val chip = Chip(
-                        binding.chipGroup.context,
-                        null,
-                        com.google.android.material.R.style.Widget_MaterialComponents_Chip_Filter
-                    )
+                    val chip =
+                        Chip(
+                            binding.chipGroup.context,
+                            null,
+                            com.google.android.material.R.style.Widget_MaterialComponents_Chip_Filter,
+                        )
                     chip.text = it.name
                     chip.isClickable = true
                     chip.isCheckable = false
                     chip.setChipBackgroundColorResource(R.color.white)
                     chip.chipStrokeWidth = 2f
-                    chip.chipStrokeColor = ColorStateList.valueOf(
-                        ContextCompat.getColor(
-                            requireContext(),
-                            R.color.black
+                    chip.chipStrokeColor =
+                        ColorStateList.valueOf(
+                            ContextCompat.getColor(
+                                requireContext(),
+                                R.color.black,
+                            ),
                         )
-                    )
                     chip.chipCornerRadius = 15f
                     chip.setOnClickListener { view ->
                         if (selectedChips.contains(it.id)) {
@@ -114,12 +120,12 @@ class AddFolderSheet : BaseSheet<AddFolderBottomSheetBinding>(AddFolderBottomShe
                 folderViewModel.insertFolder(
                     Folder(
                         name = text.toString(),
-                        lastTimestampCreate= System.currentTimeMillis(),
+                        lastTimestampCreate = System.currentTimeMillis(),
                         lastTimestampEdit = System.currentTimeMillis(),
                         lastTimestampOpen = System.currentTimeMillis(),
                         tags = selectedChips.joinToString(","),
-                        isFavorite = isFavorite
-                    )
+                        isFavorite = isFavorite,
+                    ),
                 )
             }
             findNavController().popBackStack()

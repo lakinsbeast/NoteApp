@@ -24,7 +24,6 @@ import javax.inject.Named
 
 class CreateFolderDialog() :
     BaseDialog<CreateFolderDialogBinding>(CreateFolderDialogBinding::inflate) {
-
     private var selectedChip = -2
     private var selectedText = ""
 
@@ -33,24 +32,33 @@ class CreateFolderDialog() :
     lateinit var folderVmFactory: ViewModelProvider.Factory
     private lateinit var folderViewModel: FolderViewModel
 
-    private var textRunnable = object : TextWatcher {
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-        }
+    private var textRunnable =
+        object : TextWatcher {
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int,
+            ) {
+            }
 
-        override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {
-            binding.apply {
-                text.println()
-                if (text != null) {
-                    findTextGroupChip(text)
+            override fun onTextChanged(
+                text: CharSequence?,
+                start: Int,
+                before: Int,
+                count: Int,
+            ) {
+                binding.apply {
+                    text.println()
+                    if (text != null) {
+                        findTextGroupChip(text)
+                    }
                 }
             }
+
+            override fun afterTextChanged(s: Editable?) {
+            }
         }
-
-        override fun afterTextChanged(s: Editable?) {
-
-        }
-
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         initAppComponent()
@@ -58,7 +66,10 @@ class CreateFolderDialog() :
         initViewModel()
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         initClickListeners()
         initTextListeners()
@@ -67,7 +78,6 @@ class CreateFolderDialog() :
         generateChip()
         setCornerRounded(binding.mainLayout)
         listenVM()
-
     }
 
     private fun initAppComponent() {
@@ -82,7 +92,7 @@ class CreateFolderDialog() :
         folderViewModel =
             ViewModelProvider(
                 (context as MainActivity).viewModelStore,
-                folderVmFactory
+                folderVmFactory,
             )[FolderViewModel::class.java]
     }
 
@@ -154,8 +164,8 @@ class CreateFolderDialog() :
                             System.currentTimeMillis(),
                             System.currentTimeMillis(),
                             "",
-                            isFavoriteSwitch.isChecked
-                        )
+                            isFavoriteSwitch.isChecked,
+                        ),
                     )
                 }
                 dismiss()
@@ -163,28 +173,29 @@ class CreateFolderDialog() :
         }
     }
 
-    val folderNames = mutableListOf(
-        "🏞️ Путешествия",
-        "🍽️ Еда и рецепты",
-        "🎥 Развлечения",
-        "💡 Идеи и планы",
-        "🚗 Транспорт",
-        "🎓 Образование",
-        "🎂 События и праздники",
-        "💰 Финансы",
-        "📅 Планирование",
-        "🎨 Творчество",
-        "📰 Новости",
-        "🏋️ Фитнес и здоровье",
-        "🏡 Дом и быт",
-        "🌍 Планы на путешествия",
-        "📚 Книги и чтение",
-        "🎯 Цели и достижения",
-        "🎵 Музыка",
-        "💼 Работа и задачи",
-        "🌆 Городская жизнь",
-        "🌱 Хобби и увлечения"
-    )
+    val folderNames =
+        mutableListOf(
+            "🏞️ Путешествия",
+            "🍽️ Еда и рецепты",
+            "🎥 Развлечения",
+            "💡 Идеи и планы",
+            "🚗 Транспорт",
+            "🎓 Образование",
+            "🎂 События и праздники",
+            "💰 Финансы",
+            "📅 Планирование",
+            "🎨 Творчество",
+            "📰 Новости",
+            "🏋️ Фитнес и здоровье",
+            "🏡 Дом и быт",
+            "🌍 Планы на путешествия",
+            "📚 Книги и чтение",
+            "🎯 Цели и достижения",
+            "🎵 Музыка",
+            "💼 Работа и задачи",
+            "🌆 Городская жизнь",
+            "🌱 Хобби и увлечения",
+        )
 
     private fun generateChip() {
         binding.chipGroup.removeAllViewsInLayout()
@@ -198,6 +209,4 @@ class CreateFolderDialog() :
         }
         clearAllSelectedChip()
     }
-
-
 }

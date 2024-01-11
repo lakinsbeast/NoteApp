@@ -19,7 +19,7 @@ import javax.inject.Inject
 interface Formatter
 
 interface StarFormatter : Formatter {
-    //STAR--------------------------------------
+    // STAR--------------------------------------
     var starStack: Stack<Int>
     var starHash: HashMap<Int, Int>
 
@@ -29,9 +29,12 @@ interface StarFormatter : Formatter {
     var threeStarStack: Stack<Int>
     var threeStarHash: HashMap<Int, Int>
 
-    //--------------------------------------
+    // --------------------------------------
 
-    fun handleStarFormatting(text: String, index: Int): Star
+    fun handleStarFormatting(
+        text: String,
+        index: Int,
+    ): Star
 }
 
 class StarFormatterImpl(private val textChecker: ITextCheckerT<Star>) : StarFormatter {
@@ -43,9 +46,10 @@ class StarFormatterImpl(private val textChecker: ITextCheckerT<Star>) : StarForm
 
     override var threeStarStack = Stack<Int>()
     override var threeStarHash = HashMap<Int, Int>()
+
     override fun handleStarFormatting(
         text: String,
-        index: Int
+        index: Int,
     ): Star {
         when (textChecker.checkText(text, index)) {
             Star.Empty -> {
@@ -88,13 +92,16 @@ class StarFormatterImpl(private val textChecker: ITextCheckerT<Star>) : StarForm
 }
 
 interface StrikethroughFormatter : Formatter {
-    //STRIKETHROUGH--------------------------------------
+    // STRIKETHROUGH--------------------------------------
     var strikethroughStack: Stack<Int>
     var strikethroughHash: HashMap<Int, Int>
 
-    //--------------------------------------
+    // --------------------------------------
 
-    fun handleStrikethroughFormatter(text: String, index: Int): Boolean
+    fun handleStrikethroughFormatter(
+        text: String,
+        index: Int,
+    ): Boolean
 }
 
 class StrikethroughFormatterImpl(private val textChecker: ITextCheckerT<Boolean>) :
@@ -104,7 +111,7 @@ class StrikethroughFormatterImpl(private val textChecker: ITextCheckerT<Boolean>
 
     override fun handleStrikethroughFormatter(
         text: String,
-        index: Int
+        index: Int,
     ): Boolean {
         return when (textChecker.checkText(text, index)) {
             true -> {
@@ -125,7 +132,7 @@ class StrikethroughFormatterImpl(private val textChecker: ITextCheckerT<Boolean>
 }
 
 interface HeadingFormatter : Formatter {
-    //HEADING--------------------------------------
+    // HEADING--------------------------------------
     var firstHeadingHash: HashMap<Int, Int>
     var secondHeadingHash: HashMap<Int, Int>
     var thirdHeadingHash: HashMap<Int, Int>
@@ -133,15 +140,18 @@ interface HeadingFormatter : Formatter {
     var fifthHeadingHash: HashMap<Int, Int>
     var sixthHeadingHash: HashMap<Int, Int>
 
-    //--------------------------------------
+    // --------------------------------------
     var firstNewLineTextChecker: ITextCheckerT<Int>
 
-    fun handleHeadingFormatter(text: String, index: Int): Heading
+    fun handleHeadingFormatter(
+        text: String,
+        index: Int,
+    ): Heading
 }
 
 class HeadingFormatterImpl(
     private val textChecker: ITextCheckerT<Heading>,
-    firstNewLineTC: ITextCheckerT<Int>
+    firstNewLineTC: ITextCheckerT<Int>,
 ) : HeadingFormatter {
     override var firstNewLineTextChecker: ITextCheckerT<Int> = firstNewLineTC
 
@@ -152,8 +162,10 @@ class HeadingFormatterImpl(
     override var fifthHeadingHash = HashMap<Int, Int>()
     override var sixthHeadingHash = HashMap<Int, Int>()
 
-
-    override fun handleHeadingFormatter(text: String, index: Int): Heading {
+    override fun handleHeadingFormatter(
+        text: String,
+        index: Int,
+    ): Heading {
         when (textChecker.checkText(text, index)) {
             Heading.FirstHeading -> {
                 return Heading.FirstHeading
@@ -161,12 +173,10 @@ class HeadingFormatterImpl(
 
             Heading.SecondHeading -> {
                 return Heading.SecondHeading
-
             }
 
             Heading.ThreeHeading -> {
                 return Heading.ThreeHeading
-
             }
 
             Heading.FourthHeading -> {
@@ -185,24 +195,33 @@ class HeadingFormatterImpl(
 }
 
 interface BlockQuoteFormatter : Formatter {
-    //BlockQuote--------------------------------------
+    // BlockQuote--------------------------------------
     var blockQuoteHash: HashMap<Int, Int>
     var firstNewLineTextChecker: ITextCheckerT<Int>
 
-    fun handleBlockQuote(text: String, index: Int)
+    fun handleBlockQuote(
+        text: String,
+        index: Int,
+    )
 }
 
 class BlockQuoteFormatterImpl(override var firstNewLineTextChecker: ITextCheckerT<Int>) :
     BlockQuoteFormatter {
     override var blockQuoteHash = HashMap<Int, Int>()
 
-    override fun handleBlockQuote(text: String, index: Int) {
+    override fun handleBlockQuote(
+        text: String,
+        index: Int,
+    ) {
         blockQuoteHash[index] = firstNewLineTextChecker.checkText(text, index)
     }
 }
 
 interface ReferenceFormatter : Formatter {
-    fun handleReference(text: String, index: Int)
+    fun handleReference(
+        text: String,
+        index: Int,
+    )
 }
 
 interface ReferenceSquareFormatter : ReferenceFormatter {
@@ -221,8 +240,10 @@ class ReferenceSquareFormatterImpl(override var firstSpaceTextCheckerImpl: IText
     override var referenceSquareStack = Stack<Int>()
     override var referenceSquareHash = HashMap<Int, Int>()
 
-
-    override fun handleReference(text: String, index: Int) {
+    override fun handleReference(
+        text: String,
+        index: Int,
+    ) {
         println("ReferenceSquareFormatterImpl handleReference index:$index")
         if (referenceSquareStack.isEmpty()) {
             referenceSquareStack.push(index)
@@ -232,16 +253,17 @@ class ReferenceSquareFormatterImpl(override var firstSpaceTextCheckerImpl: IText
             referenceSquareStack.pop()
             println("poped")
         }
-
     }
 }
-
 
 class ReferenceBracketFormatterImpl : ReferenceBracketFormatter {
     override var referenceBracketStack = Stack<Int>()
     override var referenceBracketHash = HashMap<Int, Int>()
 
-    override fun handleReference(text: String, index: Int) {
+    override fun handleReference(
+        text: String,
+        index: Int,
+    ) {
         if (referenceBracketStack.isEmpty()) {
             referenceBracketStack.push(index)
         } else {
@@ -249,11 +271,10 @@ class ReferenceBracketFormatterImpl : ReferenceBracketFormatter {
             referenceBracketStack.pop()
         }
     }
-
 }
 
 abstract class IStringToMarkdownTextParser(
-    vararg formatter: Formatter
+    vararg formatter: Formatter,
 ) : IMarkdownTextParser {
     var text: String = ""
     var index1: Int = 0
@@ -278,7 +299,6 @@ abstract class IStringToMarkdownTextParser(
     lateinit var referenceBracketFormatter: ReferenceBracketFormatter
     lateinit var referenceSquareFormatter: ReferenceSquareFormatter
 
-
     var skipIteration = false
     var skipTwoIteration = false
     var skipThreeIteration = false
@@ -291,7 +311,6 @@ abstract class IStringToMarkdownTextParser(
             this@IStringToMarkdownTextParser.text = text
 
             while (index1 < this@IStringToMarkdownTextParser.text.length) {
-
                 /**
                  * change to :
                  * val skipIterations = arrayOf(skipIteration, skipTwoIteration, skipThreeIteration, skipFourthIteration, skipFifthIteration, skipSixthIteration)
@@ -381,14 +400,13 @@ abstract class IStringToMarkdownTextParser(
         val referenceBracketHash = referenceBracketFormatter.referenceBracketHash
         val referenceSquareHash = referenceSquareFormatter.referenceSquareHash
 
-
         if (starHash.isNotEmpty()) {
             starHash.forEach { (key, value) ->
                 spannableString.setSpan(
                     StyleSpan(Typeface.ITALIC),
                     key,
                     value,
-                    0
+                    0,
                 )
             }
         }
@@ -398,7 +416,7 @@ abstract class IStringToMarkdownTextParser(
                     StyleSpan(Typeface.BOLD),
                     key,
                     value,
-                    0
+                    0,
                 )
             }
         }
@@ -408,7 +426,7 @@ abstract class IStringToMarkdownTextParser(
                     StyleSpan(Typeface.BOLD_ITALIC),
                     key,
                     value,
-                    0
+                    0,
                 )
             }
         }
@@ -418,7 +436,7 @@ abstract class IStringToMarkdownTextParser(
                     StrikethroughSpan(),
                     key,
                     value,
-                    0
+                    0,
                 )
             }
         }
@@ -429,7 +447,7 @@ abstract class IStringToMarkdownTextParser(
                     AbsoluteSizeSpan(35, true),
                     key,
                     value,
-                    0
+                    0,
                 )
             }
         }
@@ -439,7 +457,7 @@ abstract class IStringToMarkdownTextParser(
                     AbsoluteSizeSpan(30, true),
                     key,
                     value,
-                    0
+                    0,
                 )
             }
         }
@@ -449,7 +467,7 @@ abstract class IStringToMarkdownTextParser(
                     AbsoluteSizeSpan(25, true),
                     key,
                     value,
-                    0
+                    0,
                 )
             }
         }
@@ -459,7 +477,7 @@ abstract class IStringToMarkdownTextParser(
                     AbsoluteSizeSpan(20, true),
                     key,
                     value,
-                    0
+                    0,
                 )
             }
         }
@@ -469,7 +487,7 @@ abstract class IStringToMarkdownTextParser(
                     AbsoluteSizeSpan(15, true),
                     key,
                     value,
-                    0
+                    0,
                 )
             }
         }
@@ -479,7 +497,7 @@ abstract class IStringToMarkdownTextParser(
                     AbsoluteSizeSpan(10, true),
                     key,
                     value,
-                    0
+                    0,
                 )
             }
         }
@@ -493,11 +511,9 @@ abstract class IStringToMarkdownTextParser(
                     },
                     key,
                     value,
-                    0
+                    0,
                 )
             }
-
-
         }
 
         val refs = mutableListOf<String>()
@@ -522,11 +538,10 @@ abstract class IStringToMarkdownTextParser(
                         override fun onClick(widget: View) {
                             println("FJLKSAJFLKSJAFJLKSAJ")
                         }
-
                     },
                     key,
                     referenceSquareFormatter.firstSpaceTextCheckerImpl.checkText(text, value),
-                    0
+                    0,
                 )
                 i++
             }
@@ -534,17 +549,21 @@ abstract class IStringToMarkdownTextParser(
         return spannableString
     }
 
-
-    open suspend fun doWithTextNew(textParam: String, index: Int) {
+    open suspend fun doWithTextNew(
+        textParam: String,
+        index: Int,
+    ) {
         withContext(Dispatchers.Default) {
             async {
                 println("index before:$index")
                 if (textParam[index] == '*') {
                     println("index:$index")
-                    when (starFormatter.handleStarFormatting(
-                        text,
-                        index
-                    )) {
+                    when (
+                        starFormatter.handleStarFormatting(
+                            text,
+                            index,
+                        )
+                    ) {
                         Star.Empty -> {}
                         Star.OneStar -> {
                             index1--
@@ -562,25 +581,28 @@ abstract class IStringToMarkdownTextParser(
                         }
                     }
                 } else if (textParam[index] == '~') {
-                    when (strikethroughFormatter.handleStrikethroughFormatter(
-                        text,
-                        index
-                    )) {
+                    when (
+                        strikethroughFormatter.handleStrikethroughFormatter(
+                            text,
+                            index,
+                        )
+                    ) {
                         true -> {
                             index1--
                             text = text.removeRange(index, index + 2)
                         }
 
                         else -> {
-
                         }
                     }
                 } else if (textParam[index] == '#') {
                     headingFormatter.apply {
-                        when (headingFormatter.handleHeadingFormatter(
-                            text,
-                            index
-                        )) {
+                        when (
+                            headingFormatter.handleHeadingFormatter(
+                                text,
+                                index,
+                            )
+                        ) {
                             Heading.FirstHeading -> {
                                 text = text.removeRange(index, index + 1)
                                 firstHeadingHash[index] =
@@ -621,13 +643,12 @@ abstract class IStringToMarkdownTextParser(
                                 sixthHeadingHash[index] =
                                     firstNewLineTextChecker.checkText(
                                         text,
-                                        index + 6
+                                        index + 6,
                                     )
                                 println("after text: $text")
                             }
                         }
                     }
-
                 } else if (textParam[index] == '>') {
                     // Не работает
                     blockquoteFormatter.handleBlockQuote(text, index)
@@ -642,13 +663,14 @@ abstract class IStringToMarkdownTextParser(
                     index1 -= 1
                     text = text.removeRange(index, index + 1)
                 } else {
-
                 }
             }.await()
         }
     }
 }
 
-class StringToMarkdownTextParser @Inject constructor(
-    vararg formatter: Formatter
-) : IStringToMarkdownTextParser(*formatter)
+class StringToMarkdownTextParser
+    @Inject
+    constructor(
+        vararg formatter: Formatter,
+    ) : IStringToMarkdownTextParser(*formatter)

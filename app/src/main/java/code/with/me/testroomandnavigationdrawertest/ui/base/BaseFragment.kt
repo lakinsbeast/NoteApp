@@ -10,17 +10,15 @@ import code.with.me.testroomandnavigationdrawertest.data.Utils.findActivity
 
 abstract class BaseFragment<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?, Boolean) -> VB)) :
     Fragment() {
-
     private var _binding: VB? = null
     val binding get() = _binding!!
-
 
     fun activity() = findActivity(requireContext())
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         _binding = get(inflater, container, false)
         return binding.root
@@ -30,10 +28,8 @@ abstract class BaseFragment<VB : ViewBinding>(val get: ((LayoutInflater, ViewGro
         parentFragmentManager.beginTransaction().remove(this).commit()
     }
 
-
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
     }
-
 }

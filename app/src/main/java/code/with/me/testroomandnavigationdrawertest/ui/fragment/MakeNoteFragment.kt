@@ -1,23 +1,25 @@
 package code.with.me.testroomandnavigationdrawertest.ui.fragment
 
 import android.Manifest
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
-import android.text.Editable
-import android.text.SpannableString
-import android.text.TextWatcher
-import android.text.style.StrikethroughSpan
-import android.text.style.StyleSpan
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
+import android.view.animation.LinearInterpolator
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.FragmentActivity
@@ -29,7 +31,6 @@ import code.with.me.testroomandnavigationdrawertest.AlertCreator
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.PermissionController
 import code.with.me.testroomandnavigationdrawertest.R
-import code.with.me.testroomandnavigationdrawertest.data.Utils.mainScope
 import code.with.me.testroomandnavigationdrawertest.data.Utils.println
 import code.with.me.testroomandnavigationdrawertest.data.Utils.setCheckable
 import code.with.me.testroomandnavigationdrawertest.data.Utils.setRoundedCorners
@@ -45,19 +46,14 @@ import code.with.me.testroomandnavigationdrawertest.ui.sheet.PaintSheet
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MakeNoteViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.UserActionNote
 import com.bumptech.glide.Glide
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import java.util.Stack
 import javax.inject.Inject
 import javax.inject.Named
-
 
 class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBinding::inflate) {
     private var cameraUri: Uri? = null
@@ -73,7 +69,6 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
     @Inject
     lateinit var filesController: FilesController
 
-
     private fun openPaintSheet() {
         val paintSheet = PaintSheet()
         (activity as MainActivity).let { activity ->
@@ -81,7 +76,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         }
     }
 
-    //попробовать сделать UUID вместо случайных названий фоток
+    // попробовать сделать UUID вместо случайных названий фоток
     private var request =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             makeNoteViewModel.currentPermission.observe(viewLifecycleOwner) { currentPermission ->
@@ -112,7 +107,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
             if (imageUri != null) {
                 activity?.contentResolver?.takePersistableUriPermission(
                     imageUri,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
                 )
                 makeNoteViewModel.getImageFromGallery(imageUri)
                 saveNote()
@@ -137,7 +132,6 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         const val paintResultKey = "paintResultKey"
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val appComponent = (requireActivity().application as NotesApplication).appComponent
@@ -145,7 +139,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         makeNoteViewModel =
             ViewModelProvider(this, factory)[MakeNoteViewModel::class.java]
         listenPaintSheetResult()
-        //TODO иногда не создает в папках заметки
+        // TODO иногда не создает в папках заметки
         if (arguments?.getLong("idFolder") != null && arguments?.getLong("idFolder") != -1L) {
             makeNoteViewModel.setFolderId(arguments?.getLong("idFolder")!!)
         } else {
@@ -175,21 +169,28 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         makeNoteViewModel.saveNote()
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         initUI()
         initAdapter()
-        initClickListeners()
-        initOnEditorActionListener()
         initViewModel()
-        initTextChangeListeners()
         setBottomMarginBottomNav(20)
+
+        //установил задержку, потому что при открытии фрагмента с анимацией есть фризы
+        Handler(Looper.getMainLooper()).postDelayed({
+            initClickListeners()
+//            initOnEditorActionListener()
+            initTextChangeListeners()
+        }, 150)
     }
+
 
     private fun initOnEditorActionListener() {
         binding.apply {
-
-            //not work
+            // not work
             textEdit.setOnEditorActionListener { v, actionId, event ->
                 when (actionId) {
                     EditorInfo.IME_ACTION_DONE -> {
@@ -295,7 +296,6 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
                 textEdit.setText(it.textNote)
                 adapter.submitList(it.listOfImages.toMutableList())
                 adapter.notifyDataSetChanged()
-
             }
         }
     }
@@ -335,8 +335,12 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
             PhotoItemBinding.inflate(layoutInflater, binding.photoList.parent as ViewGroup, false)
         binding.bottomNavigation.setRoundedCorners(32f)
         binding.bottomNavigation.setCheckable()
-    }
+        if (makeNoteViewModel.noteId != -1L) {
+            binding.textEdit.hint = ""
+            binding.titleEdit.hint = ""
 
+        }
+    }
 
     private fun setBottomMarginBottomNav(animatedValue: Int) {
         val layParams =
@@ -349,19 +353,19 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         getImageFromGallery.launch(arrayOf("image/*"))
     }
 
-
     private fun openCamera() {
         activity?.let {
             if (it.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED || it.checkSelfPermission(
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 ) == PackageManager.PERMISSION_DENIED
             ) {
                 makeNoteViewModel.setPermission(MakeNoteViewModel.Companion.TypeOfPermission.CAMERA)
 //                currentPermission = TypeOfPermission.CAMERA
                 request.launch(
                     arrayOf(
-                        Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE
-                    )
+                        Manifest.permission.CAMERA,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    ),
                 )
             } else {
                 makeCameraFileAndOpenCamera(it)
@@ -369,35 +373,38 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         }
     }
 
-    //пока не знаю как быть с этой функцией, думаю какую-то часть перенести во вьюмодельку, но нужно будет инжектить filesController
+    // пока не знаю как быть с этой функцией, думаю какую-то часть перенести во вьюмодельку, но нужно будет инжектить filesController
     private fun makeCameraFileAndOpenCamera(it: FragmentActivity): Job {
         val timeStamp = SimpleDateFormat("yyyyMMddHHmmSS", Locale.getDefault()).format(Date())
 
-        val file = filesController.saveToInternalStorage(
-            it,
-            "image_${Calendar.getInstance().timeInMillis}_${timeStamp}.jpg"
-        )
+        val file =
+            filesController.saveToInternalStorage(
+                it,
+                "image_${Calendar.getInstance().timeInMillis}_$timeStamp.jpg",
+            )
         file?.createNewFile()
-        cameraUri = filesController.getUriForFile(
-            it,
-            file!!
-        )
+        cameraUri =
+            filesController.getUriForFile(
+                it,
+                file!!,
+            )
         return lifecycleScope.launch {
             getImageFromCamera.launch(
-                cameraUri
+                cameraUri,
             )
         }
     }
 
     private fun initAdapter() {
-        adapter = object : BaseAdapter<PhotoModel, PhotoItemBinding>(photoItem) {
-            private var selected0 = -1
+        adapter =
+            object : BaseAdapter<PhotoModel, PhotoItemBinding>(photoItem) {
+                private var selected0 = -1
 
 //            init {
 //                clickListener = {
 //                    selected0 = it.layoutPosition
 //                    val item = getItem(it.layoutPosition) as PhotoModel
-////                    openDetailFragment(item.id)
+// //                    openDetailFragment(item.id)
 //                }
 //                onLongClickListener = {
 //                    selected0 = it.layoutPosition
@@ -405,12 +412,13 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
 //                }
 //            }
 
-            override fun onCreateViewHolder(
-                parent: ViewGroup, viewType: Int
-            ): BaseViewHolder<PhotoItemBinding> {
-                val binding =
-                    PhotoItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                val holder = BaseViewHolder(binding)
+                override fun onCreateViewHolder(
+                    parent: ViewGroup,
+                    viewType: Int,
+                ): BaseViewHolder<PhotoItemBinding> {
+                    val binding =
+                        PhotoItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                    val holder = BaseViewHolder(binding)
 //                holder.itemView.setOnClickListener {
 //                    clickListener?.invoke(holder)
 //                }
@@ -418,28 +426,27 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
 //                    onLongClickListener?.invoke(holder)
 //                    return@setOnLongClickListener true
 //                }
-                return holder
-            }
+                    return holder
+                }
 
+                override fun onBindViewHolder(
+                    holder: BaseViewHolder<PhotoItemBinding>,
+                    position: Int,
+                ) {
+                    super.onBindViewHolder(holder, position)
 
-            override fun onBindViewHolder(
-                holder: BaseViewHolder<PhotoItemBinding>, position: Int
-            ) {
-                super.onBindViewHolder(holder, position)
-
-                holder.binding.apply {
-                    val item = getItem(position)
-                    Glide.with(this@MakeNoteFragment).load(item.path).into(image)
+                    holder.binding.apply {
+                        val item = getItem(position)
+                        Glide.with(this@MakeNoteFragment).load(item.path).into(image)
+                    }
+                }
+            }.apply {
+                this@MakeNoteFragment.binding.photoList.adapter = this
+                this@MakeNoteFragment.binding.photoList.apply {
+                    setHasFixedSize(false)
+                    layoutManager =
+                        LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
                 }
             }
-        }.apply {
-            this@MakeNoteFragment.binding.photoList.adapter = this
-            this@MakeNoteFragment.binding.photoList.apply {
-                setHasFixedSize(false)
-                layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
-            }
-        }
     }
-
-
 }

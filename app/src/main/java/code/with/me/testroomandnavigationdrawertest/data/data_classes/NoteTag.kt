@@ -18,7 +18,10 @@ class NoteTag(
         return 0
     }
 
-    override fun writeToParcel(dest: Parcel, flags: Int) {
+    override fun writeToParcel(
+        dest: Parcel,
+        flags: Int,
+    ) {
         dest.writeString(name)
         dest.writeLong(lastTimestampCreate)
         dest.writeLong(lastTimestampEdited)
@@ -33,7 +36,7 @@ class NoteTag(
                 parcel.readLong(),
                 parcel.readLong(),
                 parcel.readLong(),
-                parcel.readLong()
+                parcel.readLong(),
             )
         }
 

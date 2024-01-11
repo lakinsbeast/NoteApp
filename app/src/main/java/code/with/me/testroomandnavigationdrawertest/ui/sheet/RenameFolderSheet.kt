@@ -8,8 +8,8 @@ import androidx.navigation.fragment.navArgs
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Folder
 import code.with.me.testroomandnavigationdrawertest.databinding.RenameFolderBottomSheetBinding
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -33,7 +33,10 @@ class RenameFolderSheet :
     lateinit var folderVmFactory: ViewModelProvider.Factory
     private lateinit var folderViewModel: FolderViewModel
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         initAppComponent()
         initViewModel()
@@ -62,16 +65,17 @@ class RenameFolderSheet :
             }
 
             launch {
-                val folder = Folder(
-                    text.toString(),
-                    System.currentTimeMillis(),
-                    System.currentTimeMillis(),
-                    System.currentTimeMillis(),
-                    "",
-                    false
-                ).apply {
-                    this.id = args.idFolder
-                }
+                val folder =
+                    Folder(
+                        text.toString(),
+                        System.currentTimeMillis(),
+                        System.currentTimeMillis(),
+                        System.currentTimeMillis(),
+                        "",
+                        false,
+                    ).apply {
+                        this.id = args.idFolder
+                    }
                 folderViewModel.insertFolder(folder)
                 withContext(Dispatchers.Main) {
                     findNavController().popBackStack()

@@ -12,35 +12,37 @@ import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
 import javax.inject.Inject
 
-class NoteMenuSheetViewModel @Inject constructor(
-    private val repoNote: NoteRepository
-): ViewModel() {
+class NoteMenuSheetViewModel
+    @Inject
+    constructor(
+        private val repoNote: NoteRepository,
+    ) : ViewModel() {
+        private var note: Note? = null
+        private var _shareTextLiveData = MutableLiveData<String>()
+        var shareTextLiveData = _shareTextLiveData
 
-    private var note: Note? = null
-    private var _shareTextLiveData = MutableLiveData<String>()
-    var shareTextLiveData = _shareTextLiveData
-
-    fun shareText(id: Long) {
-        viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
-            async {
-                note = repoNote.getNoteById(id)
-            }.await()
-            _shareTextLiveData.postValue("${note?.titleNote}\n${note?.textNote}")
+        fun shareText(id: Long) {
+            viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
+                async {
+                    note = repoNote.getNoteById(id)
+                }.await()
+                _shareTextLiveData.postValue("${note?.titleNote}\n${note?.textNote}")
+            }
         }
     }
 
-}
-
-class NoteMenuSheetViewModelFactory @Inject constructor(
-    private val repo: NoteRepository
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(NoteMenuSheetViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return NoteMenuSheetViewModel(
-                repo
-            ) as T
+class NoteMenuSheetViewModelFactory
+    @Inject
+    constructor(
+        private val repo: NoteRepository,
+    ) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(NoteMenuSheetViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return NoteMenuSheetViewModel(
+                    repo,
+                ) as T
+            }
+            throw IllegalArgumentException("ukn VM class")
         }
-        throw IllegalArgumentException("ukn VM class")
     }
-}

@@ -7,8 +7,8 @@ import androidx.navigation.fragment.findNavController
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.FolderTag
 import code.with.me.testroomandnavigationdrawertest.databinding.AddFolderBottomSheetBinding
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderTagViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderTagViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -29,7 +29,10 @@ class AddFolderTagSheetMenu :
     lateinit var tagVmFactory: ViewModelProvider.Factory
     private lateinit var folderTagViewModel: FolderTagViewModel
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         initAppComponent()
         initViewModel()
@@ -63,8 +66,8 @@ class AddFolderTagSheetMenu :
                         text.toString(),
                         System.currentTimeMillis(),
                         System.currentTimeMillis(),
-                        System.currentTimeMillis()
-                    )
+                        System.currentTimeMillis(),
+                    ),
                 )
             }
             findNavController().popBackStack()

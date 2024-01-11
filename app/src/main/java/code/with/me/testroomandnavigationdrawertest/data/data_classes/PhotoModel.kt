@@ -15,8 +15,10 @@ class PhotoModel(
         return 0
     }
 
-    override fun writeToParcel(dest: Parcel, flags: Int) {
-
+    override fun writeToParcel(
+        dest: Parcel,
+        flags: Int,
+    ) {
         dest.writeString(path)
         dest.writeLong(id)
     }

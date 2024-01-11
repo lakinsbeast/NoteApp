@@ -9,29 +9,30 @@ import kotlinx.coroutines.launch
 
 class FolderListFragment :
     BaseFolderListFragment() {
-
     private var listOfFolders = mutableListOf<Folder>()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         lifecycleScope.launch {
-            folderViewModel.getAllFolders().collect() {
+            folderViewModel.getAllFolders().collect {
                 listOfFolders.clear()
                 listOfFolders = it.toMutableList()
                 adapter.submitList(listOfFolders)
                 adapter.notifyDataSetChanged()
             }
         }
-
     }
 
     fun updateRecyclerViewData(checkedChipId: String) {
-        //arrayList(3,4) -> "3,4"
+        // arrayList(3,4) -> "3,4"
         println("checkedChipId: $checkedChipId")
         if (checkedChipId.isEmpty()) {
             lifecycleScope.launch {
-                folderViewModel.getAllFolders().collect() {
+                folderViewModel.getAllFolders().collect {
                     listOfFolders.clear()
                     listOfFolders = it.toMutableList()
                     adapter.submitList(listOfFolders)
@@ -40,7 +41,7 @@ class FolderListFragment :
             }
         } else {
             lifecycleScope.launch {
-                folderViewModel.getFolderByTag(checkedChipId).collect() {
+                folderViewModel.getFolderByTag(checkedChipId).collect {
                     listOfFolders.clear()
                     listOfFolders = it.toMutableList()
                     adapter.submitList(listOfFolders)
@@ -49,6 +50,4 @@ class FolderListFragment :
             }
         }
     }
-
-
 }

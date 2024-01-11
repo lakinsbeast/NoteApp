@@ -40,5 +40,4 @@ class MarkdownParserModule {
     fun provideFirstSpaceTextChecker(): ITextCheckerT<Int> {
         return FirstSpaceTextCheckerImpl()
     }
-
 }

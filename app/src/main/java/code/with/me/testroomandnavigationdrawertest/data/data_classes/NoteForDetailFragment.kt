@@ -1,8 +1,5 @@
 package code.with.me.testroomandnavigationdrawertest.data.data_classes
 
-import androidx.room.ColumnInfo
-import androidx.room.PrimaryKey
-
 data class NoteForDetailFragment(
     val id: Int = 0,
     val titleNote: String = "",
@@ -11,5 +8,5 @@ data class NoteForDetailFragment(
     val audioUrl: String = "",
     val paintUrl: String = "",
     val imgFrmGlrUrl: String = "",
-    val colorCard: String = ""
+    val colorCard: String = "",
 )

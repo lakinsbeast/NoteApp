@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.GestureDetector.SimpleOnGestureListener
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -20,7 +19,6 @@ import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.data.Utils.getDate
 import code.with.me.testroomandnavigationdrawertest.data.Utils.getDisplayMetrics
 import code.with.me.testroomandnavigationdrawertest.data.Utils.gone
-import code.with.me.testroomandnavigationdrawertest.data.Utils.launchAfterTimerIO
 import code.with.me.testroomandnavigationdrawertest.data.Utils.mainScope
 import code.with.me.testroomandnavigationdrawertest.data.Utils.println
 import code.with.me.testroomandnavigationdrawertest.data.Utils.setRoundedCornersView
@@ -48,12 +46,9 @@ import java.io.File
 import javax.inject.Inject
 import javax.inject.Named
 
-
 class PreviewNoteDialog() :
     BaseDialog<ViewNoteDetailDialogPreviewBinding>(ViewNoteDetailDialogPreviewBinding::inflate) {
-
-    //TODO сделать максимальный и минимальный размер диалога
-
+    // TODO сделать максимальный и минимальный размер диалога
 
     @Inject
     @Named("viewANoteVMFactory")
@@ -97,7 +92,6 @@ class PreviewNoteDialog() :
                             try {
                                 waveForm.setSampleFrom(File(value.audioUrl))
                             } catch (_: Exception) {
-
                             }
                         } else {
                             audioLayout.gone()
@@ -112,11 +106,9 @@ class PreviewNoteDialog() :
             }
         }
 
-
     override fun onStart() {
         super.onStart()
         dialog?.window?.setWindowAnimations(R.style.DialogAnimationEnterExit)
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -128,7 +120,10 @@ class PreviewNoteDialog() :
         idIntent = arguments?.getLong("noteId") ?: 0
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         initAdapterInflating()
         initAdapter()
@@ -148,13 +143,11 @@ class PreviewNoteDialog() :
             }
             true
         }
-        //это нужно добавить потому что не будет скроллиться scrollview
+        // это нужно добавить потому что не будет скроллиться scrollview
         binding.scrollView.setOnTouchListener { v, event ->
             gestureD.onTouchEvent(event)
             false // разрешает ScrollView прокручивать контент
         }
-
-
     }
 
     var idIntent = 0L
@@ -168,77 +161,85 @@ class PreviewNoteDialog() :
     private var lastAvailableId = 0L
     private var nextAvailableId = 0L
 
-    //Избавиться от магических чисел
-    private var gestureD = GestureDetector(context, object : SimpleOnGestureListener() {
-        //false - разрешить скролл
-        override fun onScroll(
-            e1: MotionEvent?,
-            e2: MotionEvent,
-            distanceX: Float,
-            distanceY: Float
-        ): Boolean {
-            e1?.rawX?.let { rawX ->
-                when (rawX) {
-                    in 300f..800f -> {
-                        return false
+    // Избавиться от магических чисел
+    private var gestureD =
+        GestureDetector(
+            context,
+            object : SimpleOnGestureListener() {
+                // false - разрешить скролл
+                override fun onScroll(
+                    e1: MotionEvent?,
+                    e2: MotionEvent,
+                    distanceX: Float,
+                    distanceY: Float,
+                ): Boolean {
+                    e1?.rawX?.let { rawX ->
+                        when (rawX) {
+                            in 300f..800f -> {
+                                return false
+                            }
+
+                            else -> {
+                                return true
+                            }
+                        }
                     }
 
-                    else -> {
-                        return true
-                    }
+                    return false
                 }
-            }
 
-            return false
-        }
-
-        override fun onFling(
-            e1: MotionEvent?,
-            e2: MotionEvent,
-            velocityX: Float,
-            velocityY: Float
-        ): Boolean {
-            e1?.rawX?.let { rawX ->
-                when (rawX) {
-                    in 800f..1500f -> {
-                        idIntent = nextAvailableId
-                        println("idIntent: $idIntent")
-                        println("nextAvailableId: $nextAvailableId")
-                        println("lastAvailableId: $lastAvailableId")
-                        println("firstId: $firstId")
-                        println("lastId: $lastId")
+                override fun onFling(
+                    e1: MotionEvent?,
+                    e2: MotionEvent,
+                    velocityX: Float,
+                    velocityY: Float,
+                ): Boolean {
+                    e1?.rawX?.let { rawX ->
+                        when (rawX) {
+                            in 800f..1500f -> {
+                                idIntent = nextAvailableId
+                                println("idIntent: $idIntent")
+                                println("nextAvailableId: $nextAvailableId")
+                                println("lastAvailableId: $lastAvailableId")
+                                println("firstId: $firstId")
+                                println("lastId: $lastId")
 //                        idIntent += 1
-                        if (idIntent in firstId..<lastId) {
-                            viewANoteViewModel.getNoteById(idIntent)
-                        } else {
-                            idIntent = currentNote?.id ?: 0L
-                            makeMeShake(binding.root, 50, 15)
-                        }
-                        return true
-                    }
+                                if (idIntent in firstId..<lastId) {
+                                    viewANoteViewModel.getNoteById(idIntent)
+                                } else {
+                                    idIntent = currentNote?.id ?: 0L
+                                    makeMeShake(binding.root, 50, 15)
+                                }
+                                return true
+                            }
 
-                    in 0f..300f -> {
-                        idIntent = lastAvailableId
-                        if (idIntent in firstId..<lastId) {
-                            viewANoteViewModel.getNoteById(idIntent)
-                        } else {
-                            idIntent = currentNote?.id ?: 0
-                            makeMeShake(binding.root, 50, 15)
-                        }
-                        return true
-                    }
+                            in 0f..300f -> {
+                                idIntent = lastAvailableId
+                                if (idIntent in firstId..<lastId) {
+                                    viewANoteViewModel.getNoteById(idIntent)
+                                } else {
+                                    idIntent = currentNote?.id ?: 0
+                                    makeMeShake(binding.root, 50, 15)
+                                }
+                                return true
+                            }
 
-                    else -> {
-                        return false
+                            else -> {
+                                return false
+                            }
+                        }
                     }
+                    return false
                 }
-            }
-            return false
-        }
-    })
+            },
+        )
 
-    //test
-    fun makeMeShake(view: View, duration: Int, offset: Int): View? {
+    // test
+    fun makeMeShake(
+        view: View,
+        duration: Int,
+        offset: Int,
+    ): View? {
         val anim: Animation = TranslateAnimation(-offset.toFloat(), offset.toFloat(), 0f, 0f)
         anim.duration = duration.toLong()
         anim.repeatMode = Animation.REVERSE
@@ -246,7 +247,6 @@ class PreviewNoteDialog() :
         view.startAnimation(anim)
         return view
     }
-
 
     private fun setSizeParams() {
         binding.root.minimumHeight = getDisplayMetrics(activity()).heightPixels / 3
@@ -258,39 +258,44 @@ class PreviewNoteDialog() :
     }
 
     private fun setWaveformProgressCallback() {
-        binding.waveForm.onProgressChanged = object : SeekBarOnProgressChanged {
-            override fun onProgressChanged(
-                waveformSeekBar: WaveformSeekBar,
-                progress: Float,
-                fromUser: Boolean
-            ) {
-                if (fromUser) {
-                    if (viewANoteViewModel.isAudioPlaying()) {
-                        sendViewAction(UserActionAudioState.PausePlaying)
-                    }
-                    if (viewANoteViewModel.checkAudioPlayer() == null) {
-                        sendViewAction(UserActionAudioState.InitPlayer(currentNote?.audioUrl.toString()))
-                    }
-                    viewANoteViewModel.setCurrentPos(progress)
-                    startTimer(100) {
-                        if (!doWaveFormOnTouch) {
-                            sendViewAction(UserActionAudioState.StartPlaying(currentNote?.audioUrl.toString()))
+        binding.waveForm.onProgressChanged =
+            object : SeekBarOnProgressChanged {
+                override fun onProgressChanged(
+                    waveformSeekBar: WaveformSeekBar,
+                    progress: Float,
+                    fromUser: Boolean,
+                ) {
+                    if (fromUser) {
+                        if (viewANoteViewModel.isAudioPlaying()) {
+                            sendViewAction(UserActionAudioState.PausePlaying)
+                        }
+                        if (viewANoteViewModel.checkAudioPlayer() == null) {
+                            sendViewAction(UserActionAudioState.InitPlayer(currentNote?.audioUrl.toString()))
+                        }
+                        viewANoteViewModel.setCurrentPos(progress)
+                        startTimer(100) {
+                            if (!doWaveFormOnTouch) {
+                                sendViewAction(UserActionAudioState.StartPlaying(currentNote?.audioUrl.toString()))
+                            }
                         }
                     }
                 }
             }
-        }
     }
 
-    fun startTimer(delayLong: Long, doOnDelayPassed: () -> Unit) {
+    fun startTimer(
+        delayLong: Long,
+        doOnDelayPassed: () -> Unit,
+    ) {
         if (timerJob != null) {
             timerJob?.cancel()
             timerJob = null
         }
-        timerJob = CoroutineScope(Dispatchers.IO.limitedParallelism(1)).launch {
-            delay(delayLong)
-            doOnDelayPassed.invoke()
-        }
+        timerJob =
+            CoroutineScope(Dispatchers.IO.limitedParallelism(1)).launch {
+                delay(delayLong)
+                doOnDelayPassed.invoke()
+            }
     }
 
     private fun sendViewAction(userAction: UserActionAudioState) {
@@ -375,7 +380,6 @@ class PreviewNoteDialog() :
         viewANoteViewModel.nextIdNote.observe(viewLifecycleOwner) {
             nextAvailableId = it
         }
-
     }
 
     private fun handleViewState(state: NoteState) {
@@ -396,9 +400,9 @@ class PreviewNoteDialog() :
 //                showProgressBar(false)
                 dialog?.window?.decorView?.let { window ->
                     Snackbar.make(
-                        window, //binding.root is not work :(
+                        window, // binding.root is not work :(
                         state.error.toString(),
-                        Snackbar.LENGTH_LONG
+                        Snackbar.LENGTH_LONG,
                     ).show()
                 }
                 "ERROR in ${this.javaClass.simpleName} error: ${state.error}".println()
@@ -407,64 +411,62 @@ class PreviewNoteDialog() :
             is NoteState.EmptyResult -> {
 //                showProgressBar(false)
             }
-
         }
     }
 
     private fun initAdapter() {
-        adapter = object : BaseAdapter<PhotoModel, PhotoItemBinding>(photoItem) {
-            private var selected0 = -1
+        adapter =
+            object : BaseAdapter<PhotoModel, PhotoItemBinding>(photoItem) {
+                private var selected0 = -1
 
-            init {
-                clickListener = {
-                    selected0 = it.layoutPosition
-                    val item = getItem(it.layoutPosition) as PhotoModel
+                init {
+                    clickListener = {
+                        selected0 = it.layoutPosition
+                        val item = getItem(it.layoutPosition) as PhotoModel
 //                    openDetailFragment(item.id)
+                    }
+                    onLongClickListener = {
+                        selected0 = it.layoutPosition
+                        val item = getItem(it.layoutPosition) as PhotoModel
+                    }
                 }
-                onLongClickListener = {
-                    selected0 = it.layoutPosition
-                    val item = getItem(it.layoutPosition) as PhotoModel
-                }
-            }
 
-            override fun onCreateViewHolder(
-                parent: ViewGroup, viewType: Int
-            ): BaseViewHolder<PhotoItemBinding> {
-                val binding =
-                    PhotoItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                val holder = BaseViewHolder(binding)
-                //Почему-то pinch не работает даже с библиотеками upd: похоже не работает с sheet
+                override fun onCreateViewHolder(
+                    parent: ViewGroup,
+                    viewType: Int,
+                ): BaseViewHolder<PhotoItemBinding> {
+                    val binding =
+                        PhotoItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                    val holder = BaseViewHolder(binding)
+                    // Почему-то pinch не работает даже с библиотеками upd: похоже не работает с sheet
 //                holder.itemView.setOnTouchListener(context?.let { ImageMatrixTouchHandler(it) })
-                holder.itemView.setOnLongClickListener {
-                    onLongClickListener?.invoke(holder)
-                    return@setOnLongClickListener true
+                    holder.itemView.setOnLongClickListener {
+                        onLongClickListener?.invoke(holder)
+                        return@setOnLongClickListener true
+                    }
+                    return holder
                 }
-                return holder
-            }
 
+                override fun onBindViewHolder(
+                    holder: BaseViewHolder<PhotoItemBinding>,
+                    position: Int,
+                ) {
+                    super.onBindViewHolder(holder, position)
 
-            override fun onBindViewHolder(
-                holder: BaseViewHolder<PhotoItemBinding>,
-                position: Int
-            ) {
-                super.onBindViewHolder(holder, position)
+                    holder.binding.apply {
+                        val item = getItem(position)
+                        "item.path: ${item.path}".println()
 
-                holder.binding.apply {
-                    val item = getItem(position)
-                    "item.path: ${item.path}".println()
-
-                    Glide.with(this@PreviewNoteDialog)
-                        .load(Uri.parse(item.path)).into(image)
+                        Glide.with(this@PreviewNoteDialog)
+                            .load(Uri.parse(item.path)).into(image)
+                    }
+                }
+            }.apply {
+                this@PreviewNoteDialog.binding.photoList.adapter = this
+                this@PreviewNoteDialog.binding.photoList.apply {
+                    setHasFixedSize(false)
+                    layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
                 }
             }
-        }.apply {
-            this@PreviewNoteDialog.binding.photoList.adapter = this
-            this@PreviewNoteDialog.binding.photoList.apply {
-                setHasFixedSize(false)
-                layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
-            }
-        }
     }
-
-
 }

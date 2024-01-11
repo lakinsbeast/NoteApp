@@ -7,7 +7,7 @@ import androidx.room.*
 import code.with.me.testroomandnavigationdrawertest.data.Utils.isAndroidVersionGreaterOrEqual
 import kotlinx.serialization.Serializable
 
-//создал модельку для удобного создания адаптера recyclerview
+// создал модельку для удобного создания адаптера recyclerview
 @Entity
 class Note(
     @ColumnInfo(name = "title") var titleNote: String,
@@ -23,13 +23,14 @@ class Note(
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0,
 ) : Identifiable, Parcelable {
-
     override fun describeContents(): Int {
         return 0
     }
 
-    override fun writeToParcel(dest: Parcel, flags: Int) {
-
+    override fun writeToParcel(
+        dest: Parcel,
+        flags: Int,
+    ) {
         dest.writeString(titleNote)
         dest.writeString(textNote)
         dest.writeList(listOfImages)
@@ -46,7 +47,6 @@ class Note(
     companion object CREATOR : Parcelable.Creator<Note> {
         override fun createFromParcel(parcel: Parcel): Note {
             return Note(
-
                 parcel.readString() ?: "",
                 parcel.readString() ?: "",
                 if (isAndroidVersionGreaterOrEqual(Build.VERSION_CODES.TIRAMISU)) {
@@ -54,7 +54,7 @@ class Note(
                         parcel.readList(
                             this,
                             PhotoModel::class.java.classLoader,
-                            PhotoModel::class.java
+                            PhotoModel::class.java,
                         )
                     }
                 } else {
@@ -72,7 +72,7 @@ class Note(
                 parcel.readLong(),
                 parcel.readInt() == 1,
                 parcel.readString() ?: "",
-                parcel.readLong()
+                parcel.readLong(),
             )
         }
 
@@ -87,20 +87,22 @@ class Note(
 class NoteFTS(
     @ColumnInfo(name = "title") var titleNote: String,
     @ColumnInfo(name = "text") var textNote: String,
-    @ColumnInfo(name = "id") var id: Long
+    @ColumnInfo(name = "id") var id: Long,
 ) : Identifiable, Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
         parcel.readString() ?: "",
-        parcel.readLong()
+        parcel.readLong(),
     )
-
 
     override fun describeContents(): Int {
         return 0
     }
 
-    override fun writeToParcel(dest: Parcel, flags: Int) {
+    override fun writeToParcel(
+        dest: Parcel,
+        flags: Int,
+    ) {
         dest.writeLong(id)
         dest.writeString(titleNote)
         dest.writeString(textNote)

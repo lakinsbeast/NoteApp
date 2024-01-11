@@ -1,35 +1,26 @@
 package code.with.me.testroomandnavigationdrawertest.ui.base
 
-import android.app.AlertDialog
-import android.app.Dialog
-import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.ProgressBar
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.updateMargins
 import androidx.viewbinding.ViewBinding
 import code.with.me.testroomandnavigationdrawertest.data.Utils.findActivity
 import code.with.me.testroomandnavigationdrawertest.data.Utils.getDisplayMetrics
 import code.with.me.testroomandnavigationdrawertest.data.Utils.gone
 import code.with.me.testroomandnavigationdrawertest.data.Utils.setCenterGravity
-import code.with.me.testroomandnavigationdrawertest.data.Utils.setRoundedCornersView
 import code.with.me.testroomandnavigationdrawertest.data.Utils.visible
-import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?, Boolean) -> VB)) :
     BottomSheetDialogFragment() {
-
     private var _binding: VB? = null
 
     var behavior: BottomSheetBehavior<FrameLayout>? = null
@@ -49,7 +40,7 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
     var isBackNeedBeBlurred = true
     var halfExpandedRatio = 0.6f
 
-    //если установить false, то будет работать halfExpanded state, а если true, то нет, но не будет различных багов
+    // если установить false, то будет работать halfExpanded state, а если true, то нет, но не будет различных багов
     var isFitToContents = true
         set(value) {
             view?.let {
@@ -69,7 +60,7 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         peekHeight = getDisplayMetrics(activity()).heightPixels
         _binding = get.invoke(inflater, container, false)
@@ -93,7 +84,10 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         if (isBackNeedBeBlurred) {
             setUpDialogWindow()
@@ -101,13 +95,13 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
         initProgressBar()
         addViewsToSheet()
 
-        //убирает закрытие sheet, после нажатия за пределами sheet
+        // убирает закрытие sheet, после нажатия за пределами sheet
         isCancelable = isSheetCancelable
-        //убирает затемнение позади sheet
+        // убирает затемнение позади sheet
         if (!doSheetBackShadowed) {
             dialog?.window?.setDimAmount(0.02f)
         }
-        //убирает темный бэкграунд позади sheet, например, если поставить corner radius 64f, то будет видно затенение по краям
+        // убирает темный бэкграунд позади sheet, например, если поставить corner radius 64f, то будет видно затенение по краям
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         behavior = BottomSheetBehavior.from(view.parent as FrameLayout)
@@ -128,20 +122,29 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
 //            behavior.skipCollapsed = true
             behavior.isFitToContents = true
             behavior.halfExpandedRatio = halfExpandedRatio
-            behavior.addBottomSheetCallback(object :
-                BottomSheetBehavior.BottomSheetCallback() {
-                private var oldState: Int = BottomSheetBehavior.STATE_HALF_EXPANDED
-                override fun onStateChanged(bottomSheet: View, newState: Int) {
-                    onStateChanged.invoke(newState, oldState)
-                    if (newState != BottomSheetBehavior.STATE_DRAGGING && newState != BottomSheetBehavior.STATE_SETTLING) {
-                        oldState = newState
-                    }
-                }
+            behavior.addBottomSheetCallback(
+                object :
+                    BottomSheetBehavior.BottomSheetCallback() {
+                    private var oldState: Int = BottomSheetBehavior.STATE_HALF_EXPANDED
 
-                override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                    onSlide.invoke(slideOffset)
-                }
-            })
+                    override fun onStateChanged(
+                        bottomSheet: View,
+                        newState: Int,
+                    ) {
+                        onStateChanged.invoke(newState, oldState)
+                        if (newState != BottomSheetBehavior.STATE_DRAGGING && newState != BottomSheetBehavior.STATE_SETTLING) {
+                            oldState = newState
+                        }
+                    }
+
+                    override fun onSlide(
+                        bottomSheet: View,
+                        slideOffset: Float,
+                    ) {
+                        onSlide.invoke(slideOffset)
+                    }
+                },
+            )
         }
     }
 
@@ -151,7 +154,10 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
         (view.parent as FrameLayout).layoutParams = layoutParams
     }
 
-    fun setSheetHeightTo(view: View, height: Int) {
+    fun setSheetHeightTo(
+        view: View,
+        height: Int,
+    ) {
         val layoutParams = (view.parent as FrameLayout).layoutParams
         layoutParams.height = height
         (view.parent as FrameLayout).layoutParams = layoutParams
@@ -166,11 +172,11 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
         }
     }
 
-
     private fun initProgressBar() {
-        progressBar = ProgressBar(context).apply {
-            setCenterGravity(binding.root)
-        }
+        progressBar =
+            ProgressBar(context).apply {
+                setCenterGravity(binding.root)
+            }
     }
 
     override fun onDestroy() {
@@ -207,5 +213,4 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
     }
 
     fun activity() = findActivity(requireContext())
-
 }
