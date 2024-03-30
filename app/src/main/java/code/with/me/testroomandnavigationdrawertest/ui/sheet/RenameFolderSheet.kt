@@ -77,7 +77,7 @@ class RenameFolderSheet :
                         this.id = args.idFolder
                     }
                 folderViewModel.insertFolder(folder)
-                withContext(Dispatchers.Main) {
+                withContext(Dispatchers.Main.immediate) {
                     findNavController().popBackStack()
                 }
             }

@@ -9,40 +9,13 @@ import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import javax.inject.Inject
 
-// под чем я был, когда писал это?
-class FragmentController
-@Inject
-constructor(
+class FragmentController @Inject constructor(
     private val getFragmentImpl: IGetFragment,
     private val openFragmentImpl: IOpenFragment,
     private val replaceFragmentImpl: IReplaceFragment,
     private val closeFragmentImpl: ICloseFragment,
-) {
-    fun openFragment(
-        activity: MainActivity,
-        fragment: Fragment,
-        options: FragmentOptions,
-        animEnter: Int = R.anim.enter_from_right,
-        animExit: Int = R.anim.exit_to_left
-    ) {
-        openFragmentImpl.openFragment(activity, fragment, options, animEnter, animExit)
-    }
-
-    fun replaceFragment(
-        activity: MainActivity,
-        fragment: Fragment,
-        options: FragmentOptions,
-    ) {
-        replaceFragmentImpl.replaceFragment(activity, fragment, options)
-    }
-
-    fun closeFragment(
-        activity: MainActivity,
-        fragment: String,
-    ) {
-        closeFragmentImpl.closeFragment(activity, fragment)
-    }
-}
+) : IGetFragment by getFragmentImpl, IOpenFragment by openFragmentImpl,
+    IReplaceFragment by replaceFragmentImpl, ICloseFragment by closeFragmentImpl
 
 // https://kotlinexpertise.com/java-builders-kotlin-dsls/
 fun fragmentOptionsBuilder(options: FragmentOptions.() -> Unit): FragmentOptions {
@@ -70,8 +43,8 @@ interface IOpenFragment {
         activity: MainActivity,
         fragment: Fragment,
         options: FragmentOptions,
-        animEnter: Int,
-        animExit: Int
+        animEnter: Int = R.anim.enter_from_right,
+        animExit: Int = R.anim.exit_to_left
     )
 }
 
@@ -193,11 +166,13 @@ constructor(
     ) {
         try {
             val fragment = getFragmentImpl.getFragment(activity, fragmentTag)
-            if (fragment == null) {
-                throw IllegalStateException()
-            } else {
+            fragment?.let {
                 activity.supportFragmentManager.beginTransaction().remove(fragment).commit()
+
+            } ?: run {
+                throw IllegalStateException()
             }
+
         } catch (e: Exception) {
             Toast.makeText(activity, e.localizedMessage, Toast.LENGTH_LONG).show()
         }

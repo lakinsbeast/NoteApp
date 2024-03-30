@@ -4,7 +4,7 @@ import android.os.Build
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.room.*
-import code.with.me.testroomandnavigationdrawertest.data.Utils.isAndroidVersionGreaterOrEqual
+import code.with.me.testroomandnavigationdrawertest.data.utils.isAndroidVersionGreaterOrEqual
 import kotlinx.serialization.Serializable
 
 // создал модельку для удобного создания адаптера recyclerview

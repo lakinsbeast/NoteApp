@@ -11,12 +11,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
-import code.with.me.testroomandnavigationdrawertest.data.Utils.getDate
-import code.with.me.testroomandnavigationdrawertest.data.Utils.gone
-import code.with.me.testroomandnavigationdrawertest.data.Utils.mainScope
-import code.with.me.testroomandnavigationdrawertest.data.Utils.println
-import code.with.me.testroomandnavigationdrawertest.data.Utils.setRoundedCornersView
-import code.with.me.testroomandnavigationdrawertest.data.Utils.visible
+import code.with.me.testroomandnavigationdrawertest.data.utils.getDate
+import code.with.me.testroomandnavigationdrawertest.data.utils.gone
+import code.with.me.testroomandnavigationdrawertest.data.utils.mainScope
+import code.with.me.testroomandnavigationdrawertest.data.utils.println
+import code.with.me.testroomandnavigationdrawertest.data.utils.setRoundedCornersView
+import code.with.me.testroomandnavigationdrawertest.data.utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 import code.with.me.testroomandnavigationdrawertest.databinding.PhotoItemBinding
@@ -108,7 +108,6 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
         val appComponent = (requireActivity().application as NotesApplication).appComponent
         appComponent.inject(this)
         viewANoteViewModel = ViewModelProvider(this, factory)[ViewANoteViewModel::class.java]
-        viewANoteViewModel.setActivityToAudioController(activity())
     }
 
     override fun onViewCreated(

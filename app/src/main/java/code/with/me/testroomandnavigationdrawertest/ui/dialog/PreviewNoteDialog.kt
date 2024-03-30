@@ -16,14 +16,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
-import code.with.me.testroomandnavigationdrawertest.data.Utils.getDate
-import code.with.me.testroomandnavigationdrawertest.data.Utils.getDisplayMetrics
-import code.with.me.testroomandnavigationdrawertest.data.Utils.gone
-import code.with.me.testroomandnavigationdrawertest.data.Utils.mainScope
-import code.with.me.testroomandnavigationdrawertest.data.Utils.println
-import code.with.me.testroomandnavigationdrawertest.data.Utils.setRoundedCornersView
-import code.with.me.testroomandnavigationdrawertest.data.Utils.setTouchListenerForAllViews
-import code.with.me.testroomandnavigationdrawertest.data.Utils.visible
+import code.with.me.testroomandnavigationdrawertest.data.utils.getDate
+import code.with.me.testroomandnavigationdrawertest.data.utils.getDisplayMetrics
+import code.with.me.testroomandnavigationdrawertest.data.utils.gone
+import code.with.me.testroomandnavigationdrawertest.data.utils.mainScope
+import code.with.me.testroomandnavigationdrawertest.data.utils.println
+import code.with.me.testroomandnavigationdrawertest.data.utils.setRoundedCornersView
+import code.with.me.testroomandnavigationdrawertest.data.utils.setTouchListenerForAllViews
+import code.with.me.testroomandnavigationdrawertest.data.utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 import code.with.me.testroomandnavigationdrawertest.databinding.PhotoItemBinding
@@ -49,6 +49,7 @@ import javax.inject.Named
 class PreviewNoteDialog() :
     BaseDialog<ViewNoteDetailDialogPreviewBinding>(ViewNoteDetailDialogPreviewBinding::inflate) {
     // TODO сделать максимальный и минимальный размер диалога
+        //TODO переделать всё нах
 
     @Inject
     @Named("viewANoteVMFactory")
@@ -65,7 +66,7 @@ class PreviewNoteDialog() :
         set(value) {
             if (value != field) {
                 field = value
-                if (value != null) {
+                value?.let {
                     binding.apply {
                         context?.let {
                             dateText.text = getDate(it, value.lastTimestampCreate)
@@ -116,7 +117,6 @@ class PreviewNoteDialog() :
         val appComponent = (requireActivity().application as NotesApplication).appComponent
         appComponent.inject(this)
         viewANoteViewModel = ViewModelProvider(this, factory)[ViewANoteViewModel::class.java]
-        viewANoteViewModel.setActivityToAudioController(activity())
         idIntent = arguments?.getLong("noteId") ?: 0
     }
 
@@ -128,26 +128,11 @@ class PreviewNoteDialog() :
         initAdapterInflating()
         initAdapter()
         initViewModel()
-        initClickListeners()
+        initListeners()
         setWaveformProgressCallback()
         isBehindNeedBlurred = true
         binding.root.setRoundedCornersView(56f, Color.WHITE)
         setSizeParams()
-
-        binding.text.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
-            kotlin.io.println()
-        }
-        binding.root.setTouchListenerForAllViews { v, event ->
-            if (event != null) {
-                gestureD.onTouchEvent(event)
-            }
-            true
-        }
-        // это нужно добавить потому что не будет скроллиться scrollview
-        binding.scrollView.setOnTouchListener { v, event ->
-            gestureD.onTouchEvent(event)
-            false // разрешает ScrollView прокручивать контент
-        }
     }
 
     var idIntent = 0L
@@ -269,7 +254,7 @@ class PreviewNoteDialog() :
                         if (viewANoteViewModel.isAudioPlaying()) {
                             sendViewAction(UserActionAudioState.PausePlaying)
                         }
-                        if (viewANoteViewModel.checkAudioPlayer() == null) {
+                        viewANoteViewModel.checkAudioPlayer() ?: run {
                             sendViewAction(UserActionAudioState.InitPlayer(currentNote?.audioUrl.toString()))
                         }
                         viewANoteViewModel.setCurrentPos(progress)
@@ -287,7 +272,7 @@ class PreviewNoteDialog() :
         delayLong: Long,
         doOnDelayPassed: () -> Unit,
     ) {
-        if (timerJob != null) {
+        timerJob?.let {
             timerJob?.cancel()
             timerJob = null
         }
@@ -305,7 +290,7 @@ class PreviewNoteDialog() :
     /**
      * надо что-то сделать с после playAudio.setOnClickListener
      **/
-    private fun initClickListeners() {
+    private fun initListeners() {
         binding.apply {
             playPauseBtn.setOnClickListener {
                 if (viewANoteViewModel.isAudioPlaying()) {
@@ -321,6 +306,20 @@ class PreviewNoteDialog() :
             waveForm.setOnClickListener {
                 doWaveFormOnTouch = false
             }
+        }
+        binding.text.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+            kotlin.io.println()
+        }
+        binding.root.setTouchListenerForAllViews { v, event ->
+            event?.let {
+                gestureD.onTouchEvent(event)
+            }
+            true
+        }
+        // это нужно добавить потому что не будет скроллиться scrollview
+        binding.scrollView.setOnTouchListener { v, event ->
+            gestureD.onTouchEvent(event)
+            false // разрешает ScrollView прокручивать контент
         }
     }
 
@@ -465,7 +464,8 @@ class PreviewNoteDialog() :
                 this@PreviewNoteDialog.binding.photoList.adapter = this
                 this@PreviewNoteDialog.binding.photoList.apply {
                     setHasFixedSize(false)
-                    layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+                    layoutManager =
+                        LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
                 }
             }
     }

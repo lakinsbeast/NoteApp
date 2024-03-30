@@ -13,9 +13,9 @@ import androidx.viewpager2.widget.ViewPager2
 import code.with.me.testroomandnavigationdrawertest.AlertCreator
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
-import code.with.me.testroomandnavigationdrawertest.data.Utils.gone
-import code.with.me.testroomandnavigationdrawertest.data.Utils.launchAfterTimerMain
-import code.with.me.testroomandnavigationdrawertest.data.Utils.visible
+import code.with.me.testroomandnavigationdrawertest.data.utils.gone
+import code.with.me.testroomandnavigationdrawertest.data.utils.launchAfterTimerMain
+import code.with.me.testroomandnavigationdrawertest.data.utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.FolderTag
 import code.with.me.testroomandnavigationdrawertest.databinding.HomeFragmentBinding
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment

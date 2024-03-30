@@ -11,11 +11,11 @@ import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.viewbinding.ViewBinding
-import code.with.me.testroomandnavigationdrawertest.data.Utils.findActivity
-import code.with.me.testroomandnavigationdrawertest.data.Utils.getDisplayMetrics
-import code.with.me.testroomandnavigationdrawertest.data.Utils.gone
-import code.with.me.testroomandnavigationdrawertest.data.Utils.setCenterGravity
-import code.with.me.testroomandnavigationdrawertest.data.Utils.visible
+import code.with.me.testroomandnavigationdrawertest.data.utils.findActivity
+import code.with.me.testroomandnavigationdrawertest.data.utils.getDisplayMetrics
+import code.with.me.testroomandnavigationdrawertest.data.utils.gone
+import code.with.me.testroomandnavigationdrawertest.data.utils.setCenterGravity
+import code.with.me.testroomandnavigationdrawertest.data.utils.visible
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
@@ -38,7 +38,7 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
     private var peekHeight: Int = 1100
     var canHide = true
     var isBackNeedBeBlurred = true
-    var halfExpandedRatio = 0.6f
+    private var halfExpandedRatio = 0.6f
 
     // если установить false, то будет работать halfExpanded state, а если true, то нет, но не будет различных багов
     var isFitToContents = true

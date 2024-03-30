@@ -6,9 +6,9 @@ import android.view.KeyEvent
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
-import code.with.me.testroomandnavigationdrawertest.data.Utils.gone
-import code.with.me.testroomandnavigationdrawertest.data.Utils.setRoundedCornersView
-import code.with.me.testroomandnavigationdrawertest.data.Utils.visible
+import code.with.me.testroomandnavigationdrawertest.data.utils.gone
+import code.with.me.testroomandnavigationdrawertest.data.utils.setRoundedCornersView
+import code.with.me.testroomandnavigationdrawertest.data.utils.visible
 import code.with.me.testroomandnavigationdrawertest.databinding.SettingsSheetBinding
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.SettingsViewModel

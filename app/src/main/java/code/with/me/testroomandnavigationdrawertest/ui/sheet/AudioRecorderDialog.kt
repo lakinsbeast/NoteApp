@@ -12,8 +12,8 @@ import android.view.WindowManager
 import android.view.animation.OvershootInterpolator
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.audio.AudioController
-import code.with.me.testroomandnavigationdrawertest.data.Utils.setCancelButton
-import code.with.me.testroomandnavigationdrawertest.data.Utils.setRoundedCornersView
+import code.with.me.testroomandnavigationdrawertest.data.utils.setCancelButton
+import code.with.me.testroomandnavigationdrawertest.data.utils.setRoundedCornersView
 import code.with.me.testroomandnavigationdrawertest.databinding.AudioRecorderBinding
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import kotlinx.coroutines.CoroutineScope
@@ -28,7 +28,17 @@ class AudioRecorderDialog(private val myContext: Context, private val result: (S
     Dialog(myContext) {
     private lateinit var binding: AudioRecorderBinding
 
-    private var timer: Job? = null
+    private val timer: Job by lazy {
+        CoroutineScope(Dispatchers.IO.limitedParallelism(1)).launch {
+            while (true) {
+                withContext(Dispatchers.Main.immediate) {
+                    binding.recordTime.text = DateUtils.formatElapsedTime(seconds)
+                }
+                delay(1000)
+                seconds++
+            }
+        }
+    }
     private var seconds = 0L
 
     @Inject
@@ -40,11 +50,10 @@ class AudioRecorderDialog(private val myContext: Context, private val result: (S
         initAppComponent()
         binding = AudioRecorderBinding.inflate(LayoutInflater.from(myContext))
         setContentView(binding.root)
-        audioController.activity = (myContext as MainActivity)
 
         binding.apply {
             saveAudioButton.setCancelButton()
-            audioController.startRecording { scale ->
+            audioController.startRecording(myContext as MainActivity) { scale ->
                 micImage.animate()
                     .scaleX(scale)
                     .scaleY(scale)
@@ -77,16 +86,7 @@ class AudioRecorderDialog(private val myContext: Context, private val result: (S
     }
 
     private fun launchTimer() {
-        timer =
-            CoroutineScope(Dispatchers.IO.limitedParallelism(1)).launch {
-                while (true) {
-                    withContext(Dispatchers.Main) {
-                        binding.recordTime.text = DateUtils.formatElapsedTime(seconds)
-                    }
-                    delay(1000)
-                    seconds++
-                }
-            }
+        timer
     }
 
     private fun setUpDialogWindow() {
@@ -100,7 +100,6 @@ class AudioRecorderDialog(private val myContext: Context, private val result: (S
 
     override fun onDetachedFromWindow() {
         audioController.apply {
-            this.activity = null
             stopRecording()
             stopPlaying()
         }

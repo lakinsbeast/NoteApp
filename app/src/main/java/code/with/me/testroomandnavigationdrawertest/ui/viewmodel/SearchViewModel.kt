@@ -24,12 +24,6 @@ class SearchViewModel
         fun search(text: String) {
             viewModelScope.launch(Dispatchers.IO) {
                 val list = repoNote.searchNotes("$text*")
-                println("--------")
-                list.forEach {
-                    println("NoteFTS: $it")
-                }
-                println("--------")
-
                 _noteList.postValue(list)
             }
         }

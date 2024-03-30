@@ -1,10 +1,6 @@
 package code.with.me.testroomandnavigationdrawertest.ui.fragment
 
 import android.Manifest
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.ObjectAnimator
-import android.animation.ValueAnimator
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -15,10 +11,6 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.AlphaAnimation
-import android.view.animation.Animation
-import android.view.animation.LinearInterpolator
 import android.view.inputmethod.EditorInfo
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.addTextChangedListener
@@ -31,9 +23,8 @@ import code.with.me.testroomandnavigationdrawertest.AlertCreator
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.PermissionController
 import code.with.me.testroomandnavigationdrawertest.R
-import code.with.me.testroomandnavigationdrawertest.data.Utils.println
-import code.with.me.testroomandnavigationdrawertest.data.Utils.setCheckable
-import code.with.me.testroomandnavigationdrawertest.data.Utils.setRoundedCorners
+import code.with.me.testroomandnavigationdrawertest.data.utils.setCheckable
+import code.with.me.testroomandnavigationdrawertest.data.utils.setRoundedCorners
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityAddNoteBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.PhotoItemBinding
@@ -56,7 +47,7 @@ import javax.inject.Inject
 import javax.inject.Named
 
 class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBinding::inflate) {
-    private var cameraUri: Uri? = null
+    private lateinit var cameraUri: Uri
 
     @Inject
     @Named("makeNoteVMFactory")
@@ -104,7 +95,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
 
     private val getImageFromGallery =
         registerForActivityResult(ActivityResultContracts.OpenDocument()) { imageUri ->
-            if (imageUri != null) {
+            imageUri?.let {
                 activity?.contentResolver?.takePersistableUriPermission(
                     imageUri,
                     Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
@@ -115,8 +106,8 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         }
 
     private val getImageFromCamera =
-        registerForActivityResult(ActivityResultContracts.TakePicture()) {
-            if (it) {
+        registerForActivityResult(ActivityResultContracts.TakePicture()) { callback ->
+            if (callback) {
                 activity?.let {
                     MediaStore.Images.Media.getBitmap(it.contentResolver, cameraUri)
                     makeNoteViewModel.getImageFromCamera(cameraUri.toString())
@@ -126,7 +117,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         }
 
     private val requestAudioPermission =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { it -> }
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
     companion object {
         const val paintResultKey = "paintResultKey"
@@ -140,26 +131,25 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
             ViewModelProvider(this, factory)[MakeNoteViewModel::class.java]
         listenPaintSheetResult()
         // TODO иногда не создает в папках заметки
-        if (arguments?.getLong("idFolder") != null && arguments?.getLong("idFolder") != -1L) {
-            makeNoteViewModel.setFolderId(arguments?.getLong("idFolder")!!)
-        } else {
-            println("idFolder is null!")
+        arguments?.getLong("idFolder")?.let {
+            if (arguments?.getLong("idFolder") != -1L) {
+                makeNoteViewModel.setFolderId(arguments?.getLong("idFolder")!!)
+            }
         }
-
-        if (arguments?.getLong("noteId") != null && arguments?.getLong("noteId") != -1L) {
-            kotlin.io.println("noteId: ${arguments?.getLong("noteId")!!}")
-            makeNoteViewModel.noteId = arguments?.getLong("noteId")!!
-        } else {
+        arguments?.getLong("noteId")?.let {
+            if (arguments?.getLong("noteId") != -1L) {
+                makeNoteViewModel.noteId = arguments?.getLong("noteId")!!
+            }
         }
     }
 
     private fun listenPaintSheetResult() {
-        setFragmentResultListener(paintResultKey) { requestKey: String, bundle: Bundle ->
+        setFragmentResultListener(paintResultKey) { _: String, bundle: Bundle ->
             val paintBitmap = bundle.getString("pathBitmap")
-            if (paintBitmap != null) {
+            paintBitmap?.let {
                 makeNoteViewModel.setPaintSheetResult(paintBitmap)
                 saveNote()
-            } else {
+            } ?: run {
                 throw java.lang.Exception("Не удалось получить данные paintActivity")
             }
         }
@@ -244,7 +234,6 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
             }
 
             is UserActionNote.SavedNoteToDB -> {}
-            else -> {}
         }
     }
 
@@ -374,20 +363,25 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
     }
 
     // пока не знаю как быть с этой функцией, думаю какую-то часть перенести во вьюмодельку, но нужно будет инжектить filesController
-    private fun makeCameraFileAndOpenCamera(it: FragmentActivity): Job {
+    private fun makeCameraFileAndOpenCamera(fragmentActivity: FragmentActivity): Job {
         val timeStamp = SimpleDateFormat("yyyyMMddHHmmSS", Locale.getDefault()).format(Date())
 
         val file =
             filesController.saveToInternalStorage(
-                it,
+                fragmentActivity,
                 "image_${Calendar.getInstance().timeInMillis}_$timeStamp.jpg",
             )
         file?.createNewFile()
-        cameraUri =
-            filesController.getUriForFile(
-                it,
-                file!!,
-            )
+        file?.let {
+            cameraUri =
+                filesController.getUriForFile(
+                    fragmentActivity,
+                    file,
+                )
+        } ?: run {
+            return@run
+        }
+
         return lifecycleScope.launch {
             getImageFromCamera.launch(
                 cameraUri,

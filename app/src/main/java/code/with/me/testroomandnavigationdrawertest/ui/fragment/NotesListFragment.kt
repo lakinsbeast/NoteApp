@@ -1,27 +1,19 @@
 package code.with.me.testroomandnavigationdrawertest.ui.fragment
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.ValueAnimator
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewAnimationUtils
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
-import android.widget.FrameLayout
 import android.widget.Toast
-import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
-import code.with.me.testroomandnavigationdrawertest.data.Utils.getDisplayMetrics
-import code.with.me.testroomandnavigationdrawertest.data.Utils.gone
-import code.with.me.testroomandnavigationdrawertest.data.Utils.visible
+import code.with.me.testroomandnavigationdrawertest.data.utils.gone
+import code.with.me.testroomandnavigationdrawertest.data.utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.data.enums.NoteItemsCallback
 import code.with.me.testroomandnavigationdrawertest.databinding.FragmentNotesListBinding
@@ -37,7 +29,6 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
-import kotlin.math.hypot
 
 class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
     FragmentNotesListBinding::inflate,
@@ -206,10 +197,10 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
                         NoteItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                     val holder = BaseViewHolder(binding)
                     holder.itemView.setOnClickListener {
-                        clickListener?.invoke(holder)
+                        clickListener.invoke(holder)
                     }
                     holder.itemView.setOnLongClickListener {
-                        onLongClickListener?.invoke(holder)
+                        onLongClickListener.invoke(holder)
                         true
                     }
 

@@ -113,7 +113,8 @@ class ControllerModule {
         ReplaceFragmentImpl(fragmentBackStackManager)
 
     @Provides
-    fun provideCloseFragmentImpl(getFragment: IGetFragment): ICloseFragment = CloseFragmentImpl(getFragment)
+    fun provideCloseFragmentImpl(getFragment: IGetFragment): ICloseFragment =
+        CloseFragmentImpl(getFragment)
 
     @Provides
     fun provideFragmentController(

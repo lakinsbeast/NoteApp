@@ -11,8 +11,8 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import androidx.viewbinding.ViewBinding
-import code.with.me.testroomandnavigationdrawertest.data.Utils.findActivity
-import code.with.me.testroomandnavigationdrawertest.data.Utils.setRoundedCornersView
+import code.with.me.testroomandnavigationdrawertest.data.utils.findActivity
+import code.with.me.testroomandnavigationdrawertest.data.utils.setRoundedCornersView
 
 // лучше использовать DialogFragment, вместо Dialog
 @SuppressLint("ResourceType")

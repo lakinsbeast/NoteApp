@@ -7,9 +7,8 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.transition.Slide
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
-import code.with.me.testroomandnavigationdrawertest.data.Utils.safeClickListener
+import code.with.me.testroomandnavigationdrawertest.data.utils.safeClickListener
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Folder
 import code.with.me.testroomandnavigationdrawertest.databinding.FolderItemBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.FragmentFolderListBinding
@@ -93,7 +92,11 @@ abstract class BaseFolderListFragment :
                     viewType: Int,
                 ): BaseViewHolder<FolderItemBinding> {
                     val binding =
-                        FolderItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                        FolderItemBinding.inflate(
+                            LayoutInflater.from(parent.context),
+                            parent,
+                            false
+                        )
                     val holder = BaseViewHolder(binding)
                     initCreateClickListeners(holder)
                     return holder
@@ -114,10 +117,10 @@ abstract class BaseFolderListFragment :
 
                 fun initCreateClickListeners(holder: BaseViewHolder<FolderItemBinding>) {
                     holder.itemView.setOnClickListener {
-                        clickListener?.invoke(holder)
+                        clickListener.invoke(holder)
                     }
                     holder.itemView.setOnLongClickListener {
-                        onLongClickListener?.invoke(holder)
+                        onLongClickListener.invoke(holder)
                         return@setOnLongClickListener true
                     }
                 }
@@ -142,7 +145,7 @@ abstract class BaseFolderListFragment :
                 async {
                     folderViewModel.updateLastOpenedFolder(System.currentTimeMillis(), id)
                 }.await()
-                withContext(Dispatchers.Main) {
+                withContext(Dispatchers.Main.immediate) {
                     val folderHomeFragment = parentFragment as? FolderHomeFragment
                     folderHomeFragment?.navigateToNotesListFragment(id)
                 }

@@ -3,7 +3,7 @@ package code.with.me.testroomandnavigationdrawertest.ui.sheet
 import android.os.Bundle
 import android.view.View
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
-import code.with.me.testroomandnavigationdrawertest.data.Utils.mainScope
+import code.with.me.testroomandnavigationdrawertest.data.utils.mainScope
 import code.with.me.testroomandnavigationdrawertest.databinding.SeeTextSheetBinding
 import code.with.me.testroomandnavigationdrawertest.markdown.StringToMarkdownTextParser
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet

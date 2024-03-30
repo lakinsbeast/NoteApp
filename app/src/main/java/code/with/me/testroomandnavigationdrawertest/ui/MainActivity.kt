@@ -12,7 +12,9 @@ import code.with.me.testroomandnavigationdrawertest.ui.fragment.MainScreenFragme
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
+    private val binding: ActivityMainBinding by lazy {
+        ActivityMainBinding.inflate(layoutInflater)
+    }
 
     @Inject
     lateinit var fragmentController: FragmentController
@@ -23,8 +25,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         initAppComponent()
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-
         setContentView(binding.root)
 
         val fragment = MainScreenFragment()
@@ -33,17 +33,7 @@ class MainActivity : AppCompatActivity() {
             fragment,
             fragmentOptionsBuilder {
                 fragmentLayout = R.id.fragment_detail
-            },
-
-        )
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
+            })
     }
 
     private fun initAppComponent() {

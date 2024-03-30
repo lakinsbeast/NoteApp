@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "(test) room and navigation drawer test"
 include ':app'
+include ':lint-rules'

@@ -6,9 +6,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
-import code.with.me.testroomandnavigationdrawertest.data.Utils.gone
-import code.with.me.testroomandnavigationdrawertest.data.Utils.setUpperRoundedCornersView
-import code.with.me.testroomandnavigationdrawertest.data.Utils.visible
+import code.with.me.testroomandnavigationdrawertest.data.utils.gone
+import code.with.me.testroomandnavigationdrawertest.data.utils.setUpperRoundedCornersView
+import code.with.me.testroomandnavigationdrawertest.data.utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.enums.NoteItemsCallback
 import code.with.me.testroomandnavigationdrawertest.databinding.NoteMenuSheetBinding
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
@@ -89,7 +89,6 @@ class NoteMenuSheet(private val idOfNote: Long, private val action: (NoteItemsCa
         noteMenuSheetViewModel =
             ViewModelProvider(this, factory)[NoteMenuSheetViewModel::class.java]
         noteMenuSheetViewModel.shareTextLiveData.observe(viewLifecycleOwner) {
-            println("it: $it")
             if (it.isNotBlank()) {
                 val intent = Intent()
                 intent.action = Intent.ACTION_SEND

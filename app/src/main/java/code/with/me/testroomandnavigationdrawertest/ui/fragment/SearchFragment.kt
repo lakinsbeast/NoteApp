@@ -1,5 +1,6 @@
 package code.with.me.testroomandnavigationdrawertest.ui.fragment
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
-import code.with.me.testroomandnavigationdrawertest.data.Utils.hideKeyboard
+import code.with.me.testroomandnavigationdrawertest.data.utils.hideKeyboard
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.NoteFTS
 import code.with.me.testroomandnavigationdrawertest.databinding.NoteItemBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.SearchFragmentBinding
@@ -99,8 +100,10 @@ class SearchFragment : BaseFragment<SearchFragmentBinding>(
         val searchEditText =
             binding.searchView.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)
         searchEditText.setTextColor(resources.getColor(R.color.white, null))
-        searchEditText.textCursorDrawable =
-            resources.getDrawable(R.drawable.text_cursor, null)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            searchEditText.textCursorDrawable =
+                resources.getDrawable(R.drawable.text_cursor, null)
+        }
     }
 
     private fun initAdapterBinding() {
@@ -159,10 +162,10 @@ class SearchFragment : BaseFragment<SearchFragmentBinding>(
                         NoteItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                     val holder = BaseViewHolder(binding)
                     holder.itemView.setOnClickListener {
-                        clickListener?.invoke(holder)
+                        clickListener.invoke(holder)
                     }
                     holder.itemView.setOnLongClickListener {
-                        onLongClickListener?.invoke(holder)
+                        onLongClickListener.invoke(holder)
                         true
                     }
                     return holder

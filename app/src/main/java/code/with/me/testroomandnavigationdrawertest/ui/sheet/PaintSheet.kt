@@ -15,7 +15,6 @@ import androidx.core.view.drawToBitmap
 import androidx.fragment.app.setFragmentResult
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
-import code.with.me.testroomandnavigationdrawertest.data.Utils.println
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityPaintBinding
 import code.with.me.testroomandnavigationdrawertest.file.FilesController
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
@@ -29,7 +28,7 @@ import java.util.*
 import javax.inject.Inject
 
 class PaintSheet : BaseSheet<ActivityPaintBinding>(ActivityPaintBinding::inflate) {
-    private var drawuri: Uri? = null
+    private lateinit var drawuri: Uri
     private var isClicked: Boolean = false
     private var brushSizeForUndo: Float = 20f
     private var colorBrush: Int = -99999999
@@ -97,11 +96,16 @@ class PaintSheet : BaseSheet<ActivityPaintBinding>(ActivityPaintBinding::inflate
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream)
                     outputStream.flush()
                 }
-                drawuri =
-                    filesController.getUriForFile(
-                        requireContext(),
-                        file!!,
-                    )
+                file?.let {
+                    drawuri =
+                        filesController.getUriForFile(
+                            requireContext(),
+                            file,
+                        )
+                } ?: run {
+                    println("file is null")
+                    return@setOnClickListener
+                }
 
                 val resultIntent =
                     Bundle().apply {

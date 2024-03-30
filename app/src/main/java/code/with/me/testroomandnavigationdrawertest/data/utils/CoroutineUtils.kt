@@ -1,4 +1,4 @@
-package code.with.me.testroomandnavigationdrawertest.data.Utils
+package code.with.me.testroomandnavigationdrawertest.data.utils
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +17,7 @@ fun launchAfterTimerMain(
     block: suspend () -> Unit,
 ) {
     scope.cancel()
-    scope = CoroutineScope(Dispatchers.Main + Job())
+    scope = CoroutineScope(Dispatchers.Main.immediate + Job())
     scope.launch {
         delay(time)
         block.invoke()
@@ -37,7 +37,7 @@ fun launchAfterTimerIO(
 }
 
 suspend fun CoroutineScope.mainScope(block: suspend () -> Unit) {
-    withContext(Dispatchers.Main) {
+    withContext(Dispatchers.Main.immediate) {
         block()
     }
 }

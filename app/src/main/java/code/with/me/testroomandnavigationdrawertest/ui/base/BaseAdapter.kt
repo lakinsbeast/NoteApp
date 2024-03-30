@@ -10,9 +10,17 @@ open class BaseAdapter<T : Identifiable, A : ViewBinding>(val binding: A) :
     ListAdapter<T, BaseAdapter.BaseViewHolder<A>>(
         code.with.me.testroomandnavigationdrawertest.ui.DiffUtil(),
     ) {
-    private var recycView: RecyclerView? = null
-    var clickListener: ((binding: BaseViewHolder<A>) -> Unit)? = null
-    var onLongClickListener: ((binding: BaseViewHolder<A>) -> Unit)? = null
+    private var recyclerView: RecyclerView? = null
+
+    // cannot be used
+    //    val newclickListener by lazy {
+//        { binding: BaseViewHolder<A> ->
+//
+//        }
+//    }
+
+    lateinit var clickListener: (binding: BaseViewHolder<A>) -> Unit
+    lateinit var onLongClickListener: (binding: BaseViewHolder<A>) -> Unit
 
     class BaseViewHolder<T : ViewBinding>(val binding: T) :
         RecyclerView.ViewHolder(binding.root)
@@ -36,11 +44,11 @@ open class BaseAdapter<T : Identifiable, A : ViewBinding>(val binding: A) :
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
-        recycView = recyclerView
+        this.recyclerView = recyclerView
     }
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         super.onDetachedFromRecyclerView(recyclerView)
-        recycView = null
+        this.recyclerView = null
     }
 }

@@ -1,4 +1,4 @@
-package code.with.me.testroomandnavigationdrawertest.data.Utils
+package code.with.me.testroomandnavigationdrawertest.data.utils
 
 import android.content.Context
 import android.os.Build
