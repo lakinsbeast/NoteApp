@@ -5,34 +5,41 @@ import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.View
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
-import code.with.me.testroomandnavigationdrawertest.NotesApplication
-import code.with.me.testroomandnavigationdrawertest.data.utils.launchAfterTimerMain
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import code.with.me.testroomandnavigationdrawertest.appComponent
 import code.with.me.testroomandnavigationdrawertest.data.utils.println
 import code.with.me.testroomandnavigationdrawertest.data.utils.setCancelButton
 import code.with.me.testroomandnavigationdrawertest.data.utils.setChipSelectedDesign
 import code.with.me.testroomandnavigationdrawertest.data.utils.setChipUnSelectedDesign
 import code.with.me.testroomandnavigationdrawertest.data.utils.setConfirmButton
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Folder
+import code.with.me.testroomandnavigationdrawertest.data.utils.launchMainScope
 import code.with.me.testroomandnavigationdrawertest.databinding.CreateFolderDialogBinding
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseDialog
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderViewModel
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.CreateFolderViewModel
 import com.google.android.material.chip.Chip
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
 
 class CreateFolderDialog() :
     BaseDialog<CreateFolderDialogBinding>(CreateFolderDialogBinding::inflate) {
-    private var selectedChip = -2
-    private var selectedText = ""
 
     @Inject
-    @Named("folderVMFactory")
+    @Named("createFolderVMFactory")
     lateinit var folderVmFactory: ViewModelProvider.Factory
-    private lateinit var folderViewModel: FolderViewModel
+    private val viewModel: CreateFolderViewModel by lazy {
+        ViewModelProvider(
+            (context as MainActivity).viewModelStore,
+            folderVmFactory,
+        )[CreateFolderViewModel::class.java]
+    }
 
-    private var textRunnable =
+    private var textListener =
         object : TextWatcher {
             override fun beforeTextChanged(
                 s: CharSequence?,
@@ -49,7 +56,6 @@ class CreateFolderDialog() :
                 count: Int,
             ) {
                 binding.apply {
-                    text.println()
                     if (text != null) {
                         findTextGroupChip(text)
                     }
@@ -63,7 +69,6 @@ class CreateFolderDialog() :
     override fun onCreate(savedInstanceState: Bundle?) {
         initAppComponent()
         super.onCreate(savedInstanceState)
-        initViewModel()
     }
 
     override fun onViewCreated(
@@ -82,35 +87,38 @@ class CreateFolderDialog() :
 
     private fun initAppComponent() {
         context.let {
-            val appComponent =
-                ((it as MainActivity).application as NotesApplication).appComponent
-            appComponent.inject(this@CreateFolderDialog)
+            appComponent.inject(this)
         }
     }
 
-    private fun initViewModel() {
-        folderViewModel =
-            ViewModelProvider(
-                (context as MainActivity).viewModelStore,
-                folderVmFactory,
-            )[FolderViewModel::class.java]
-    }
-
+    /** похоже это бесполезно, потому что вне зависимости от выбора размытие работает
+     * на заднем фоне*/
     private fun listenVM() {
-        folderViewModel.isUseBehindBlurEnabled.observe(viewLifecycleOwner) {
-            isBehindNeedBlurred = it
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.isUseBehindBlurEnabled.collect {
+                    isBehindNeedBlurred = it
+                }
+            }
         }
-        folderViewModel.isUseBackgroundBlurEnabled.observe(viewLifecycleOwner) {
-            isBackgroundNeedBlurred = it
+
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.isUseBackgroundBlurEnabled.collect {
+                    isBackgroundNeedBlurred = it
+                }
+            }
         }
     }
 
     private fun initTextListeners() {
         binding.apply {
-            folderNameInput.addTextChangedListener(textRunnable)
+            folderNameInput.addTextChangedListener(textListener)
         }
     }
 
+    /** находит указанный параметром текст chip из chipGroup и выделяет белым цветом
+     * при помощи .setChipSelectedDesign */
     private fun findTextGroupChip(text: CharSequence) {
         for (chip in 0 until binding.chipGroup.childCount) {
             val selectedChip = (binding.chipGroup.getChildAt(chip) as Chip)
@@ -124,6 +132,7 @@ class CreateFolderDialog() :
         }
     }
 
+    /** проходится по списку чипов(chipGroup) и делает их "невыбранными" */
     private fun clearAllSelectedChip() {
         for (chip in 0 until binding.chipGroup.childCount) {
             (binding.chipGroup.getChildAt(chip) as Chip).setChipUnSelectedDesign()
@@ -132,19 +141,20 @@ class CreateFolderDialog() :
 
     private fun initClickListeners() {
         binding.apply {
+            /** при клике на любой chip ищет нужный чип и выделяет его белым цветом */
             chipGroup.setOnCheckedStateChangeListener { group, checkedIds ->
                 clearAllSelectedChip()
                 val checkedChip = root.findViewById<Chip>(chipGroup.checkedChipId)
-                if (chipGroup.checkedChipId != -1) {
-                    selectedChip = chipGroup.checkedChipId
-                }
+//                if (chipGroup.checkedChipId != -1) {
+//                    viewModel.selectedChip = chipGroup.checkedChipId
+//                }
                 checkedChip?.let {
                     it.setChipSelectedDesign()
                     val chipText = it.text.toString()
-                    selectedText = chipText
-                    folderNameInput.removeTextChangedListener(textRunnable)
+                    viewModel.selectedText = chipText
+                    folderNameInput.removeTextChangedListener(textListener)
                     folderNameInput.text.clear()
-                    folderNameInput.addTextChangedListener(textRunnable)
+                    folderNameInput.addTextChangedListener(textListener)
                     folderNameInput.append(chipText)
                 }
             }
@@ -156,8 +166,8 @@ class CreateFolderDialog() :
                     folderNameInput.error = "Введите название!"
                     return@setOnClickListener
                 }
-                launchAfterTimerMain(0) {
-                    folderViewModel.insertFolder(
+                launchMainScope {
+                    viewModel.insertFolder(
                         Folder(
                             folderNameInput.text.toString(),
                             System.currentTimeMillis(),
@@ -173,6 +183,7 @@ class CreateFolderDialog() :
         }
     }
 
+    /** заготовленные имена папок, на рандом достаются 4 штуки */
     val folderNames =
         mutableListOf(
             "🏞️ Путешествия",
@@ -195,8 +206,29 @@ class CreateFolderDialog() :
             "💼 Работа и задачи",
             "🌆 Городская жизнь",
             "🌱 Хобби и увлечения",
+            "💖 Личное",
+            "👨‍👩‍👧‍👦 Семья и друзья",
+            "🐶 Питомцы",
+            "🛠️ DIY и ремонт",
+            "🛍️ Покупки и шопинг",
+            "💻 Технологии",
+            "🩺 Медицина и здоровье",
+            "🏛️ Культура и искусство",
+            "🌳 Природа и экология",
+            "🚀 Наука и космос",
+            "🙏 Благотворительность",
+            "🎧 Подкасты и аудиокниги",
+            "🎬 Кино и сериалы",
+            "🎮 Игры",
+            "🎤 Музыкальные инструменты",
+            "✍️ Письмо и журналистика",
+            "📸 Фотография",
+            "💃🕺 Танцы",
+            "🤸‍♀️ Спорт",
+            "🧘‍♀️ Медитация и йога"
         )
 
+    /** создает 4 chip'a со случайным названием из folderNames */
     private fun generateChip() {
         binding.chipGroup.removeAllViewsInLayout()
         repeat(4) {

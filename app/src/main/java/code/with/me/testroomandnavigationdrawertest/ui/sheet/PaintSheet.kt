@@ -15,6 +15,7 @@ import androidx.core.view.drawToBitmap
 import androidx.fragment.app.setFragmentResult
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
+import code.with.me.testroomandnavigationdrawertest.appComponent
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityPaintBinding
 import code.with.me.testroomandnavigationdrawertest.file.FilesController
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
@@ -53,7 +54,6 @@ class PaintSheet : BaseSheet<ActivityPaintBinding>(ActivityPaintBinding::inflate
     }
 
     private fun initAppComponent() {
-        val appComponent = (requireActivity().application as NotesApplication).appComponent
         appComponent.inject(this)
     }
 

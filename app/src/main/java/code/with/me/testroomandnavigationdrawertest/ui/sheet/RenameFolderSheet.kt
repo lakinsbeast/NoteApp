@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
+import code.with.me.testroomandnavigationdrawertest.appComponent
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Folder
 import code.with.me.testroomandnavigationdrawertest.databinding.RenameFolderBottomSheetBinding
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
@@ -21,6 +22,7 @@ import javax.inject.Inject
 import javax.inject.Named
 import kotlin.coroutines.CoroutineContext
 
+/** todo не используется*/
 class RenameFolderSheet :
     BaseSheet<RenameFolderBottomSheetBinding>(RenameFolderBottomSheetBinding::inflate),
     CoroutineScope {
@@ -31,7 +33,9 @@ class RenameFolderSheet :
     @Inject
     @Named("folderVMFactory")
     lateinit var folderVmFactory: ViewModelProvider.Factory
-    private lateinit var folderViewModel: FolderViewModel
+    private val folderViewModel: FolderViewModel by lazy {
+        ViewModelProvider(this, folderVmFactory).get(FolderViewModel::class.java)
+    }
 
     override fun onViewCreated(
         view: View,
@@ -39,21 +43,13 @@ class RenameFolderSheet :
     ) {
         super.onViewCreated(view, savedInstanceState)
         initAppComponent()
-        initViewModel()
         initClickListeners()
     }
 
     private fun initAppComponent() {
-        activity?.let {
-            val appComponent = (it.application as NotesApplication).appComponent
-            appComponent.inject(this@RenameFolderSheet)
-        }
+        appComponent.inject(this)
     }
 
-    private fun initViewModel() {
-        folderViewModel =
-            ViewModelProvider(this, folderVmFactory).get(FolderViewModel::class.java)
-    }
 
     private fun initClickListeners() {
         binding.renameFolderBtn.setOnClickListener {

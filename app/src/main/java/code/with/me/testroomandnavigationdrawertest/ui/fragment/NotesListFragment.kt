@@ -7,11 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.Toast
+import androidx.core.view.isGone
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
+import code.with.me.testroomandnavigationdrawertest.appComponent
 import code.with.me.testroomandnavigationdrawertest.data.utils.gone
 import code.with.me.testroomandnavigationdrawertest.data.utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
@@ -36,18 +38,19 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
     lateinit var adapter: BaseAdapter<Note, NoteItemBinding>
     private lateinit var itemsBinding: NoteItemBinding
 
-    var idFolder = -1L
-
     @Inject
     @Named("noteVMFactory")
     lateinit var factory: ViewModelProvider.Factory
-    private lateinit var noteViewModel: NoteViewModel
+    private val noteViewModel: NoteViewModel by lazy {
+        ViewModelProvider(this, factory)[NoteViewModel::class.java]
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val appComponent = (requireActivity().application as NotesApplication).appComponent
         appComponent.inject(this)
-        idFolder = arguments?.getLong("idFolder") ?: -1
+        /** достаем айди папки, если он был выбран и выводим все заметки, которые
+         * привязаны к папке*/
+        noteViewModel.idFolder = arguments?.getLong("idFolder") ?: -1
     }
 
     override fun onViewCreated(
@@ -55,7 +58,6 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        initViewModel()
         initAdapterBinding()
         initAppComponent()
         initAdapter()
@@ -71,41 +73,36 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
             noteViewModel.userActionState.observe(viewLifecycleOwner) { state ->
                 handleUserActionState(state)
             }
-            if (idFolder == -1L) {
+            if (noteViewModel.idFolder == -1L) {
                 noteViewModel.getAllNotes()
             } else {
-                noteViewModel.getAllNotes(idFolder)
+                noteViewModel.getAllNotes(noteViewModel.idFolder)
             }
         }
     }
 
+    // TODO: проверить нужно или нет
     private fun handleUserActionState(state: NotesListUserAction) {
         binding.apply {
             when (state) {
                 is NotesListUserAction.ShareText<*> -> {
-                    println("SHARE!!")
                     if (state.data.toString().isNotBlank()) {
-                        val intent = Intent()
-                        intent.action = Intent.ACTION_SEND
-                        intent.type = "text/plain"
-                        intent.putExtra(Intent.EXTRA_TEXT, state.data.toString())
-                        startActivity(Intent.createChooser(intent, "Share via"))
+                        Intent().apply {
+                            action = Intent.ACTION_SEND
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT, state.data.toString())
+                            startActivity(Intent.createChooser(this, "Share via"))
+                        }
                     } else {
                         Toast.makeText(context, "Пустой текст", Toast.LENGTH_SHORT).show()
                     }
                 }
-
-                else -> {}
             }
         }
     }
 
     private fun showProgressBar(show: Boolean) {
-        if (show) {
-            binding.progressBar.visible()
-        } else {
-            binding.progressBar.gone()
-        }
+        binding.progressBar.isGone = !show
     }
 
     private fun handleViewState(state: NoteState) {
@@ -134,7 +131,6 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
     }
 
     private fun initAppComponent() {
-        val appComponent = (activity?.application as NotesApplication).appComponent
         appComponent.inject(this)
     }
 
@@ -143,9 +139,6 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
             NoteItemBinding.inflate(layoutInflater, binding.rv.parent as ViewGroup, false)
     }
 
-    private fun initViewModel() {
-        noteViewModel = ViewModelProvider(this, factory)[NoteViewModel::class.java]
-    }
 
     private fun initRecyclerView(binding: FragmentNotesListBinding) {
         binding.apply {
@@ -162,16 +155,12 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
     private fun initAdapter() {
         adapter =
             object : BaseAdapter<Note, NoteItemBinding>(itemsBinding) {
-                private var selected0 = -1
-
                 init {
                     clickListener = {
-                        selected0 = it.layoutPosition
                         val item = getItem(it.layoutPosition) as Note
                         openDetailFragment(it.itemView, item.id)
                     }
                     onLongClickListener = {
-                        selected0 = it.layoutPosition
                         val item = getItem(it.layoutPosition) as Note
 
                         openPreviewDialog(item.id /*x, y*/)

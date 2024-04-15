@@ -21,32 +21,7 @@ constructor(
     private val repo: FolderRepository,
     private val dataStoreManager: DataStoreManager,
 ) : BaseViewModel() {
-    private val _state = MutableLiveData<FolderVMState>(FolderVMState.Loading)
-    val state: LiveData<FolderVMState>
-        get() = _state
 
-    private fun setState(state: FolderVMState) {
-        _state.postValue(state)
-    }
-
-    private val _isUseBehindBlurEnabled = MutableLiveData<Boolean>()
-    val isUseBehindBlurEnabled = _isUseBehindBlurEnabled
-
-    private val _isUseBackgroundBlurEnabled = MutableLiveData<Boolean>()
-    val isUseBackgroundBlurEnabled = _isUseBackgroundBlurEnabled
-
-    init {
-        viewModelScope.launch {
-            dataStoreManager.useBehindBlurFlow.collect {
-                _isUseBehindBlurEnabled.postValue(it)
-            }
-        }
-        viewModelScope.launch {
-            dataStoreManager.useBackgroundBlurFlow.collect {
-                _isUseBackgroundBlurEnabled.postValue(it)
-            }
-        }
-    }
 
     fun getAllFolders(): Flow<List<Folder>> = repo.getAllFolders()
 
@@ -78,6 +53,8 @@ constructor(
     suspend fun updateFolder(folder: Folder) = repo.updateFolder(folder)
 
     suspend fun deleteFolder(folder: Folder) = repo.deleteFolder(folder)
+
+
 }
 
 sealed class FolderVMState {

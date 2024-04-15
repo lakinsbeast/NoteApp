@@ -23,12 +23,10 @@ class MainScreenViewModel(
     private val dataStoreManager: DataStoreManager,
 ) : ViewModel() {
 
-//    private var selectedChip = -1
-//    private var selectedChipFolderId = 1L
-
     private val _selectedChip = MutableStateFlow(-1)
     val selectedChip = _selectedChip.asStateFlow()
 
+    /** todo понять зачем нужен в принципе нужен selectedChipFolderId */
     private val _selectedChipFolderId = MutableStateFlow(1L)
     val selectedChipFolderId = _selectedChipFolderId.asStateFlow()
     fun getAllFolders(): Flow<List<Folder>> = repoFolder.getAllFolders()
@@ -37,6 +35,7 @@ class MainScreenViewModel(
     val isUseFolderEnabled = _isUseFolderEnabled.asStateFlow()
 
     init {
+        /** нужно ли использовать папки, если false, то скрывает вьюху папок */
         viewModelScope.launch {
             dataStoreManager.useFolderFlow.collect {
                 _isUseFolderEnabled.emit(it)

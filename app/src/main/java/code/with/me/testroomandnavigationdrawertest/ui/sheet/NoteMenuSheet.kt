@@ -4,15 +4,23 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isGone
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
-import code.with.me.testroomandnavigationdrawertest.NotesApplication
-import code.with.me.testroomandnavigationdrawertest.data.utils.gone
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import code.with.me.testroomandnavigationdrawertest.appComponent
+import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.ROUNDED_CORNERS_SHEET
+import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.ROUNDED_CORNERS_STROKE
 import code.with.me.testroomandnavigationdrawertest.data.utils.setUpperRoundedCornersView
-import code.with.me.testroomandnavigationdrawertest.data.utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.enums.NoteItemsCallback
 import code.with.me.testroomandnavigationdrawertest.databinding.NoteMenuSheetBinding
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteMenuSheetViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -21,7 +29,9 @@ class NoteMenuSheet(private val idOfNote: Long, private val action: (NoteItemsCa
     @Inject
     @Named("noteMenuSheetVMFactory")
     lateinit var factory: ViewModelProvider.Factory
-    private lateinit var noteMenuSheetViewModel: NoteMenuSheetViewModel
+    private val viewModel: NoteMenuSheetViewModel by lazy {
+        ViewModelProvider(this, factory)[NoteMenuSheetViewModel::class.java]
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +40,6 @@ class NoteMenuSheet(private val idOfNote: Long, private val action: (NoteItemsCa
 
     private fun initAppComponent() {
         activity?.let {
-            val appComponent = (it.application as NotesApplication).appComponent
             appComponent.inject(this)
         }
     }
@@ -40,63 +49,66 @@ class NoteMenuSheet(private val idOfNote: Long, private val action: (NoteItemsCa
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        initAndListenViewModel()
+        listenViewModel()
         binding.mainLayout.setUpperRoundedCornersView(
-            (1.0f) * 64f,
+            ROUNDED_CORNERS_SHEET,
             Color.WHITE,
             Color.BLACK,
-            (1.0f) * 5f,
+            ROUNDED_CORNERS_STROKE,
         )
         binding.apply {
             progressBar.playAnimation()
-            shareLay.setOnClickListener {
-                showCustomProgressBar(true)
-                noteMenuSheetViewModel.shareText(idOfNote)
-            }
-            moveLay.setOnClickListener {
-                action.invoke(NoteItemsCallback.MOVE)
-                dismiss()
-            }
-            // TODO сделать так, чтоб в зависимости от того в избранном он или нет менялся текст и иконка
-            favoriteLay.setOnClickListener {
-                action.invoke(NoteItemsCallback.FAVORITE)
-                dismiss()
-            }
-            lockLay.setOnClickListener {
-                action.invoke(NoteItemsCallback.LOCK)
-                dismiss()
-            }
-            deleteLay.setOnClickListener {
-                action.invoke(NoteItemsCallback.DELETE)
-                dismiss()
-            }
-            closeBtn.setOnClickListener {
-                dismiss()
-            }
+            initClickListeners()
         }
         setStateCollapsed()
     }
 
-    fun showCustomProgressBar(show: Boolean) {
-        if (show) {
-            binding.progressBarLay.visible()
-        } else {
-            binding.progressBarLay.gone()
+    private fun NoteMenuSheetBinding.initClickListeners() {
+        shareLay.setOnClickListener {
+            showCustomProgressBar(true)
+            viewModel.shareText(idOfNote)
+        }
+        moveLay.setOnClickListener {
+            action.invoke(NoteItemsCallback.MOVE)
+            dismiss()
+        }
+        // TODO сделать так, чтоб в зависимости от того в избранном он или нет менялся текст и иконка
+        favoriteLay.setOnClickListener {
+            action.invoke(NoteItemsCallback.FAVORITE)
+            dismiss()
+        }
+        lockLay.setOnClickListener {
+            action.invoke(NoteItemsCallback.LOCK)
+            dismiss()
+        }
+        deleteLay.setOnClickListener {
+            action.invoke(NoteItemsCallback.DELETE)
+            dismiss()
+        }
+        closeBtn.setOnClickListener {
+            dismiss()
         }
     }
 
-    private fun initAndListenViewModel() {
-        noteMenuSheetViewModel =
-            ViewModelProvider(this, factory)[NoteMenuSheetViewModel::class.java]
-        noteMenuSheetViewModel.shareTextLiveData.observe(viewLifecycleOwner) {
-            if (it.isNotBlank()) {
-                val intent = Intent()
-                intent.action = Intent.ACTION_SEND
-                intent.type = "text/plain"
-                intent.putExtra(Intent.EXTRA_TEXT, it)
-                startActivity(Intent.createChooser(intent, "Поделиться текстом с"))
+    private fun showCustomProgressBar(show: Boolean) {
+        binding.progressBarLay.isGone = !show
+    }
+
+    private fun listenViewModel() {
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.shareTextLiveData.drop(1).flowOn(Dispatchers.Main.immediate)
+                    .collect { shareText ->
+                        if (shareText.isNotBlank()) {
+                            val intent = Intent()
+                            intent.action = Intent.ACTION_SEND
+                            intent.type = "text/plain"
+                            intent.putExtra(Intent.EXTRA_TEXT, shareText)
+                            startActivity(Intent.createChooser(intent, "Поделиться текстом с"))
+                        }
+                        showCustomProgressBar(false)
+                    }
             }
-            showCustomProgressBar(false)
         }
     }
 }

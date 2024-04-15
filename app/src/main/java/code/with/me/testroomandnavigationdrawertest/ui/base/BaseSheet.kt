@@ -11,6 +11,7 @@ import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.viewbinding.ViewBinding
+import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.STANDARD_BLUR_RADIUS
 import code.with.me.testroomandnavigationdrawertest.data.utils.findActivity
 import code.with.me.testroomandnavigationdrawertest.data.utils.getDisplayMetrics
 import code.with.me.testroomandnavigationdrawertest.data.utils.gone
@@ -50,7 +51,10 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
         }
     val binding get() = _binding!!
 
+    /** коллбэк при движении sheet вверх/вниз можно переопределить*/
     var onSlide: ((Float) -> Unit) = {}
+
+    /** коллбэк стейта sheet можно переопределить*/
     var onStateChanged: ((Int, Int) -> Unit) = { oldState, newState -> }
 
     private lateinit var progressBar: ProgressBar
@@ -79,8 +83,8 @@ abstract class BaseSheet<VB : ViewBinding>(val get: ((LayoutInflater, ViewGroup?
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             dialog?.window?.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
-            dialog?.window?.attributes?.blurBehindRadius = 10
-            dialog?.window?.setBackgroundBlurRadius(10)
+            dialog?.window?.attributes?.blurBehindRadius = STANDARD_BLUR_RADIUS
+            dialog?.window?.setBackgroundBlurRadius(STANDARD_BLUR_RADIUS)
         }
     }
 

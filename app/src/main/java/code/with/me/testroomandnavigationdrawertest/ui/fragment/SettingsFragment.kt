@@ -3,6 +3,7 @@ package code.with.me.testroomandnavigationdrawertest.ui.fragment
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.updateLayoutParams
+import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.SETTINGS_IMAGE_HEIGHT_WIDTH
 import code.with.me.testroomandnavigationdrawertest.databinding.SettingsFragmentBinding
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.SettingsSheet
@@ -19,10 +20,19 @@ class SettingsFragment : BaseFragment<SettingsFragmentBinding>(SettingsFragmentB
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        initAnimation()
+        openSettingsSheet()
+    }
+
+    private fun initAnimation() {
         binding.imageView.updateLayoutParams {
-            height = ((1.0f) * 650).toInt()
-            width = ((1.0f) * 650).toInt()
+            height = SETTINGS_IMAGE_HEIGHT_WIDTH
+            width = SETTINGS_IMAGE_HEIGHT_WIDTH
         }
+        binding.imageView.playAnimation()
+    }
+
+    private fun openSettingsSheet() {
         val sheet =
             SettingsSheet {
                 binding.frameLayout.alpha = 1.0f - it
@@ -31,14 +41,12 @@ class SettingsFragment : BaseFragment<SettingsFragmentBinding>(SettingsFragmentB
                     height = ((1.0f - it) * 650).toInt()
                     width = ((1.0f - it) * 650).toInt()
                 }
+            }.apply {
+                canHide = false
+                isBackNeedBeBlurred = false
+                doSheetBackShadowed = false
+                isSheetCancelable = false
             }
-        binding.imageView.playAnimation()
-        sheet.apply {
-            canHide = false
-            isBackNeedBeBlurred = false
-            doSheetBackShadowed = false
-            isSheetCancelable = false
-        }
         activity().sheetController.showSheet(activity(), sheet)
     }
 }

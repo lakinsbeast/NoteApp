@@ -3,9 +3,9 @@ package code.with.me.testroomandnavigationdrawertest.data.utils
 import android.content.Context
 import android.text.format.DateUtils
 
-fun getDate(
-    context: Context,
+fun Context?.getDate(
     time: Long,
 ): String? {
-    return DateUtils.formatDateTime(context, time, DateUtils.FORMAT_SHOW_YEAR)
+    if (this == null) return ""
+    return DateUtils.formatDateTime(this, time, DateUtils.FORMAT_SHOW_YEAR)
 }

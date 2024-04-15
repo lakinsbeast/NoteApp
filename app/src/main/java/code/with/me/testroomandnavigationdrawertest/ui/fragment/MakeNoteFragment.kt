@@ -22,7 +22,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.AlertCreator
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.PermissionController
+import code.with.me.testroomandnavigationdrawertest.PermissionController.checkCameraAndWriteExternalStoragePermission
 import code.with.me.testroomandnavigationdrawertest.R
+import code.with.me.testroomandnavigationdrawertest.appComponent
 import code.with.me.testroomandnavigationdrawertest.data.utils.setCheckable
 import code.with.me.testroomandnavigationdrawertest.data.utils.setRoundedCorners
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
@@ -52,7 +54,9 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
     @Inject
     @Named("makeNoteVMFactory")
     lateinit var factory: ViewModelProvider.Factory
-    private lateinit var makeNoteViewModel: MakeNoteViewModel
+    private val makeNoteViewModel: MakeNoteViewModel by lazy {
+        ViewModelProvider(this, factory)[MakeNoteViewModel::class.java]
+    }
 
     lateinit var adapter: BaseAdapter<PhotoModel, PhotoItemBinding>
     private lateinit var photoItem: PhotoItemBinding
@@ -87,7 +91,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
                     }
 
                     else -> {
-                        println("jkghsfhkjsfgd")
+                        println("jkghsfhkjsfgd") //??
                     }
                 }
             }
@@ -125,10 +129,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val appComponent = (requireActivity().application as NotesApplication).appComponent
         appComponent.inject(this)
-        makeNoteViewModel =
-            ViewModelProvider(this, factory)[MakeNoteViewModel::class.java]
         listenPaintSheetResult()
         // TODO иногда не создает в папках заметки
         arguments?.getLong("idFolder")?.let {
@@ -344,12 +345,8 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
 
     private fun openCamera() {
         activity?.let {
-            if (it.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED || it.checkSelfPermission(
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                ) == PackageManager.PERMISSION_DENIED
-            ) {
+            if (!it.checkCameraAndWriteExternalStoragePermission()) {
                 makeNoteViewModel.setPermission(MakeNoteViewModel.Companion.TypeOfPermission.CAMERA)
-//                currentPermission = TypeOfPermission.CAMERA
                 request.launch(
                     arrayOf(
                         Manifest.permission.CAMERA,
@@ -359,6 +356,21 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
             } else {
                 makeCameraFileAndOpenCamera(it)
             }
+//            if (it.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED || it.checkSelfPermission(
+//                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+//                ) == PackageManager.PERMISSION_DENIED
+//            ) {
+//                makeNoteViewModel.setPermission(MakeNoteViewModel.Companion.TypeOfPermission.CAMERA)
+////                currentPermission = TypeOfPermission.CAMERA
+//                request.launch(
+//                    arrayOf(
+//                        Manifest.permission.CAMERA,
+//                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+//                    ),
+//                )
+//            } else {
+//                makeCameraFileAndOpenCamera(it)
+//            }
         }
     }
 
@@ -392,19 +404,6 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
     private fun initAdapter() {
         adapter =
             object : BaseAdapter<PhotoModel, PhotoItemBinding>(photoItem) {
-                private var selected0 = -1
-
-//            init {
-//                clickListener = {
-//                    selected0 = it.layoutPosition
-//                    val item = getItem(it.layoutPosition) as PhotoModel
-// //                    openDetailFragment(item.id)
-//                }
-//                onLongClickListener = {
-//                    selected0 = it.layoutPosition
-//                    val item = getItem(it.layoutPosition) as PhotoModel
-//                }
-//            }
 
                 override fun onCreateViewHolder(
                     parent: ViewGroup,
@@ -413,13 +412,6 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
                     val binding =
                         PhotoItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                     val holder = BaseViewHolder(binding)
-//                holder.itemView.setOnClickListener {
-//                    clickListener?.invoke(holder)
-//                }
-//                holder.itemView.setOnLongClickListener {
-//                    onLongClickListener?.invoke(holder)
-//                    return@setOnLongClickListener true
-//                }
                     return holder
                 }
 

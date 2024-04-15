@@ -11,7 +11,8 @@ import kotlinx.coroutines.withContext
 private var scope = CoroutineScope(Dispatchers.Main.immediate + Job())
 private var ioScope = CoroutineScope(Dispatchers.IO + Job())
 
-// todo надо изменить, дичь какая-то
+// todo надо что-то сделать
+// выполняет блок кода, после того, как таймер
 fun launchAfterTimerMain(
     time: Long,
     block: suspend () -> Unit,
@@ -22,6 +23,22 @@ fun launchAfterTimerMain(
         delay(time)
         block.invoke()
     }
+}
+
+/** запускает указанный блок кода в Main потоке **/
+fun launchMainScope(
+    block: suspend () -> Unit,
+) = CoroutineScope(Dispatchers.Main.immediate + Job()).launch {
+    block.invoke()
+}
+
+/** запускает указанный блок кода в Main потоке после истечения задержки **/
+fun launchMainScope(
+    time: Long,
+    block: suspend () -> Unit,
+) = CoroutineScope(Dispatchers.Main.immediate + Job()).launch {
+    delay(time)
+    block.invoke()
 }
 
 fun launchAfterTimerIO(
@@ -36,13 +53,13 @@ fun launchAfterTimerIO(
     }
 }
 
-suspend fun CoroutineScope.mainScope(block: suspend () -> Unit) {
+suspend fun mainScope(block: suspend () -> Unit) {
     withContext(Dispatchers.Main.immediate) {
         block()
     }
 }
 
-suspend fun CoroutineScope.ioScope(block: suspend () -> Unit) {
+suspend fun ioScope(block: suspend () -> Unit) {
     withContext(Dispatchers.IO) {
         block()
     }

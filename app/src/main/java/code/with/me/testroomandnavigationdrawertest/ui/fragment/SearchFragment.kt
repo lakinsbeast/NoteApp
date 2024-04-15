@@ -1,5 +1,6 @@
 package code.with.me.testroomandnavigationdrawertest.ui.fragment
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,11 +9,15 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
+import code.with.me.testroomandnavigationdrawertest.appComponent
 import code.with.me.testroomandnavigationdrawertest.data.utils.hideKeyboard
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.NoteFTS
 import code.with.me.testroomandnavigationdrawertest.databinding.NoteItemBinding
@@ -21,23 +26,25 @@ import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
 import code.with.me.testroomandnavigationdrawertest.ui.dialog.PreviewNoteDialog
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.SearchViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
 
 class SearchFragment : BaseFragment<SearchFragmentBinding>(
     SearchFragmentBinding::inflate,
 ) {
-    lateinit var adapter: BaseAdapter<NoteFTS, NoteItemBinding>
+    private lateinit var adapter: BaseAdapter<NoteFTS, NoteItemBinding>
     private lateinit var itemsBinding: NoteItemBinding
 
     @Inject
     @Named("searchVMFactory")
     lateinit var factory: ViewModelProvider.Factory
-    private lateinit var searchViewModel: SearchViewModel
+    private val searchViewModel: SearchViewModel by lazy {
+        ViewModelProvider(this, factory)[SearchViewModel::class.java]
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val appComponent = (requireActivity().application as NotesApplication).appComponent
         appComponent.inject(this)
     }
 
@@ -49,20 +56,18 @@ class SearchFragment : BaseFragment<SearchFragmentBinding>(
         initAdapterBinding()
         initAdapter()
         initRecyclerView()
-        searchViewModel = ViewModelProvider(this, factory)[SearchViewModel::class.java]
-        searchViewModel.noteList.observe(viewLifecycleOwner) {
-            adapter.submitList(it.toMutableList())
-        }
+        listenViewModel()
         setSearchEditTextStyle()
+        hideCloseButtonInSearchView()
+        configureSearchViewForExpandedInput()
+        binding.searchView.clearFocus()
+        setTouchListeners()
+        setClickListeners()
+    }
 
-        val closeBtn =
-            binding.searchView.findViewById<ImageView>(androidx.appcompat.R.id.search_close_btn)
-        closeBtn.isEnabled = false
-        closeBtn.setImageDrawable(null)
-
-        // включаем кликабельность ssearchview по всей searchview, а не только по иконке
+    private fun configureSearchViewForExpandedInput() {
+        // включаем кликабельность searchview по всей searchview, а не только по иконке
         binding.searchView.isIconified = false
-
         binding.searchView.setOnQueryTextListener(
             object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?): Boolean {
@@ -77,32 +82,55 @@ class SearchFragment : BaseFragment<SearchFragmentBinding>(
                 }
             },
         )
+    }
 
-        binding.searchView.clearFocus()
-
-        // убираем фокус при клике на любом месте, чтоб не пришлось нажимать два раза back button
-        binding.rv.setOnTouchListener { v, event ->
-            hideKeyboard()
-            binding.searchView.clearFocus()
-            true
-        }
-        binding.root.setOnTouchListener { v, event ->
-            binding.searchView.clearFocus()
-            true
-        }
-
+    private fun setClickListeners() {
         binding.backArrow.setOnClickListener {
             closeFragment()
         }
     }
 
+    /** убирает кнопку "крестик" справа от searchview*/
+    private fun hideCloseButtonInSearchView() {
+        binding.searchView.findViewById<ImageView>(androidx.appcompat.R.id.search_close_btn).apply {
+            isEnabled = false
+            setImageDrawable(null)
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setTouchListeners() {
+        // убираем фокус при клике на любом месте, чтоб не пришлось нажимать два раза back button
+        binding.rv.setOnTouchListener { _, _ ->
+            hideKeyboard()
+            binding.searchView.clearFocus()
+            true
+        }
+        binding.root.setOnTouchListener { _, _ ->
+            binding.searchView.clearFocus()
+            true
+        }
+    }
+
+    private fun listenViewModel() {
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                searchViewModel.noteList.collect { noteList ->
+                    adapter.submitList(noteList.toMutableList())
+                }
+            }
+        }
+
+    }
+
+    /** применяем стиль для searchView*/
     private fun setSearchEditTextStyle() {
         val searchEditText =
             binding.searchView.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)
         searchEditText.setTextColor(resources.getColor(R.color.white, null))
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             searchEditText.textCursorDrawable =
-                resources.getDrawable(R.drawable.text_cursor, null)
+                ResourcesCompat.getDrawable(resources, R.drawable.text_cursor, null)
         }
     }
 
@@ -122,36 +150,33 @@ class SearchFragment : BaseFragment<SearchFragmentBinding>(
     private fun initAdapter() {
         adapter =
             object : BaseAdapter<NoteFTS, NoteItemBinding>(itemsBinding) {
-                private var selected0 = -1
 
                 init {
                     clickListener = {
-                        selected0 = it.layoutPosition
                         val item = getItem(it.layoutPosition) as NoteFTS
                         openDetailFragment(item.id)
                         hideKeyboard()
-                        this@SearchFragment.binding.searchView.clearFocus()
-                        this@SearchFragment.closeFragment()
+                        closeFragment()
                     }
                     onLongClickListener = {
-                        selected0 = it.layoutPosition
                         val item = getItem(it.layoutPosition) as NoteFTS
                         openPreviewDialog(item.id)
                         hideKeyboard()
-                        this@SearchFragment.binding.searchView.clearFocus()
-                        this@SearchFragment.closeFragment()
+                        closeFragment()
                     }
+                }
+
+                private fun closeFragment() {
+                    this@SearchFragment.binding.searchView.clearFocus()
+                    this@SearchFragment.closeFragment()
                 }
 
                 private fun openPreviewDialog(id: Long) {
                     val bundle = Bundle()
-                    val dialog = PreviewNoteDialog()
-                    dialog.arguments =
-                        bundle.apply {
-                            putLong("noteId", id)
-                        }
-
-                    dialog.show(activity().supportFragmentManager, "CreateFolderDialog")
+                    PreviewNoteDialog().apply {
+                        arguments = bundle.apply { putLong("noteId", id) }
+                        this.show(activity().supportFragmentManager, "CreateFolderDialog")
+                    }
                 }
 
                 override fun onCreateViewHolder(
@@ -187,9 +212,7 @@ class SearchFragment : BaseFragment<SearchFragmentBinding>(
 
                 fun openDetailFragment(id: Long) {
                     for (fragment in activity?.supportFragmentManager?.fragments!!) {
-                        println("fragment: ${fragment.javaClass.simpleName}")
                         if (fragment is MainScreenFragment) {
-//                        fragment.navigateToViewANoteSheet(id)
                             fragment.openMakeNoteFragment(id)
                             break
                         }
@@ -209,15 +232,6 @@ class SearchFragment : BaseFragment<SearchFragmentBinding>(
                         return "Без названия"
                     }
                     return this
-                }
-
-                fun posItemText(count: Int): String {
-                    val count = count + 1
-                    return if (count < 10) {
-                        "0$count/"
-                    } else {
-                        "$count/"
-                    }
                 }
 
                 fun String.checkEmptyText(): String {

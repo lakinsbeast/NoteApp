@@ -15,13 +15,13 @@ import code.with.me.testroomandnavigationdrawertest.ui.controllers.IReplaceFragm
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.OpenFragmentImpl
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.ReplaceFragmentImpl
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.SheetController
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderTagViewModelFactory
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.CreateFolderViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderViewModelFactory
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MainScreenViewModelFactory
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MakeNoteViewModelFactory
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteMenuSheetViewModelFactory
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteTagViewModelFactory
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModelFactory
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.PreviewNoteDialogViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.SearchViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.SettingsViewModelFactory
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.ViewANoteViewModelFactory
@@ -68,32 +68,20 @@ abstract class BindAppModule {
     @Named("folderVMFactory")
     abstract fun bindFolderVMFactory(factory: FolderViewModelFactory): ViewModelProvider.Factory
 
-    @Binds
-    @Singleton
-    @Named("folderTagVMFactory")
-    abstract fun bindFolderTagVMFactory(factory: FolderTagViewModelFactory): ViewModelProvider.Factory
 
     @Binds
     @Singleton
-    @Named("noteTagVMFactory")
-    abstract fun bindNoteTagVMFactory(factory: NoteTagViewModelFactory): ViewModelProvider.Factory
-
+    @Named("createFolderVMFactory")
+    abstract fun bindCreateFolderVMFactory(factory: CreateFolderViewModel.Companion.CreateFolderViewModelFactory): ViewModelProvider.Factory
     @Binds
     @Singleton
     @Named("mainScreenVMFactory")
     abstract fun bindMainScreenVMFactory(factory: MainScreenViewModelFactory): ViewModelProvider.Factory
-}
 
-@Module
-class ApplicationModule(private val application: NotesApplication) {
-    @Provides
+    @Binds
     @Singleton
-    fun provideApp(): NotesApplication = application
-
-//    @Provides
-//    fun provideStringToMarkdownTextParser(vararg formatters: Formatter): IStringToMarkdownTextParser {
-//        return StringToMarkdownTextParser(*formatters)
-//    }
+    @Named("previewVMFactory")
+    abstract fun bindPreviewVMFactory(factory: PreviewNoteDialogViewModel.Companion.PreviewNoteDialogViewModelFactory): ViewModelProvider.Factory
 }
 
 @Module

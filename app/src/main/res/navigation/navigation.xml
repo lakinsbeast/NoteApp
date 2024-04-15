@@ -9,28 +9,8 @@
         android:name="code.with.me.testroomandnavigationdrawertest.ui.fragment.NotesListFragment"
         android:label="fragment_notes_list"
         tools:layout="@layout/fragment_notes_list" >
-        <argument
-            android:name="idFolder"
-            app:argType="long" />
-        <action
-            android:id="@+id/action_notesListFragment2_to_makeANoteSheet"
-            app:destination="@id/makeANoteSheet" />
     </fragment>
-    <fragment
-        android:id="@+id/folderListFragment"
-        android:name="code.with.me.testroomandnavigationdrawertest.ui.fragment.FolderListFragment"
-        android:label="fragment_folder_list"
-        tools:layout="@layout/fragment_folder_list" >
-        <action
-            android:id="@+id/action_folderListFragment_to_notesListFragment2"
-            app:destination="@id/notesListFragment2" />
-        <action
-            android:id="@+id/action_folderListFragment_to_addFolderSheet"
-            app:destination="@id/addFolderSheet" />
-        <action
-            android:id="@+id/action_folderListFragment_to_selectFolderDestinationSheet"
-            app:destination="@id/selectFolderDestinationSheet" />
-    </fragment>
+
     <dialog
         android:id="@+id/addFolderSheet"
         android:name="code.with.me.testroomandnavigationdrawertest.ui.sheet.AddFolderSheet"
@@ -56,62 +36,8 @@
             app:argType="long" />
         <action
             android:id="@+id/action_selectFolderDestinationSheet_to_renameFolderSheet"
-            app:destination="@id/renameFolderSheet"
-            app:popUpTo="@id/homeFragment"
-            app:popUpToInclusive="false" />
+            app:destination="@id/renameFolderSheet" />
     </dialog>
-    <fragment
-        android:id="@+id/homeFragment"
-        android:name="code.with.me.testroomandnavigationdrawertest.ui.fragment.FolderHomeFragment"
-        android:label="HomeFragment" >
-        <action
-            android:id="@+id/action_homeFragment_to_folderListFragment"
-            app:destination="@id/folderListFragment" />
-        <action
-            android:id="@+id/action_homeFragment_to_addFolderSheet"
-            app:destination="@id/addFolderSheet" />
-        <action
-            android:id="@+id/action_homeFragment_to_notesListFragment2"
-            app:destination="@id/notesListFragment2" />
-        <action
-            android:id="@+id/action_homeFragment_to_noteHomeFragment"
-            app:destination="@id/noteHomeFragment" />
-        <action
-            android:id="@+id/action_homeFragment_to_addFolderTagSheetMenu"
-            app:destination="@id/addFolderTagSheetMenu" />
-        <action
-            android:id="@+id/action_homeFragment_to_selectFolderDestinationSheet"
-            app:destination="@id/selectFolderDestinationSheet" />
-    </fragment>
-    <fragment
-        android:id="@+id/lastViewedFoldersFragment"
-        android:name="code.with.me.testroomandnavigationdrawertest.ui.fragment.LastViewedFoldersListFragment"
-        android:label="LastViewedFoldersFragment" />
-    <fragment
-        android:id="@+id/lastEditedFolderFragment"
-        android:name="code.with.me.testroomandnavigationdrawertest.ui.fragment.LastEditedFolderListFragment"
-        android:label="LastEditedFolderFragment" />
-    <fragment
-        android:id="@+id/favoriteFoldersFragment"
-        android:name="code.with.me.testroomandnavigationdrawertest.ui.fragment.FavoriteFoldersListFragment"
-        android:label="FavoriteFoldersFragment" />
-    <fragment
-        android:id="@+id/noteHomeFragment"
-        android:name="code.with.me.testroomandnavigationdrawertest.ui.fragment.NoteHomeFragment"
-        android:label="NoteHomeFragment" >
-        <argument
-            android:name="idFolder"
-            app:argType="long" />
-        <action
-            android:id="@+id/action_noteHomeFragment_to_addNoteTagSheetMenu"
-            app:destination="@id/addNoteTagSheetMenu" />
-        <action
-            android:id="@+id/action_noteHomeFragment_to_viewANoteSheet"
-            app:destination="@id/viewANoteSheet" />
-        <action
-            android:id="@+id/action_noteHomeFragment_to_makeANoteSheet"
-            app:destination="@id/makeANoteSheet" />
-    </fragment>
     <dialog
         android:id="@+id/addFolderTagSheetMenu"
         android:name="code.with.me.testroomandnavigationdrawertest.ui.sheet.AddFolderTagSheetMenu"
@@ -129,20 +55,7 @@
             app:argType="long"
             android:defaultValue="0L" />
     </dialog>
-    <dialog
-        android:id="@+id/makeANoteSheet"
-        android:name="code.with.me.testroomandnavigationdrawertest.ui.sheet.MakeANoteSheet"
-        android:label="MakeANoteSheet" >
-        <argument
-            android:name="idFolder"
-            app:argType="long" />
-        <action
-            android:id="@+id/action_makeANoteSheet_to_notesListFragment2"
-            app:destination="@id/notesListFragment2" />
-        <action
-            android:id="@+id/action_makeANoteSheet_to_paintSheet"
-            app:destination="@id/paintSheet" />
-    </dialog>
+
     <dialog
         android:id="@+id/paintSheet"
         android:name="code.with.me.testroomandnavigationdrawertest.ui.sheet.PaintSheet"

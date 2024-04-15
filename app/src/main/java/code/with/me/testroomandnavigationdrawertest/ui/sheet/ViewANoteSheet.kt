@@ -7,10 +7,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
+import code.with.me.testroomandnavigationdrawertest.appComponent
+import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.ROUNDED_CORNERS_SHEET
+import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.ROUNDED_CORNERS_STROKE
 import code.with.me.testroomandnavigationdrawertest.data.utils.getDate
 import code.with.me.testroomandnavigationdrawertest.data.utils.gone
 import code.with.me.testroomandnavigationdrawertest.data.utils.mainScope
@@ -34,13 +39,12 @@ import com.masoudss.lib.SeekBarOnProgressChanged
 import com.masoudss.lib.WaveformSeekBar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Named
 
+//todo: не используется в проекте
 class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheetBinding::inflate) {
     /**
      * Нет обработки ошибок у MediaPlayer во viewModel
@@ -49,65 +53,16 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
     @Inject
     @Named("viewANoteVMFactory")
     lateinit var factory: ViewModelProvider.Factory
-    private lateinit var viewANoteViewModel: ViewANoteViewModel
-
-    @Inject
-    lateinit var markdownParser: StringToMarkdownTextParser
+    private val viewModel: ViewANoteViewModel by lazy {
+        ViewModelProvider(this, factory)[ViewANoteViewModel::class.java]
+    }
 
     lateinit var adapter: BaseAdapter<PhotoModel, PhotoItemBinding>
     private lateinit var photoItem: PhotoItemBinding
 
-    private var timerJob: Job? = null
-    private var doWaveFormOnTouch = false
-
-    private var currentNote: Note? = null
-        set(value) {
-            if (value != field) {
-                field = value
-                if (value != null) {
-                    binding.apply {
-                        context?.let {
-                            dateText.text = getDate(it, value.lastTimestampCreate)
-                        }
-                        titleText.text = value.titleNote
-                        CoroutineScope(Dispatchers.IO).launch {
-                            try {
-//                                val parsedText = markdownParser.getParsedText(value.textNote)
-                                mainScope {
-                                    text.text = value.textNote
-                                }
-                            } catch (e: Exception) {
-                                mainScope {
-                                    Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
-                                    text.text = value.textNote
-                                    e.printStackTrace()
-                                }
-                            }
-                        }
-
-                        if (value.audioUrl.isNotEmpty()) {
-                            audioLayout.visible()
-                            "File(value.audioUrl) exist? ${File(value.audioUrl).exists()}".println()
-                            try {
-                                waveForm.setSampleFrom(File(value.audioUrl))
-                            } catch (_: Exception) {
-                            }
-                        } else {
-                            audioLayout.gone()
-                        }
-
-                        adapter.submitList(ArrayList(value.listOfImages))
-                        adapter.notifyDataSetChanged()
-                    }
-                }
-            }
-        }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val appComponent = (requireActivity().application as NotesApplication).appComponent
         appComponent.inject(this)
-        viewANoteViewModel = ViewModelProvider(this, factory)[ViewANoteViewModel::class.java]
     }
 
     override fun onViewCreated(
@@ -126,68 +81,48 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
     private fun setRoundedCornersAndCallback() {
         binding.include2.root.alpha = 1.0f
         binding.mainLayout.setRoundedCornersView(
-            (1.0f) * 64f,
+            ROUNDED_CORNERS_SHEET,
             Color.WHITE,
             Color.BLACK,
-            (1.0f) * 5f,
+            ROUNDED_CORNERS_STROKE,
         )
         onSlide = {
             binding.include2.root.alpha = 1.0f - it
-            // проверка надо, что бы не уменьшался радиус угла после halfexpanded
+            // проверка нужна, что бы не уменьшался радиус угла после halfexpanded
             if (it >= 0) {
                 binding.mainLayout.setRoundedCornersView(
-                    (1.0f - it) * 64f,
+                    (1.0f - it) * ROUNDED_CORNERS_SHEET,
                     Color.WHITE,
                     Color.BLACK,
-                    (1.0f - it) * 5f,
+                    (1.0f - it) * ROUNDED_CORNERS_STROKE,
                 )
             }
         }
     }
 
     private fun setWaveformProgressCallback() {
-        binding.waveForm.onProgressChanged =
-            object : SeekBarOnProgressChanged {
-                override fun onProgressChanged(
-                    waveformSeekBar: WaveformSeekBar,
-                    progress: Float,
-                    fromUser: Boolean,
-                ) {
-                    if (fromUser) {
-                        if (viewANoteViewModel.isAudioPlaying()) {
-                            sendViewAction(UserActionAudioState.PausePlaying)
-                        }
-                        if (viewANoteViewModel.checkAudioPlayer() == null) {
-                            sendViewAction(UserActionAudioState.InitPlayer(currentNote?.audioUrl.toString()))
-                        }
-                        viewANoteViewModel.setCurrentPos(progress)
-                        startTimer(100) {
-                            if (!doWaveFormOnTouch) {
-                                sendViewAction(UserActionAudioState.StartPlaying(currentNote?.audioUrl.toString()))
-                            }
-                        }
+        binding.waveForm.onProgressChanged = object : SeekBarOnProgressChanged {
+            override fun onProgressChanged(
+                waveformSeekBar: WaveformSeekBar,
+                progress: Float,
+                fromUser: Boolean,
+            ) {
+                if (fromUser) {
+                    if (viewModel.isAudioPlaying()) {
+                        sendViewAction(UserActionAudioState.PausePlaying)
                     }
+                    if (!viewModel.checkAudioPlayer()) {
+                        sendViewAction(UserActionAudioState.InitPlayer(viewModel.currentNote?.audioUrl.toString()))
+                    }
+                    viewModel.setCurrentPos(progress)
+                    viewModel.startTimer(100)
                 }
             }
-    }
-
-    fun startTimer(
-        delayLong: Long,
-        doOnDelayPassed: () -> Unit,
-    ) {
-        if (timerJob != null) {
-            timerJob?.cancel()
-            timerJob = null
         }
-        timerJob =
-            CoroutineScope(Dispatchers.IO.limitedParallelism(1)).launch {
-                delay(delayLong)
-                doOnDelayPassed.invoke()
-            }
     }
 
     private fun sendViewAction(userAction: UserActionAudioState) {
-        viewANoteViewModel.processUserActionsAudio(userAction)
+        viewModel.processUserActionsAudio(userAction)
     }
 
     /**
@@ -195,19 +130,19 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
      **/
     private fun initClickListeners() {
         binding.apply {
-            playAudio.setOnClickListener {
-                if (viewANoteViewModel.isAudioPlaying()) {
+            playPauseBtn.setOnClickListener {
+                if (viewModel.isAudioPlaying()) {
                     sendViewAction(UserActionAudioState.PausePlaying)
                 } else {
-                    sendViewAction(UserActionAudioState.StartPlaying(currentNote?.audioUrl.toString()))
+                    sendViewAction(UserActionAudioState.StartPlaying(viewModel.currentNote?.audioUrl.toString()))
                 }
             }
             waveForm.setOnTouchListener { v, event ->
-                doWaveFormOnTouch = true
+                viewModel.doWaveFormOnTouch = true
                 false
             }
             waveForm.setOnClickListener {
-                doWaveFormOnTouch = false
+                viewModel.doWaveFormOnTouch = false
             }
         }
     }
@@ -218,41 +153,59 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
     }
 
     private fun initViewModel() {
-        val idIntent = arguments?.getLong("noteId") ?: 0L
-        "id: $idIntent".println()
-        viewANoteViewModel.getNoteById(idIntent)
-        viewANoteViewModel.state.observe(viewLifecycleOwner) { state ->
-            handleViewState(state)
-        }
-        viewANoteViewModel.waveFormProgress.observe(viewLifecycleOwner) { progress ->
-            binding.waveForm.progress = progress
-        }
-        viewANoteViewModel.userActionAudioState.observe(viewLifecycleOwner) {
-            if (it is UserActionAudioState.Error<*>) {
-                Toast.makeText(activity(), it.error.toString(), Toast.LENGTH_SHORT).show()
+        viewModel.idIntent = arguments?.getLong("noteId") ?: 0L
+        viewModel.getNoteById(viewModel.idIntent)
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.state.collect { state ->
+                    handleViewState(state)
+                }
             }
         }
-
-        viewANoteViewModel.getAudioPlaybackStateLiveData().observe(viewLifecycleOwner) { state ->
-            when (state) {
-//                is AudioPlayerState.Idle -> {
-//                    binding.playAudio.setImageResource(R.drawable.small_play_arrow_btn)
-//                }
-
-                is AudioPlayerState.Playing -> {
-                    binding.playAudio.setImageResource(R.drawable.small_pause_btn)
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.waveFormProgress.collect { progress ->
+                    binding.waveForm.progress = progress
                 }
-
-                is AudioPlayerState.Paused -> {
-                    binding.playAudio.setImageResource(R.drawable.small_play_arrow_btn)
+            }
+        }
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.timerState.collect { progress ->
+                    if (!viewModel.doWaveFormOnTouch) {
+                        sendViewAction(UserActionAudioState.StartPlaying(viewModel.currentNote?.audioUrl.toString()))
+                    }
                 }
+            }
+        }
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.userActionAudioState.collect {
+                    if (it is UserActionAudioState.Error<*>) {
+                        Toast.makeText(activity(), it.error.toString(), Toast.LENGTH_SHORT).show()
+                    }
 
-                AudioPlayerState.Completed -> {
-                    binding.playAudio.setImageResource(R.drawable.small_play_arrow_btn)
-                }
+                    if (binding.playPauseBtn.isAnimating) {
+                        binding.playPauseBtn.clearAnimation()
+                    }
 
-                is AudioPlayerState.Error<*> -> {
-                    Toast.makeText(activity(), state.error.toString(), Toast.LENGTH_SHORT).show()
+                    when (it) {
+                        is UserActionAudioState.StartPlaying -> {
+                            binding.playPauseBtn.setAnimation(R.raw.play_anim)
+                        }
+
+                        is UserActionAudioState.PausePlaying -> {
+                            binding.playPauseBtn.setAnimation(R.raw.pause_anim)
+                        }
+
+                        is UserActionAudioState.Error<*> -> {
+                            Toast.makeText(activity(), it.error.toString(), Toast.LENGTH_SHORT)
+                                .show()
+                        }
+
+                        else -> {}
+                    }
+                    binding.playPauseBtn.playAnimation()
                 }
             }
         }
@@ -266,26 +219,55 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
 
             is NoteState.Result<*> -> {
                 binding.apply {
-                    currentNote = state.data as Note
-                    println("note: ${state.data}")
+                    setNote(state.data as Note)
                 }
                 showProgressBar(false)
             }
 
             is NoteState.Error<*> -> {
                 showProgressBar(false)
-                dialog?.window?.decorView?.let { window ->
-                    Snackbar.make(
-                        window, // binding.root is not work :(
-                        state.error.toString(),
-                        Snackbar.LENGTH_LONG,
-                    ).show()
-                }
+                showError(state.error.toString())
                 "ERROR in ${this.javaClass.simpleName} error: ${state.error}".println()
             }
 
             is NoteState.EmptyResult -> {
                 showProgressBar(false)
+            }
+        }
+    }
+
+    private fun showError(text: String) {
+        dialog?.window?.decorView?.let { window ->
+            Snackbar.make(
+                window, // binding.root is not work :(
+                text,
+                Snackbar.LENGTH_LONG,
+            ).show()
+        }
+    }
+
+    private fun setNote(value: Note?) {
+        value?.let {
+            binding.apply {
+                dateText.text = context.getDate(value.lastTimestampCreate)
+                titleText.text = value.titleNote
+                text.text = value.textNote
+                if (value.audioUrl.isNotEmpty()) {
+                    audioLayout.visible()
+//                    "File(value.audioUrl) exist? ${File(value.audioUrl).exists()}".println()
+                    try {
+                        waveForm.setSampleFrom(File(value.audioUrl))
+                    } catch (error: Exception) {
+                        showError(
+                            error.localizedMessage?.toString()
+                                ?: "Не удалось инициализировать волну аудио" //???
+                        )
+                    }
+                } else {
+                    audioLayout.gone()
+                }
+                adapter.submitList(ArrayList(value.listOfImages))
+                adapter.notifyDataSetChanged()
             }
         }
     }
@@ -341,7 +323,8 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
                 this@ViewANoteSheet.binding.photoList.adapter = this
                 this@ViewANoteSheet.binding.photoList.apply {
                     setHasFixedSize(false)
-                    layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+                    layoutManager =
+                        LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
                 }
             }
     }

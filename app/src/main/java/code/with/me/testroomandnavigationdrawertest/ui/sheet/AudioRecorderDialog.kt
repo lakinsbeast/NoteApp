@@ -10,8 +10,10 @@ import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.WindowManager
 import android.view.animation.OvershootInterpolator
-import code.with.me.testroomandnavigationdrawertest.NotesApplication
+import code.with.me.testroomandnavigationdrawertest.appComponent
 import code.with.me.testroomandnavigationdrawertest.audio.AudioController
+import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.ROUNDED_CORNERS
+import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.STANDARD_BLUR_RADIUS
 import code.with.me.testroomandnavigationdrawertest.data.utils.setCancelButton
 import code.with.me.testroomandnavigationdrawertest.data.utils.setRoundedCornersView
 import code.with.me.testroomandnavigationdrawertest.databinding.AudioRecorderBinding
@@ -69,8 +71,6 @@ class AudioRecorderDialog(private val myContext: Context, private val result: (S
     }
 
     private fun initAppComponent() {
-        val appComponent =
-            ((myContext as MainActivity).application as NotesApplication).appComponent
         appComponent.inject(this)
     }
 
@@ -90,11 +90,11 @@ class AudioRecorderDialog(private val myContext: Context, private val result: (S
     }
 
     private fun setUpDialogWindow() {
-        binding.root.setRoundedCornersView(56f)
+        binding.root.setRoundedCornersView(ROUNDED_CORNERS)
         this.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             this.window?.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
-            this.window?.attributes?.blurBehindRadius = 10
+            this.window?.attributes?.blurBehindRadius = STANDARD_BLUR_RADIUS
         }
     }
 

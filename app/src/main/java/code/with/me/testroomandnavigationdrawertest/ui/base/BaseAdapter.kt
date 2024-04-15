@@ -12,13 +12,6 @@ open class BaseAdapter<T : Identifiable, A : ViewBinding>(val binding: A) :
     ) {
     private var recyclerView: RecyclerView? = null
 
-    // cannot be used
-    //    val newclickListener by lazy {
-//        { binding: BaseViewHolder<A> ->
-//
-//        }
-//    }
-
     lateinit var clickListener: (binding: BaseViewHolder<A>) -> Unit
     lateinit var onLongClickListener: (binding: BaseViewHolder<A>) -> Unit
 

@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface NoteTagDAO {
     @Query("SELECT * FROM notetag")
-    fun getAllTags(): Flow<List<NoteTag>>
+    fun getAllTags(): List<NoteTag>
 
     @Insert
     @Throws(SQLiteException::class)

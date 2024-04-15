@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mainLayout"
-    android:transitionName="test"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/white"
+    android:transitionName="test">
 
     <ScrollView
         android:id="@+id/scrollView"
@@ -102,9 +102,7 @@
                             app:wave_padding_top="2dp"
                             app:wave_progress="0"
                             app:wave_progress_color="@color/light_blue_600"
-                            app:wave_width="3dp"
-
-                            />
+                            app:wave_width="5dp" />
                     </LinearLayout>
                 </FrameLayout>
 

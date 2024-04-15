@@ -8,6 +8,8 @@ import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.domain.repo.NoteRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
 import javax.inject.Inject
@@ -17,16 +19,21 @@ class NoteMenuSheetViewModel
 constructor(
     private val repoNote: NoteRepository,
 ) : ViewModel() {
-    private lateinit var note: Note
-    private var _shareTextLiveData = MutableLiveData<String>()
-    var shareTextLiveData = _shareTextLiveData
+    /**
+     * шерит текст и заголовок для создания интента
+     **/
+    private var _shareTextLiveData = MutableStateFlow("")
+    var shareTextLiveData = _shareTextLiveData.asStateFlow()
 
+    /**
+     * достает текст и заголовок у заметки по [id]
+     */
     fun shareText(id: Long) {
         viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
-            async {
-                note = repoNote.getNoteById(id)
+            val note = async {
+                repoNote.getNoteById(id)
             }.await()
-            _shareTextLiveData.postValue("${note.titleNote}\n${note.textNote}")
+            _shareTextLiveData.emit("${note.titleNote}\n${note.textNote}")
         }
     }
 }

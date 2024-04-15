@@ -9,39 +9,46 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class FolderRepositoryImpl
-    @Inject
-    constructor(
-        private val fDao: FolderDAO,
-        private val tDao: FolderTagDAO,
-    ) : FolderRepository {
-        override fun getAllFolders(): Flow<List<Folder>> = fDao.getAllFolders()
+@Inject
+constructor(
+    private val fDao: FolderDAO,
+    private val tDao: FolderTagDAO,
+) : FolderRepository {
+    override fun getAllFolders(): Flow<List<Folder>> = fDao.getAllFolders()
 
-        override fun getNotesInFolder(folderId: Long): Flow<List<Note>> = fDao.getNotesInFolder(folderId)
+    override fun getNotesInFolder(folderId: Long): Flow<List<Note>> =
+        fDao.getNotesInFolder(folderId)
 
-        override fun getAllFoldersSortByNameASC(): Flow<List<Folder>> = fDao.getAllFoldersSortByNameASC()
+    override fun getAllFoldersSortByNameASC(): Flow<List<Folder>> =
+        fDao.getAllFoldersSortByNameASC()
 
-        override fun getAllFoldersSortByNameDESC(): Flow<List<Folder>> = fDao.getAllFoldersSortByNameDESC()
+    override fun getAllFoldersSortByNameDESC(): Flow<List<Folder>> =
+        fDao.getAllFoldersSortByNameDESC()
 
-        override fun getAllFoldersLastOpenedNewest(): Flow<List<Folder>> = fDao.getAllFoldersLastOpenedNewest()
+    override fun getAllFoldersLastOpenedNewest(): Flow<List<Folder>> =
+        fDao.getAllFoldersLastOpenedNewest()
 
-        override fun getAllFoldersLastOpenedOldest(): Flow<List<Folder>> = fDao.getAllFoldersLastOpenedOldest()
+    override fun getAllFoldersLastOpenedOldest(): Flow<List<Folder>> =
+        fDao.getAllFoldersLastOpenedOldest()
 
-        override fun getAllFoldersLastEditedNewest(): Flow<List<Folder>> = fDao.getAllFoldersLastEditedNewest()
+    override fun getAllFoldersLastEditedNewest(): Flow<List<Folder>> =
+        fDao.getAllFoldersLastEditedNewest()
 
-        override fun getAllFoldersLastEditedOldest(): Flow<List<Folder>> = fDao.getAllFoldersLastEditedOldest()
+    override fun getAllFoldersLastEditedOldest(): Flow<List<Folder>> =
+        fDao.getAllFoldersLastEditedOldest()
 
-        override fun updateLastOpenedFolder(
-            time: Long,
-            folderId: Long,
-        ) = fDao.updateLastOpenedFolder(time, folderId)
+    override fun updateLastOpenedFolder(
+        time: Long,
+        folderId: Long,
+    ) = fDao.updateLastOpenedFolder(time, folderId)
 
-        override suspend fun getAllFoldersFavorite(): Flow<List<Folder>> = fDao.getAllFoldersFavorite()
+    override suspend fun getAllFoldersFavorite(): Flow<List<Folder>> = fDao.getAllFoldersFavorite()
 
-        override fun getFolderByTag(tag: String): Flow<List<Folder>> = fDao.getFolderByTag(tag)
+    override fun getFolderByTag(tag: String): Flow<List<Folder>> = fDao.getFolderByTag(tag)
 
-        override suspend fun insertFolder(folder: Folder): Long = fDao.insertFolder(folder)
+    override suspend fun insertFolder(folder: Folder): Long = fDao.insertFolder(folder)
 
-        override suspend fun updateFolder(folder: Folder) = fDao.updateFolder(folder)
+    override suspend fun updateFolder(folder: Folder) = fDao.updateFolder(folder)
 
-        override suspend fun deleteFolder(folder: Folder) = fDao.deleteFolder(folder)
-    }
+    override suspend fun deleteFolder(folder: Folder) = fDao.deleteFolder(folder)
+}

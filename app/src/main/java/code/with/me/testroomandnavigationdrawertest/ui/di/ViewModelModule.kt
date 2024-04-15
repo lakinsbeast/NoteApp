@@ -9,11 +9,9 @@ import code.with.me.testroomandnavigationdrawertest.data.repos.NoteTagRepository
 import code.with.me.testroomandnavigationdrawertest.markdown.Formatter
 import code.with.me.testroomandnavigationdrawertest.markdown.IStringToMarkdownTextParser
 import code.with.me.testroomandnavigationdrawertest.markdown.StringToMarkdownTextParser
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderTagViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MakeNoteViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteMenuSheetViewModel
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteTagViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.SearchViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.SettingsViewModel
@@ -42,16 +40,10 @@ class ViewModelModule {
     ) = ViewANoteViewModel(repo, audioController)
 
     @Provides
-    fun provideNoteTagViewModel(repo: NoteTagRepositoryImpl) = NoteTagViewModel(repo)
-
-    @Provides
     fun provideFolderViewModel(
         repo: FolderRepositoryImpl,
         dataStore: DataStoreManager,
     ) = FolderViewModel(repo, dataStore)
-
-    @Provides
-    fun provideFolderTagViewModel(repo: FolderTagRepositoryImpl) = FolderTagViewModel(repo)
 
     @Provides
     fun provideSettingsViewModel(dataStore: DataStoreManager) = SettingsViewModel(dataStore)

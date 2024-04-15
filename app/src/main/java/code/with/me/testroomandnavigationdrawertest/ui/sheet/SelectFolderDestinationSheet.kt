@@ -6,12 +6,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
+import code.with.me.testroomandnavigationdrawertest.appComponent
 import code.with.me.testroomandnavigationdrawertest.databinding.FolderMenuBottomSheetBinding
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.FolderViewModel
 import javax.inject.Inject
 import javax.inject.Named
 
+/** todo не используется*/
 class SelectFolderDestinationSheet :
     BaseSheet<FolderMenuBottomSheetBinding>(FolderMenuBottomSheetBinding::inflate) {
     private val args: SelectFolderDestinationSheetArgs by navArgs()
@@ -19,7 +21,9 @@ class SelectFolderDestinationSheet :
     @Inject
     @Named("folderVMFactory")
     lateinit var folderVmFactory: ViewModelProvider.Factory
-    private lateinit var folderViewModel: FolderViewModel
+    private val folderViewModel: FolderViewModel by lazy {
+        ViewModelProvider(this, folderVmFactory).get(FolderViewModel::class.java)
+    }
 
     override fun onViewCreated(
         view: View,
@@ -27,20 +31,11 @@ class SelectFolderDestinationSheet :
     ) {
         super.onViewCreated(view, savedInstanceState)
         initAppComponent()
-        initViewModel()
         initClickListeners()
     }
 
     private fun initAppComponent() {
-        activity?.let {
-            val appComponent = (it.application as NotesApplication).appComponent
-            appComponent.inject(this@SelectFolderDestinationSheet)
-        }
-    }
-
-    private fun initViewModel() {
-        folderViewModel =
-            ViewModelProvider(this, folderVmFactory).get(FolderViewModel::class.java)
+        appComponent.inject(this)
     }
 
     private fun initClickListeners() {

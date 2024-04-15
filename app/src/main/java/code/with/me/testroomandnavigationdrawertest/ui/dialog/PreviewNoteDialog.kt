@@ -12,14 +12,18 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.TranslateAnimation
 import android.widget.Toast
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
+import code.with.me.testroomandnavigationdrawertest.appComponent
+import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.ROUNDED_CORNERS
+import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.SHAKE_DURATION
 import code.with.me.testroomandnavigationdrawertest.data.utils.getDate
 import code.with.me.testroomandnavigationdrawertest.data.utils.getDisplayMetrics
 import code.with.me.testroomandnavigationdrawertest.data.utils.gone
-import code.with.me.testroomandnavigationdrawertest.data.utils.mainScope
 import code.with.me.testroomandnavigationdrawertest.data.utils.println
 import code.with.me.testroomandnavigationdrawertest.data.utils.setRoundedCornersView
 import code.with.me.testroomandnavigationdrawertest.data.utils.setTouchListenerForAllViews
@@ -31,16 +35,13 @@ import code.with.me.testroomandnavigationdrawertest.databinding.ViewNoteDetailDi
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseDialog
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteState
+import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.PreviewNoteDialogViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.UserActionAudioState
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.ViewANoteViewModel
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.masoudss.lib.SeekBarOnProgressChanged
 import com.masoudss.lib.WaveformSeekBar
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -49,63 +50,15 @@ import javax.inject.Named
 class PreviewNoteDialog() :
     BaseDialog<ViewNoteDetailDialogPreviewBinding>(ViewNoteDetailDialogPreviewBinding::inflate) {
     // TODO сделать максимальный и минимальный размер диалога
-        //TODO переделать всё нах
-
     @Inject
-    @Named("viewANoteVMFactory")
+    @Named("previewVMFactory")
     lateinit var factory: ViewModelProvider.Factory
-    private lateinit var viewANoteViewModel: ViewANoteViewModel
+    private val viewModel: PreviewNoteDialogViewModel by lazy {
+        ViewModelProvider(this, factory)[PreviewNoteDialogViewModel::class.java]
+    }
 
     lateinit var adapter: BaseAdapter<PhotoModel, PhotoItemBinding>
     private lateinit var photoItem: PhotoItemBinding
-
-    private var timerJob: Job? = null
-    private var doWaveFormOnTouch = false
-
-    private var currentNote: Note? = null
-        set(value) {
-            if (value != field) {
-                field = value
-                value?.let {
-                    binding.apply {
-                        context?.let {
-                            dateText.text = getDate(it, value.lastTimestampCreate)
-                        }
-                        titleText.text = value.titleNote
-                        CoroutineScope(Dispatchers.IO).launch {
-                            try {
-//                                val parsedText = markdownParser.getParsedText(value.textNote)
-                                mainScope {
-                                    text.text = value.textNote
-                                }
-                            } catch (e: Exception) {
-                                mainScope {
-                                    Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
-                                    text.text = value.textNote
-                                    e.printStackTrace()
-                                }
-                            }
-                        }
-
-                        if (value.audioUrl.isNotEmpty()) {
-                            audioLayout.visible()
-                            "File(value.audioUrl) exist? ${File(value.audioUrl).exists()}".println()
-                            try {
-                                waveForm.setSampleFrom(File(value.audioUrl))
-                            } catch (_: Exception) {
-                            }
-                        } else {
-                            audioLayout.gone()
-                        }
-
-                        adapter.submitList(ArrayList(value.listOfImages))
-                        adapter.notifyDataSetChanged()
-                    }
-                    viewANoteViewModel.getNextAvailableId(value.id)
-                    viewANoteViewModel.getPreviousAvailableId(value.id)
-                }
-            }
-        }
 
     override fun onStart() {
         super.onStart()
@@ -114,10 +67,8 @@ class PreviewNoteDialog() :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val appComponent = (requireActivity().application as NotesApplication).appComponent
         appComponent.inject(this)
-        viewANoteViewModel = ViewModelProvider(this, factory)[ViewANoteViewModel::class.java]
-        idIntent = arguments?.getLong("noteId") ?: 0
+        viewModel.idIntent = arguments?.getLong("noteId") ?: 0
     }
 
     override fun onViewCreated(
@@ -131,104 +82,94 @@ class PreviewNoteDialog() :
         initListeners()
         setWaveformProgressCallback()
         isBehindNeedBlurred = true
-        binding.root.setRoundedCornersView(56f, Color.WHITE)
+        binding.root.setRoundedCornersView(ROUNDED_CORNERS, Color.WHITE)
         setSizeParams()
     }
 
-    var idIntent = 0L
-        set(value) {
-            field = value
-        }
+    private var firstLastId = Pair(0, 0)
+    private var firstLastAvailableId = Pair(0L, 0L)
 
-    private var lastId = 0
-    private var firstId = 0
 
-    private var lastAvailableId = 0L
-    private var nextAvailableId = 0L
+    // Избавиться от magic numbers
+    private var gestureD = GestureDetector(
+        context,
+        object : SimpleOnGestureListener() {
+            // false - разрешить скролл
+            override fun onScroll(
+                e1: MotionEvent?,
+                e2: MotionEvent,
+                distanceX: Float,
+                distanceY: Float,
+            ): Boolean {
+                e1?.rawX?.let { rawX ->
+                    when (rawX) {
+                        in 300f..800f -> {
+                            return false
+                        }
 
-    // Избавиться от магических чисел
-    private var gestureD =
-        GestureDetector(
-            context,
-            object : SimpleOnGestureListener() {
-                // false - разрешить скролл
-                override fun onScroll(
-                    e1: MotionEvent?,
-                    e2: MotionEvent,
-                    distanceX: Float,
-                    distanceY: Float,
-                ): Boolean {
-                    e1?.rawX?.let { rawX ->
-                        when (rawX) {
-                            in 300f..800f -> {
-                                return false
-                            }
-
-                            else -> {
-                                return true
-                            }
+                        else -> {
+                            return true
                         }
                     }
-
-                    return false
                 }
 
-                override fun onFling(
-                    e1: MotionEvent?,
-                    e2: MotionEvent,
-                    velocityX: Float,
-                    velocityY: Float,
-                ): Boolean {
-                    e1?.rawX?.let { rawX ->
-                        when (rawX) {
-                            in 800f..1500f -> {
-                                idIntent = nextAvailableId
-                                println("idIntent: $idIntent")
-                                println("nextAvailableId: $nextAvailableId")
-                                println("lastAvailableId: $lastAvailableId")
-                                println("firstId: $firstId")
-                                println("lastId: $lastId")
-//                        idIntent += 1
-                                if (idIntent in firstId..<lastId) {
-                                    viewANoteViewModel.getNoteById(idIntent)
-                                } else {
-                                    idIntent = currentNote?.id ?: 0L
-                                    makeMeShake(binding.root, 50, 15)
-                                }
-                                return true
-                            }
+                return false
+            }
 
-                            in 0f..300f -> {
-                                idIntent = lastAvailableId
-                                if (idIntent in firstId..<lastId) {
-                                    viewANoteViewModel.getNoteById(idIntent)
-                                } else {
-                                    idIntent = currentNote?.id ?: 0
-                                    makeMeShake(binding.root, 50, 15)
-                                }
-                                return true
+            override fun onFling(
+                e1: MotionEvent?,
+                e2: MotionEvent,
+                velocityX: Float,
+                velocityY: Float,
+            ): Boolean {
+                e1?.rawX?.let { rawX ->
+                    when (rawX) {
+                        in 800f..1500f -> {
+                            viewModel.idIntent = firstLastAvailableId.first
+                            if (viewModel.idIntent in firstLastId.first..<firstLastId.second) {
+                                viewModel.getNoteById(viewModel.idIntent)
+                            } else {
+                                viewModel.idIntent = viewModel.currentNote?.id ?: 0L
+                                makeMeShake(binding.root, SHAKE_DURATION, 5)
                             }
+                            return true
+                        }
 
-                            else -> {
-                                return false
+                        in 0f..300f -> {
+                            viewModel.idIntent = firstLastAvailableId.second
+                            if (viewModel.idIntent in firstLastId.first..<firstLastId.second) {
+                                viewModel.getNoteById(viewModel.idIntent)
+                            } else {
+                                viewModel.idIntent = viewModel.currentNote?.id ?: 0
+                                makeMeShake(binding.root, SHAKE_DURATION, 5)
                             }
+                            return true
+                        }
+
+                        else -> {
+                            return false
                         }
                     }
-                    return false
                 }
-            },
-        )
+                return false
+            }
+        },
+    )
 
-    // test
     fun makeMeShake(
         view: View,
         duration: Int,
         offset: Int,
-    ): View? {
-        val anim: Animation = TranslateAnimation(-offset.toFloat(), offset.toFloat(), 0f, 0f)
+    ): View {
+        val anim: Animation = TranslateAnimation(
+            -offset.toFloat(),
+            offset.toFloat(),
+            -offset.toFloat(),
+            offset.toFloat()
+        )
         anim.duration = duration.toLong()
         anim.repeatMode = Animation.REVERSE
-        anim.repeatCount = 5
+        anim.repeatCount = 3
         view.startAnimation(anim)
         return view
     }
@@ -243,48 +184,28 @@ class PreviewNoteDialog() :
     }
 
     private fun setWaveformProgressCallback() {
-        binding.waveForm.onProgressChanged =
-            object : SeekBarOnProgressChanged {
-                override fun onProgressChanged(
-                    waveformSeekBar: WaveformSeekBar,
-                    progress: Float,
-                    fromUser: Boolean,
-                ) {
-                    if (fromUser) {
-                        if (viewANoteViewModel.isAudioPlaying()) {
-                            sendViewAction(UserActionAudioState.PausePlaying)
-                        }
-                        viewANoteViewModel.checkAudioPlayer() ?: run {
-                            sendViewAction(UserActionAudioState.InitPlayer(currentNote?.audioUrl.toString()))
-                        }
-                        viewANoteViewModel.setCurrentPos(progress)
-                        startTimer(100) {
-                            if (!doWaveFormOnTouch) {
-                                sendViewAction(UserActionAudioState.StartPlaying(currentNote?.audioUrl.toString()))
-                            }
-                        }
+        binding.waveForm.onProgressChanged = object : SeekBarOnProgressChanged {
+            override fun onProgressChanged(
+                waveformSeekBar: WaveformSeekBar,
+                progress: Float,
+                fromUser: Boolean,
+            ) {
+                if (fromUser) {
+                    if (viewModel.isAudioPlaying()) {
+                        sendViewAction(UserActionAudioState.PausePlaying)
                     }
+                    if (!viewModel.checkAudioPlayer()) {
+                        sendViewAction(UserActionAudioState.InitPlayer(viewModel.currentNote?.audioUrl.toString()))
+                    }
+                    viewModel.setCurrentPos(progress)
+                    viewModel.startTimer(100)
                 }
             }
-    }
-
-    fun startTimer(
-        delayLong: Long,
-        doOnDelayPassed: () -> Unit,
-    ) {
-        timerJob?.let {
-            timerJob?.cancel()
-            timerJob = null
         }
-        timerJob =
-            CoroutineScope(Dispatchers.IO.limitedParallelism(1)).launch {
-                delay(delayLong)
-                doOnDelayPassed.invoke()
-            }
     }
 
     private fun sendViewAction(userAction: UserActionAudioState) {
-        viewANoteViewModel.processUserActionsAudio(userAction)
+        viewModel.processUserActionsAudio(userAction)
     }
 
     /**
@@ -293,18 +214,18 @@ class PreviewNoteDialog() :
     private fun initListeners() {
         binding.apply {
             playPauseBtn.setOnClickListener {
-                if (viewANoteViewModel.isAudioPlaying()) {
+                if (viewModel.isAudioPlaying()) {
                     sendViewAction(UserActionAudioState.PausePlaying)
                 } else {
-                    sendViewAction(UserActionAudioState.StartPlaying(currentNote?.audioUrl.toString()))
+                    sendViewAction(UserActionAudioState.StartPlaying(viewModel.currentNote?.audioUrl.toString()))
                 }
             }
             waveForm.setOnTouchListener { v, event ->
-                doWaveFormOnTouch = true
+                viewModel.doWaveFormOnTouch = true
                 false
             }
             waveForm.setOnClickListener {
-                doWaveFormOnTouch = false
+                viewModel.doWaveFormOnTouch = false
             }
         }
         binding.text.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
@@ -329,144 +250,179 @@ class PreviewNoteDialog() :
     }
 
     private fun initViewModel() {
-//        val idIntent = arguments?.getInt("noteId") ?: 0
-//        "id: $idIntent".println()
-        viewANoteViewModel.getNoteById(idIntent)
-        viewANoteViewModel.state.observe(viewLifecycleOwner) { state ->
-            handleViewState(state)
-        }
-        viewANoteViewModel.getFirstCustomer()
-        viewANoteViewModel.getLastCustomer()
-        viewANoteViewModel.waveFormProgress.observe(viewLifecycleOwner) { progress ->
-            binding.waveForm.progress = progress
-        }
-        viewANoteViewModel.userActionAudioState.observe(viewLifecycleOwner) {
-            println("userActionAudioState: $it")
-            if (it is UserActionAudioState.Error<*>) {
-                Toast.makeText(activity(), it.error.toString(), Toast.LENGTH_SHORT).show()
-            }
+        viewModel.getNoteById(viewModel.idIntent)
+        viewModel.getFirstAndLastCustomer()
+        listenViewModels()
+    }
 
-            if (binding.playPauseBtn.isAnimating) {
-                binding.playPauseBtn.clearAnimation()
-            }
-
-            when (it) {
-                is UserActionAudioState.StartPlaying -> {
-                    binding.playPauseBtn.setAnimation(R.raw.play_anim)
+    private fun listenViewModels() {
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.state.collect { state ->
+                    handleViewState(state)
                 }
-
-                is UserActionAudioState.PausePlaying -> {
-                    binding.playPauseBtn.setAnimation(R.raw.pause_anim)
-                }
-
-                is UserActionAudioState.Error<*> -> {
-                    Toast.makeText(activity(), it.error.toString(), Toast.LENGTH_SHORT).show()
-                }
-
-                else -> {}
             }
-            binding.playPauseBtn.playAnimation()
         }
-        viewANoteViewModel.lastIdOfNotes.observe(viewLifecycleOwner) {
-            lastId = it
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.waveFormProgress.collect { progress ->
+                    binding.waveForm.progress = progress
+                }
+            }
         }
-        viewANoteViewModel.firstIdOfNotes.observe(viewLifecycleOwner) {
-            firstId = it
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.timerState.collect { progress ->
+                    if (!viewModel.doWaveFormOnTouch) {
+                        sendViewAction(UserActionAudioState.StartPlaying(viewModel.currentNote?.audioUrl.toString()))
+                    }
+                }
+            }
         }
-        viewANoteViewModel.previousIdNote.observe(viewLifecycleOwner) {
-            lastAvailableId = it
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.userActionAudioState.collect {
+                    if (it is UserActionAudioState.Error<*>) {
+                        Toast.makeText(activity(), it.error.toString(), Toast.LENGTH_SHORT).show()
+                    }
+
+                    if (binding.playPauseBtn.isAnimating) {
+                        binding.playPauseBtn.clearAnimation()
+                    }
+
+                    when (it) {
+                        is UserActionAudioState.StartPlaying -> {
+                            binding.playPauseBtn.setAnimation(R.raw.play_anim)
+                        }
+
+                        is UserActionAudioState.PausePlaying -> {
+                            binding.playPauseBtn.setAnimation(R.raw.pause_anim)
+                        }
+
+                        is UserActionAudioState.Error<*> -> {
+                            Toast.makeText(activity(), it.error.toString(), Toast.LENGTH_SHORT)
+                                .show()
+                        }
+
+                        else -> {}
+                    }
+                    binding.playPauseBtn.playAnimation()
+                }
+            }
         }
-        viewANoteViewModel.nextIdNote.observe(viewLifecycleOwner) {
-            nextAvailableId = it
+
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.firstAndLastId.filter { it != Pair(0, 0) }.collect {
+                    firstLastId = it
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.firstAndLastAvailableId.filter { it != Pair(0L, 0L) }.collect {
+                    firstLastAvailableId = it
+                }
+            }
         }
     }
 
     private fun handleViewState(state: NoteState) {
         when (state) {
             is NoteState.Loading -> {
-//                showProgressBar(true)
             }
 
             is NoteState.Result<*> -> {
                 binding.apply {
-                    println("note: ${state.data}")
-                    currentNote = state.data as Note
+                    setNote(state.data as Note)
                 }
-//                showProgressBar(false)
             }
 
             is NoteState.Error<*> -> {
-//                showProgressBar(false)
-                dialog?.window?.decorView?.let { window ->
-                    Snackbar.make(
-                        window, // binding.root is not work :(
-                        state.error.toString(),
-                        Snackbar.LENGTH_LONG,
-                    ).show()
-                }
+                showError(state.error.toString())
                 "ERROR in ${this.javaClass.simpleName} error: ${state.error}".println()
             }
 
             is NoteState.EmptyResult -> {
-//                showProgressBar(false)
+                showError("Не удалось загрузить данные :(")
             }
         }
     }
 
+    private fun showError(text: String) {
+        dialog?.window?.decorView?.let { window ->
+            Snackbar.make(
+                window, // binding.root is not work :(
+                text,
+                Snackbar.LENGTH_LONG,
+            ).show()
+        }
+    }
+
+    private fun setNote(value: Note?) {
+        value?.let {
+            binding.apply {
+                dateText.text = context.getDate(value.lastTimestampCreate)
+                titleText.text = value.titleNote
+                text.text = value.textNote
+                if (value.audioUrl.isNotEmpty()) {
+                    audioLayout.visible()
+//                    "File(value.audioUrl) exist? ${File(value.audioUrl).exists()}".println()
+                    try {
+                        waveForm.setSampleFrom(File(value.audioUrl))
+                    } catch (error: Exception) {
+                        showError(
+                            error.localizedMessage?.toString()
+                                ?: "Не удалось инициализировать волну аудио" //???
+                        )
+                    }
+                } else {
+                    audioLayout.gone()
+                }
+                adapter.submitList(ArrayList(value.listOfImages))
+                adapter.notifyDataSetChanged()
+            }
+            viewModel.getFirstAndLastAvailableId(value.id)
+        }
+    }
+
     private fun initAdapter() {
-        adapter =
-            object : BaseAdapter<PhotoModel, PhotoItemBinding>(photoItem) {
-                private var selected0 = -1
-
-                init {
-                    clickListener = {
-                        selected0 = it.layoutPosition
-                        val item = getItem(it.layoutPosition) as PhotoModel
-//                    openDetailFragment(item.id)
-                    }
-                    onLongClickListener = {
-                        selected0 = it.layoutPosition
-                        val item = getItem(it.layoutPosition) as PhotoModel
-                    }
+        adapter = object : BaseAdapter<PhotoModel, PhotoItemBinding>(photoItem) {
+            override fun onCreateViewHolder(
+                parent: ViewGroup,
+                viewType: Int,
+            ): BaseViewHolder<PhotoItemBinding> {
+                val binding =
+                    PhotoItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                val holder = BaseViewHolder(binding)
+                // Почему-то pinch to zoom не работает даже с библиотеками upd: похоже не работает с sheet
+                holder.itemView.setOnLongClickListener {
+                    onLongClickListener.invoke(holder)
+                    return@setOnLongClickListener true
                 }
+                return holder
+            }
 
-                override fun onCreateViewHolder(
-                    parent: ViewGroup,
-                    viewType: Int,
-                ): BaseViewHolder<PhotoItemBinding> {
-                    val binding =
-                        PhotoItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                    val holder = BaseViewHolder(binding)
-                    // Почему-то pinch не работает даже с библиотеками upd: похоже не работает с sheet
-//                holder.itemView.setOnTouchListener(context?.let { ImageMatrixTouchHandler(it) })
-                    holder.itemView.setOnLongClickListener {
-                        onLongClickListener?.invoke(holder)
-                        return@setOnLongClickListener true
-                    }
-                    return holder
-                }
+            override fun onBindViewHolder(
+                holder: BaseViewHolder<PhotoItemBinding>,
+                position: Int,
+            ) {
+                super.onBindViewHolder(holder, position)
 
-                override fun onBindViewHolder(
-                    holder: BaseViewHolder<PhotoItemBinding>,
-                    position: Int,
-                ) {
-                    super.onBindViewHolder(holder, position)
-
-                    holder.binding.apply {
-                        val item = getItem(position)
-                        "item.path: ${item.path}".println()
-
-                        Glide.with(this@PreviewNoteDialog)
-                            .load(Uri.parse(item.path)).into(image)
-                    }
-                }
-            }.apply {
-                this@PreviewNoteDialog.binding.photoList.adapter = this
-                this@PreviewNoteDialog.binding.photoList.apply {
-                    setHasFixedSize(false)
-                    layoutManager =
-                        LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+                holder.binding.apply {
+                    val item = getItem(position)
+                    Glide.with(this@PreviewNoteDialog).load(Uri.parse(item.path)).into(image)
                 }
             }
+        }.apply {
+            this@PreviewNoteDialog.binding.photoList.adapter = this
+            this@PreviewNoteDialog.binding.photoList.apply {
+                setHasFixedSize(false)
+                layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+            }
+        }
     }
+
+
 }

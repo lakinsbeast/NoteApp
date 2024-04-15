@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
+import code.with.me.testroomandnavigationdrawertest.appComponent
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityMainBinding
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.FragmentController
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.SheetController
@@ -37,7 +38,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initAppComponent() {
-        val appComponent = (application as NotesApplication).appComponent
         appComponent.inject(this)
     }
 }

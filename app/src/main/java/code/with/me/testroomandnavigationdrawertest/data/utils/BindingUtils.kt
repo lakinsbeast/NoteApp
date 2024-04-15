@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.forEachIndexed
 import androidx.core.view.get
 import code.with.me.testroomandnavigationdrawertest.R
+import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.ROUNDED_CORNERS_STROKE
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.chip.Chip
@@ -41,11 +42,12 @@ fun findActivity(context: Context): MainActivity {
     return context as MainActivity
 }
 
+
 fun View.setRoundedCornersView(
     radius: Float,
     color: Int = Color.BLACK,
     strokeColor: Int? = null,
-    strokeWidth: Float = 5f,
+    strokeWidth: Float = ROUNDED_CORNERS_STROKE,
 ) {
     val shapeAppearanceModel =
         ShapeAppearanceModel.builder()
@@ -62,11 +64,12 @@ fun View.setRoundedCornersView(
     background = layerDrawable
 }
 
+
 fun View.setUpperRoundedCornersView(
     radius: Float,
     color: Int = Color.BLACK,
     strokeColor: Int? = null,
-    strokeWidth: Float = 5f,
+    strokeWidth: Float = ROUNDED_CORNERS_STROKE,
 ) {
     val shapeAppearanceModel =
         ShapeAppearanceModel.builder()
@@ -104,6 +107,7 @@ fun BottomNavigationView.setCheckable(boolean: Boolean = false) {
     }
 }
 
+/** todo нет обработки ошибки, а он может быть в getViewGroup */
 fun ProgressBar.setCenterGravity(view: View) {
     when (getViewGroup(view)) {
         is FrameLayout -> {

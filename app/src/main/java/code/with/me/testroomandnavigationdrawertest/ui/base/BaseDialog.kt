@@ -11,6 +11,8 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import androidx.viewbinding.ViewBinding
+import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.ROUNDED_CORNERS
+import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.STANDARD_BLUR_RADIUS
 import code.with.me.testroomandnavigationdrawertest.data.utils.findActivity
 import code.with.me.testroomandnavigationdrawertest.data.utils.setRoundedCornersView
 
@@ -22,6 +24,7 @@ abstract class BaseDialog<VB : ViewBinding>(
     private var _binding: VB? = null
     val binding get() = _binding!!
 
+    /** отвечает за затемнение позади диалога*/
     var dimAmount = 1f
         set(value) {
             dialog?.window?.setDimAmount(value)
@@ -32,12 +35,14 @@ abstract class BaseDialog<VB : ViewBinding>(
             isCancelable = value
             field = value
         }
+
+    /** нужно ли использовать размытие позади*/
     var isBehindNeedBlurred = true
         set(value) {
             if (value) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     dialog?.window?.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
-                    dialog?.window?.attributes?.blurBehindRadius = 10
+                    dialog?.window?.attributes?.blurBehindRadius = STANDARD_BLUR_RADIUS
                 }
             } else {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -93,11 +98,11 @@ abstract class BaseDialog<VB : ViewBinding>(
     ) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-//        dialog?.window?.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
     }
 
+    /** делает углы диалога закругленными*/
     fun setCornerRounded(view: View) {
-        view.setRoundedCornersView(56f)
+        view.setRoundedCornersView(ROUNDED_CORNERS)
     }
 
     override fun onDestroy() {

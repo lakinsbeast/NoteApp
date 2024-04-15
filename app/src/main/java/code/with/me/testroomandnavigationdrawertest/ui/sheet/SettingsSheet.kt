@@ -4,14 +4,20 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
-import code.with.me.testroomandnavigationdrawertest.NotesApplication
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import code.with.me.testroomandnavigationdrawertest.appComponent
+import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.ROUNDED_CORNERS_SHEET
+import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.ROUNDED_CORNERS_STROKE
 import code.with.me.testroomandnavigationdrawertest.data.utils.gone
 import code.with.me.testroomandnavigationdrawertest.data.utils.setRoundedCornersView
 import code.with.me.testroomandnavigationdrawertest.data.utils.visible
 import code.with.me.testroomandnavigationdrawertest.databinding.SettingsSheetBinding
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.SettingsViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -22,13 +28,13 @@ class SettingsSheet(val slide: (Float) -> Unit) :
     @Inject
     @Named("settingsVMFactory")
     lateinit var factory: ViewModelProvider.Factory
-    private lateinit var settingsViewModel: SettingsViewModel
+    private val viewModel: SettingsViewModel by lazy {
+        ViewModelProvider(this, factory)[SettingsViewModel::class.java]
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val appComponent = (requireActivity().application as NotesApplication).appComponent
         appComponent.inject(this)
         super.onCreate(savedInstanceState)
-        settingsViewModel = ViewModelProvider(this, factory)[SettingsViewModel::class.java]
     }
 
     override fun onViewCreated(
@@ -36,34 +42,23 @@ class SettingsSheet(val slide: (Float) -> Unit) :
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        initViewModel()
+        initRoundedCorners()
+        initOnSlideCallback()
+        initListeners()
+        setStateCollapsed()
+        setBackPressed()
+    }
 
-        settingsViewModel.isUseFolderEnabled.observe(viewLifecycleOwner) {
-            binding.isUseFolderSettingsSwitch.isChecked = it
-        }
-        settingsViewModel.isUseBehindBlurEnabled.observe(viewLifecycleOwner) {
-            binding.useABehindBlurSwitch.isChecked = it
-        }
-        settingsViewModel.isUseBackgroundBlurEnabled.observe(viewLifecycleOwner) {
-            binding.useABackgroundBlurSwitch.isChecked = it
-        }
-
-        binding.mainLayout.setRoundedCornersView(
-            (1.0f) * 64f,
-            Color.WHITE,
-            Color.BLACK,
-            (1.0f) * 5f,
-        )
-
+    /** при движении sheet делается видимым/невидимым текст "настроки" и кнопки назад
+     * и становятся острее верхние углы тем сильнее, чем ближе вверх
+     * */
+    private fun initOnSlideCallback() {
         onSlide = {
             slide.invoke(it)
             binding.apply {
                 include2.root.alpha = 1.0f - it
-                mainLayout.setRoundedCornersView(
-                    (1.0f - it) * 64f,
-                    Color.WHITE,
-                    Color.BLACK,
-                    (1.0f - it) * 5f,
-                )
+                initRoundedCornersWithParams(it)
                 if (it > 0.01f) {
                     topMenuLayout.visible()
                     topMenuLayout.alpha = it
@@ -72,22 +67,83 @@ class SettingsSheet(val slide: (Float) -> Unit) :
                 }
             }
         }
+    }
+
+    private fun SettingsSheetBinding.initRoundedCornersWithParams(
+        it: Float
+    ) {
+        mainLayout.setRoundedCornersView(
+            (1.0f - it) * ROUNDED_CORNERS_SHEET,
+            Color.WHITE,
+            Color.BLACK,
+            (1.0f - it) * ROUNDED_CORNERS_STROKE,
+        )
+    }
+
+    /** делает углы sheet закругленными при создании */
+    private fun initRoundedCorners() {
+        binding.apply {
+            mainLayout.setRoundedCornersView(
+                ROUNDED_CORNERS_SHEET,
+                Color.WHITE,
+                Color.BLACK,
+                ROUNDED_CORNERS_STROKE,
+            )
+        }
+    }
+
+    private fun initListeners() {
         binding.apply {
             backBtn.setOnClickListener {
                 closeSettingsScreen()
             }
             isUseFolderSettingsSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
-                settingsViewModel.applyUseFolder(isChecked)
+                viewModel.saveSetting(
+                    SettingsViewModel.SettingAction.ApplyFolderSettings(
+                        isChecked
+                    )
+                )
             }
             useABehindBlurSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
-                settingsViewModel.applyUseBehindBlur(isChecked)
+                viewModel.saveSetting(
+                    SettingsViewModel.SettingAction.ApplyBehindBlurSettings(
+                        isChecked
+                    )
+                )
             }
             useABackgroundBlurSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
-                settingsViewModel.applyUseBackgroundBlur(isChecked)
+                viewModel.saveSetting(
+                    SettingsViewModel.SettingAction.ApplyBackgroundBlurSettings(
+                        isChecked
+                    )
+                )
             }
         }
-        setStateCollapsed()
-        setBackPressed()
+    }
+
+    private fun initViewModel() {
+        // TODO: есть ли смысл в нем?
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.isUseFolderEnabled.collect {
+                    binding.isUseFolderSettingsSwitch.isChecked = it
+                }
+            }
+        }
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.isUseBehindBlurEnabled.collect {
+                    binding.useABehindBlurSwitch.isChecked = it
+                }
+            }
+        }
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.isUseBackgroundBlurEnabled.collect {
+                    binding.useABackgroundBlurSwitch.isChecked = it
+                }
+            }
+        }
     }
 
     private fun closeSettingsScreen() {
@@ -95,7 +151,7 @@ class SettingsSheet(val slide: (Float) -> Unit) :
         activity().fragmentController.closeFragment(activity(), "SettingsFragment")
     }
 
-    // onbackpressed нет, поэтому реализовал такую штуку
+    // onbackpressed нет, поэтому сделал такую штуку
     private fun setBackPressed() {
         dialog?.setOnKeyListener { dialog, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_BACK) {

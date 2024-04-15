@@ -18,19 +18,18 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
+import code.with.me.testroomandnavigationdrawertest.appComponent
+import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.CHIP_CORNER_RADIUS
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Folder
 import code.with.me.testroomandnavigationdrawertest.data.utils.getDisplayMetrics
 import code.with.me.testroomandnavigationdrawertest.data.utils.gone
 import code.with.me.testroomandnavigationdrawertest.data.utils.launchAfterTimerMain
-import code.with.me.testroomandnavigationdrawertest.data.utils.visible
 import code.with.me.testroomandnavigationdrawertest.databinding.MainScreenFragmentBinding
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.fragmentOptionsBuilder
 import code.with.me.testroomandnavigationdrawertest.ui.dialog.CreateFolderDialog
-import code.with.me.testroomandnavigationdrawertest.ui.sheet.AddFolderSheet
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.ViewANoteSheet
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MainScreenViewModel
 import com.google.android.material.chip.Chip
@@ -47,12 +46,16 @@ class MainScreenFragment :
     @Inject
     @Named("mainScreenVMFactory")
     lateinit var mainScreenVMFactory: ViewModelProvider.Factory
-    private lateinit var mainScreenViewModel: MainScreenViewModel
+    private val mainScreenViewModel: MainScreenViewModel by lazy {
+        ViewModelProvider(
+            this,
+            mainScreenVMFactory,
+        )[MainScreenViewModel::class.java]
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initAppComponent()
-        initViewModel()
     }
 
     override fun onViewCreated(
@@ -63,15 +66,6 @@ class MainScreenFragment :
         listenViewModel()
         initClickListeners()
         openNotesListFragment()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        println("onSaveInstanceState fragment tag ${fragmentManager?.fragments?.last()?.javaClass?.simpleName}")
-        outState.putString(
-            "fragmentTag",
-            fragmentManager?.fragments?.last()?.javaClass?.simpleName,
-        )
-        super.onSaveInstanceState(outState)
     }
 
     private fun initClickListeners() {
@@ -104,23 +98,15 @@ class MainScreenFragment :
     }
 
     private fun initAppComponent() {
-        activity?.let {
-            val appComponent = (it.application as NotesApplication).appComponent
-            appComponent.inject(this@MainScreenFragment)
-        }
+        appComponent.inject(this)
     }
 
     private fun listenViewModel() {
         lifecycleScope.launch {
+            /** достает названия всех папков из бд и показывает на главном экране
+             * если пусто, то делает chipGroup невидимыми(gone) */
             mainScreenViewModel.getAllFolders().collect {
                 binding.chipGroup.removeAllViewsInLayout()
-                val chip =
-                    Chip(
-                        binding.chipGroup.context,
-                        null,
-                        MR.style.Widget_MaterialComponents_Chip_Filter,
-                    )
-                chip.setUpFirstChip()
                 if (it.isNotEmpty()) {
                     it.forEach { folder ->
                         withContext(Dispatchers.Main.immediate) {
@@ -139,6 +125,7 @@ class MainScreenFragment :
                 }
             }
         }
+        /** если false, то скрывает chipGroup папок, вне зависимости, есть ли там какие-то chip*/
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 mainScreenViewModel.isUseFolderEnabled.collect {
@@ -165,13 +152,13 @@ class MainScreenFragment :
                 ),
             )
         mainScreenViewModel.setSelectedChip(this.id)
-        chipCornerRadius = 15f
-        setOnClickListener { view ->
+        chipCornerRadius = CHIP_CORNER_RADIUS
+        setOnClickListener {
             if (mainScreenViewModel.selectedChip.value == this.id) return@setOnClickListener
             showProgressBar(true)
             openNotesListFragment()
             mainScreenViewModel.setSelectedChipFolderId(-1)
-            binding.chipGroup.forEachIndexed { index, view ->
+            binding.chipGroup.forEachIndexed { index, _ ->
                 (binding.chipGroup[index] as Chip).unsetSelected()
             }
             mainScreenViewModel.setSelectedChip(this.id)
@@ -180,8 +167,8 @@ class MainScreenFragment :
         setSelected()
     }
 
-    private fun Chip.setUpChip(it: Folder) {
-        text = it.name
+    private fun Chip.setUpChip(folder: Folder) {
+        text = folder.name
         isClickable = true
         isCheckable = false
         // если установить в стиле, то не работает
@@ -194,24 +181,24 @@ class MainScreenFragment :
                     R.color.black,
                 ),
             )
-        chipCornerRadius = 15f
+        chipCornerRadius = CHIP_CORNER_RADIUS
         val chipGroup = binding.chipGroup
         if (binding.chipGroup.isNotEmpty()) {
             id = chipGroup.getChildAt(chipGroup.childCount - 1).id + 1
         }
-        setOnClickListener { view ->
+        setOnClickListener {
             if (mainScreenViewModel.selectedChip.value == this.id) {
                 mainScreenViewModel.setSelectedChip(-1)
                 mainScreenViewModel.setSelectedChipFolderId(1)
                 openNotesListFragment()
-                chipGroup.forEachIndexed { index, view ->
+                chipGroup.forEachIndexed { index, _ ->
                     (chipGroup[index] as Chip).unsetSelected()
                 }
             } else {
                 showProgressBar(true)
-                openNotesListFragment(it)
-                mainScreenViewModel.setSelectedChipFolderId(it.id)
-                chipGroup.forEachIndexed { index, view ->
+                openNotesListFragment(folder)
+                mainScreenViewModel.setSelectedChipFolderId(folder.id)
+                chipGroup.forEachIndexed { index, _ ->
                     (chipGroup[index] as Chip).unsetSelected()
                 }
                 mainScreenViewModel.setSelectedChip(this.id)
@@ -221,14 +208,14 @@ class MainScreenFragment :
     }
 
     private fun openNotesListFragment(it: Folder? = null) {
-        val bundle = Bundle()
-        it?.let {
-            bundle.putLong("idFolder", it.id)
-        } ?: run {
-            bundle.putLong("idFolder", -1)
-        }
         val notesListFragment = NotesListFragment()
-        notesListFragment.arguments = bundle
+        notesListFragment.arguments = Bundle().apply {
+            it?.let {
+                this.putLong("idFolder", it.id)
+            } ?: run {
+                this.putLong("idFolder", -1)
+            }
+        }
         (activity as MainActivity).fragmentController.replaceFragment(
             activity as MainActivity,
             notesListFragment,
@@ -240,24 +227,23 @@ class MainScreenFragment :
         showProgressBar(false)
     }
 
+    /** щас бы вспомнить что к чему тут*/
     fun openMakeNoteFragment(id: Long = -1, view: View? = null) {
-        //TODO доделать анимацию
         view?.let {
             val expandedView = View(activity).apply {
                 setBackgroundColor(resources.getColor(R.color.white, null))
             }
 
-            var height = getDisplayMetrics(activity()).heightPixels
-            var width = getDisplayMetrics(activity()).widthPixels
+            val height = getDisplayMetrics(activity()).heightPixels
+            val width = getDisplayMetrics(activity()).widthPixels
 
             val startX = view.x
             val startY = view.y
-            val startWidth = width
             val startHeight = view.height
 
             expandedView.x = startX
             expandedView.y = startY
-            expandedView.layoutParams = FrameLayout.LayoutParams(startWidth, startHeight)
+            expandedView.layoutParams = FrameLayout.LayoutParams(width, startHeight)
 
             val container =
                 binding.root
@@ -266,8 +252,6 @@ class MainScreenFragment :
             // Вычисляем конечные координаты и размеры (на весь экран)
             val finalX = 0f
             val finalY = 0f
-            val finalWidth = width
-            val finalHeight = height
 
             val anim = ValueAnimator.ofInt(0, 100)
             anim.interpolator = AccelerateDecelerateInterpolator()
@@ -275,8 +259,8 @@ class MainScreenFragment :
                 val fraction = animation.animatedValue as Int / 100f
                 val newX = startX + fraction * (finalX - startX)
                 val newY = startY + fraction * (finalY - startY)
-                val newWidth = startWidth + (finalWidth - startWidth) * fraction
-                val newHeight = startHeight + (finalHeight - startHeight) * fraction
+                val newWidth = width + (width - width) * fraction
+                val newHeight = startHeight + (height - startHeight) * fraction
 
                 expandedView.x = newX
                 expandedView.y = newY
@@ -307,7 +291,7 @@ class MainScreenFragment :
                 }
             })
 
-            anim.duration = 300 // Длительность анимации в миллисекундах
+            anim.duration = 300
             anim.start()
         } ?: run {
             val fragment = MakeNoteFragment()
@@ -327,13 +311,6 @@ class MainScreenFragment :
         }
     }
 
-    private fun openMakeFolderSheet() {
-        val sheet = AddFolderSheet()
-        (activity as MainActivity).let { activity ->
-            activity.sheetController.showSheet(activity, sheet)
-        }
-    }
-
     private fun showProgressBar(show: Boolean) {
         binding.progressBar.isGone = !show
 //        if (show) binding.progressBar.visible() else binding.progressBar.gone()
@@ -347,14 +324,6 @@ class MainScreenFragment :
     private fun Chip.unsetSelected() {
         chipBackgroundColor = ColorStateList.valueOf(resources.getColor(R.color.white, null))
         setTextColor(resources.getColor(R.color.black, null))
-    }
-
-    private fun initViewModel() {
-        mainScreenViewModel =
-            ViewModelProvider(
-                this,
-                mainScreenVMFactory,
-            )[MainScreenViewModel::class.java]
     }
 
     fun navigateToViewANoteSheet(id: Long) {

@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalCoroutinesApi::class)
-
 package code.with.me.testroomandnavigationdrawertest.ui.viewmodel
 
 import android.media.MediaPlayer
@@ -12,9 +10,8 @@ import androidx.lifecycle.viewModelScope
 import code.with.me.testroomandnavigationdrawertest.audio.AudioController
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.domain.repo.NoteRepository
-import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -26,18 +23,20 @@ import java.lang.IllegalArgumentException
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
-class ViewANoteViewModel
+class PreviewNoteDialogViewModel
 @Inject
 constructor(
     private val repoNote: NoteRepository,
     private val audioController: AudioController,
 ) : ViewModel() {
+
     private val _state = MutableStateFlow<NoteState>(NoteState.Loading)
     val state = _state.asStateFlow()
 
     private val _userActionAudioState =
         MutableStateFlow<UserActionAudioState>(UserActionAudioState.Loading)
     val userActionAudioState = _userActionAudioState.asStateFlow()
+
 
     private val _waveFormProgress = MutableStateFlow(0f)
     val waveFormProgress = _waveFormProgress.asStateFlow()
@@ -46,6 +45,13 @@ constructor(
     val timerState = _timerState.asStateFlow()
 
     var currentNote: Note? = null
+
+    //можно было использовать sharedflow, вместо стандартных значений = -1 но пока попробую так
+    private val _firstAndLastId = MutableStateFlow(Pair(0, 0))
+    val firstAndLastId = _firstAndLastId.asStateFlow()
+
+    private val _firstAndLastAvailableId = MutableStateFlow(Pair(0L, 0L))
+    val firstAndLastAvailableId = _firstAndLastAvailableId.asStateFlow()
 
     val audioPlaybackObserver = Observer<AudioPlayerState> { state -> }
 
@@ -85,6 +91,19 @@ constructor(
         }
     }
 
+    fun getFirstAndLastAvailableId(id: Long) {
+        viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
+            val firstIdDeferred = async { repoNote.getNextAvailableId(id) }
+            val lastIdDeferred = async { repoNote.getPreviousAvailableId(id) }
+
+            val firstId = firstIdDeferred.await() ?: 0L
+            val lastId = lastIdDeferred.await() ?: 0L
+
+            _firstAndLastAvailableId.emit(Pair(firstId, lastId))
+        }
+    }
+
+
     fun getNoteById(id: Long) {
         viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
             try {
@@ -100,6 +119,19 @@ constructor(
             }
         }
     }
+
+    fun getFirstAndLastCustomer() {
+        viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
+            val firstIdDeferred = async { repoNote.getFirstCustomer() }
+            val lastIdDeferred = async { repoNote.getLastCustomer() }
+
+            val firstId = firstIdDeferred.await().toInt()
+            val lastId = lastIdDeferred.await().toInt()
+
+            _firstAndLastId.emit(Pair(firstId, lastId))
+        }
+    }
+
 
     fun processUserActionsAudio(userAction: UserActionAudioState) {
         viewModelScope.launch {
@@ -187,51 +219,25 @@ constructor(
             currentPos = ((it.duration.times(progress)).roundToInt()) / 100
         }
     }
-}
 
-sealed class UserActionAudioState {
-    data object Loading : UserActionAudioState()
-
-    class StartPlaying(val audioUri: String) : UserActionAudioState()
-
-    class StartPlayingAt(val play: String) : UserActionAudioState()
-
-    data object PausePlaying : UserActionAudioState()
-
-    class SeekTo(val position: Int) : UserActionAudioState()
-
-    data class IsPlaying(val isPlaying: Boolean) : UserActionAudioState()
-
-    class InitPlayer(val audioUri: String) : UserActionAudioState()
-
-    class Error<T>(val error: T) : UserActionAudioState()
-}
-
-sealed class AudioPlayerState {
-    //    data object Idle : AudioPlayerState()
-    data object Playing : AudioPlayerState()
-
-    data object Paused : AudioPlayerState()
-
-    data object Completed : AudioPlayerState()
-
-    class Error<T>(val error: T) : AudioPlayerState()
-}
-
-class ViewANoteViewModelFactory
-@Inject
-constructor(
-    private val repo: NoteRepository,
-    private val audioController: AudioController,
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(ViewANoteViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return ViewANoteViewModel(
-                repo,
-                audioController,
-            ) as T
+    companion object {
+        class PreviewNoteDialogViewModelFactory
+        @Inject
+        constructor(
+            private val repo: NoteRepository,
+            private val audioController: AudioController,
+        ) : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                if (modelClass.isAssignableFrom(PreviewNoteDialogViewModel::class.java)) {
+                    @Suppress("UNCHECKED_CAST")
+                    return PreviewNoteDialogViewModel(
+                        repo,
+                        audioController,
+                    ) as T
+                }
+                throw IllegalArgumentException("ukn VM class")
+            }
         }
-        throw IllegalArgumentException("ukn VM class")
     }
+
 }
