@@ -1,22 +1,19 @@
 package code.with.me.testroomandnavigationdrawertest.data.di
 
 import code.with.me.testroomandnavigationdrawertest.NotesApplication
-import code.with.me.testroomandnavigationdrawertest.domain.di.RepositoryModule
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import code.with.me.testroomandnavigationdrawertest.ui.di.AudioModule
-import code.with.me.testroomandnavigationdrawertest.ui.di.BindAppModule
 import code.with.me.testroomandnavigationdrawertest.ui.di.ControllerModule
 import code.with.me.testroomandnavigationdrawertest.ui.di.FileModule
 import code.with.me.testroomandnavigationdrawertest.ui.di.FormatterModule
 import code.with.me.testroomandnavigationdrawertest.ui.di.MarkdownParserModule
-import code.with.me.testroomandnavigationdrawertest.ui.di.ViewModelModule
+import code.with.me.testroomandnavigationdrawertest.ui.dialog.AudioRecorderDialog
 import code.with.me.testroomandnavigationdrawertest.ui.dialog.CreateFolderDialog
 import code.with.me.testroomandnavigationdrawertest.ui.dialog.PreviewNoteDialog
 import code.with.me.testroomandnavigationdrawertest.ui.fragment.MainScreenFragment
 import code.with.me.testroomandnavigationdrawertest.ui.fragment.MakeNoteFragment
 import code.with.me.testroomandnavigationdrawertest.ui.fragment.NotesListFragment
 import code.with.me.testroomandnavigationdrawertest.ui.fragment.SearchFragment
-import code.with.me.testroomandnavigationdrawertest.ui.sheet.AudioRecorderDialog
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.NoteMenuSheet
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.PaintSheet
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.RenameFolderSheet
@@ -24,21 +21,21 @@ import code.with.me.testroomandnavigationdrawertest.ui.sheet.SelectFolderDestina
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.SettingsSheet
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.ViewANoteSheet
 import dagger.Component
-import javax.inject.Singleton
 
-@Singleton
+// @FragmentScoped
 @Component(
     modules = [
         DatabaseModule::class,
-        RepositoryModule::class,
-        BindAppModule::class,
+//        RepositoryModule::class,
+//        BindAppModule::class,
         ControllerModule::class,
         AudioModule::class,
         FileModule::class,
         MarkdownParserModule::class,
         FormatterModule::class,
-        ViewModelModule::class,
-        SettingsModule::class,
+//        ViewModelModule::class,
+//        SettingsModule::class,
+//        AppModule::class,
     ],
 )
 interface AppComponent {
@@ -59,6 +56,7 @@ interface AppComponent {
     fun inject(noteMenuSheet: NoteMenuSheet)
 
     fun inject(fragment: SearchFragment)
+
     fun inject(makeNoteFragment: MakeNoteFragment)
 
     fun inject(renameFolderSheet: RenameFolderSheet)
@@ -70,5 +68,4 @@ interface AppComponent {
     fun inject(settingsSheet: SettingsSheet)
 
     fun inject(selectFolderDestinationSheet: SelectFolderDestinationSheet)
-
 }

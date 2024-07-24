@@ -1,7 +1,8 @@
 package code.with.me.testroomandnavigationdrawertest.data.di
 
+import android.content.Context
 import androidx.room.Room
-import code.with.me.testroomandnavigationdrawertest.NotesApplication
+import code.with.me.testroomandnavigationdrawertest.data.const.Const.Companion.DATABASE_NAME
 import code.with.me.testroomandnavigationdrawertest.data.localDataSource.FolderDAO
 import code.with.me.testroomandnavigationdrawertest.data.localDataSource.FolderTagDAO
 import code.with.me.testroomandnavigationdrawertest.data.localDataSource.NoteDAO
@@ -9,29 +10,32 @@ import code.with.me.testroomandnavigationdrawertest.data.localDataSource.NoteDat
 import code.with.me.testroomandnavigationdrawertest.data.localDataSource.NoteTagDAO
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 
 @Module
-class DatabaseModule(private val application: NotesApplication) {
+@InstallIn(SingletonComponent::class)
+class DatabaseModule() {
     @Provides
-    @Singleton
-    fun provideDatabase(): NoteDatabase =
-        Room.databaseBuilder(application.applicationContext, NoteDatabase::class.java, "note")
-            .fallbackToDestructiveMigration().build()
+    fun provideDatabase(
+        @ApplicationContext context: Context,
+    ): NoteDatabase =
+        Room.databaseBuilder(
+            context,
+            NoteDatabase::class.java,
+            DATABASE_NAME,
+        ).fallbackToDestructiveMigration().build()
 
     @Provides
-    @Singleton
     fun provideNoteDAO(db: NoteDatabase): NoteDAO = db.noteDao()
 
     @Provides
-    @Singleton
     fun provideFolderDAO(db: NoteDatabase): FolderDAO = db.folderDao()
 
     @Provides
-    @Singleton
     fun provideTagDAO(db: NoteDatabase): FolderTagDAO = db.folderTagDAO()
 
     @Provides
-    @Singleton
     fun provideNoteTagDAO(db: NoteDatabase): NoteTagDAO = db.noteTagDAO()
 }

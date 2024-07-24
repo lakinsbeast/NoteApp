@@ -1,14 +1,18 @@
 package code.with.me.testroomandnavigationdrawertest.data.di
 
-import code.with.me.testroomandnavigationdrawertest.NotesApplication
+import android.content.Context
 import code.with.me.testroomandnavigationdrawertest.data.localDataSource.DataStoreManager
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 
 @Module
-class SettingsModule(private val application: NotesApplication) {
+@InstallIn(SingletonComponent::class)
+class SettingsModule() {
     @Provides
-    @Singleton
-    fun provideDataStoreManager() = DataStoreManager(application.applicationContext)
+    fun provideDataStoreManager(
+        @ApplicationContext context: Context,
+    ) = DataStoreManager(context)
 }

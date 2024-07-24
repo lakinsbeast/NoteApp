@@ -1,11 +1,8 @@
 package code.with.me.testroomandnavigationdrawertest.ui.di
 
 import code.with.me.testroomandnavigationdrawertest.audio.AudioController
-import code.with.me.testroomandnavigationdrawertest.data.localDataSource.DataStoreManager
 import code.with.me.testroomandnavigationdrawertest.data.repos.FolderRepositoryImpl
-import code.with.me.testroomandnavigationdrawertest.data.repos.FolderTagRepositoryImpl
 import code.with.me.testroomandnavigationdrawertest.data.repos.NoteRepositoryImpl
-import code.with.me.testroomandnavigationdrawertest.data.repos.NoteTagRepositoryImpl
 import code.with.me.testroomandnavigationdrawertest.markdown.Formatter
 import code.with.me.testroomandnavigationdrawertest.markdown.IStringToMarkdownTextParser
 import code.with.me.testroomandnavigationdrawertest.markdown.StringToMarkdownTextParser
@@ -18,8 +15,11 @@ import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.SettingsViewMod
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.ViewANoteViewModel
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
 
 @Module
+@InstallIn(ViewModelComponent::class)
 class ViewModelModule {
     @Provides
     fun provideNoteViewModel(repo: NoteRepositoryImpl) = NoteViewModel(repo)
@@ -42,11 +42,11 @@ class ViewModelModule {
     @Provides
     fun provideFolderViewModel(
         repo: FolderRepositoryImpl,
-        dataStore: DataStoreManager,
-    ) = FolderViewModel(repo, dataStore)
+//        dataStore: DataStoreManager,
+    ) = FolderViewModel(repo /*dataStore*/)
 
     @Provides
-    fun provideSettingsViewModel(dataStore: DataStoreManager) = SettingsViewModel(dataStore)
+    fun provideSettingsViewModel(/*dataStore: DataStoreManager*/) = SettingsViewModel(/*dataStore*/)
 
     @Provides
     fun provideStringToMarkdownTextParser(vararg formatters: Formatter): IStringToMarkdownTextParser {

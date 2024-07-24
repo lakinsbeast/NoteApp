@@ -1,86 +1,79 @@
 package code.with.me.testroomandnavigationdrawertest.ui.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Folder
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
-import code.with.me.testroomandnavigationdrawertest.data.localDataSource.DataStoreManager
 import code.with.me.testroomandnavigationdrawertest.domain.repo.FolderRepository
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
 import javax.inject.Inject
 
+@HiltViewModel
 class FolderViewModel
-@Inject
-constructor(
-    private val repo: FolderRepository,
-    private val dataStoreManager: DataStoreManager,
-) : BaseViewModel() {
+    @Inject
+    constructor(
+        private val repo: FolderRepository,
+//        private val dataStoreManager: DataStoreManager,
+    ) : BaseViewModel() {
+        fun getAllFolders(): Flow<List<Folder>> = repo.getAllFolders()
 
+        fun getNotesInFolder(folderId: Long): Flow<List<Note>> = repo.getNotesInFolder(folderId)
 
-    fun getAllFolders(): Flow<List<Folder>> = repo.getAllFolders()
+        fun getAllFoldersSortByNameASC(): Flow<List<Folder>> = repo.getAllFoldersSortByNameASC()
 
-    fun getNotesInFolder(folderId: Long): Flow<List<Note>> = repo.getNotesInFolder(folderId)
+        fun getAllFoldersSortByNameDESC(): Flow<List<Folder>> = repo.getAllFoldersSortByNameDESC()
 
-    fun getAllFoldersSortByNameASC(): Flow<List<Folder>> = repo.getAllFoldersSortByNameASC()
+        fun getAllFoldersLastOpenedNewest(): Flow<List<Folder>> = repo.getAllFoldersLastOpenedNewest()
 
-    fun getAllFoldersSortByNameDESC(): Flow<List<Folder>> = repo.getAllFoldersSortByNameDESC()
+        fun getAllFoldersLastOpenedOldest(): Flow<List<Folder>> = repo.getAllFoldersLastOpenedOldest()
 
-    fun getAllFoldersLastOpenedNewest(): Flow<List<Folder>> = repo.getAllFoldersLastOpenedNewest()
+        fun getAllFoldersLastEditedNewest(): Flow<List<Folder>> = repo.getAllFoldersLastEditedNewest()
 
-    fun getAllFoldersLastOpenedOldest(): Flow<List<Folder>> = repo.getAllFoldersLastOpenedOldest()
+        fun getAllFoldersLastEditedOldest(): Flow<List<Folder>> = repo.getAllFoldersLastEditedOldest()
 
-    fun getAllFoldersLastEditedNewest(): Flow<List<Folder>> = repo.getAllFoldersLastEditedNewest()
+        suspend fun getAllFoldersFavorite(): Flow<List<Folder>> = repo.getAllFoldersFavorite()
 
-    fun getAllFoldersLastEditedOldest(): Flow<List<Folder>> = repo.getAllFoldersLastEditedOldest()
+        fun getFolderByTag(tag: String): Flow<List<Folder>> = repo.getFolderByTag(tag)
 
-    suspend fun getAllFoldersFavorite(): Flow<List<Folder>> = repo.getAllFoldersFavorite()
+        fun updateLastOpenedFolder(
+            time: Long,
+            folderId: Long,
+        ) = repo.updateLastOpenedFolder(time, folderId)
 
-    fun getFolderByTag(tag: String): Flow<List<Folder>> = repo.getFolderByTag(tag)
+        suspend fun insertFolder(folder: Folder): Long = repo.insertFolder(folder)
 
-    fun updateLastOpenedFolder(
-        time: Long,
-        folderId: Long,
-    ) = repo.updateLastOpenedFolder(time, folderId)
+        suspend fun updateFolder(folder: Folder) = repo.updateFolder(folder)
 
-    suspend fun insertFolder(folder: Folder): Long = repo.insertFolder(folder)
-
-    suspend fun updateFolder(folder: Folder) = repo.updateFolder(folder)
-
-    suspend fun deleteFolder(folder: Folder) = repo.deleteFolder(folder)
-
-
-}
+        suspend fun deleteFolder(folder: Folder) = repo.deleteFolder(folder)
+    }
 
 sealed class FolderVMState {
-    data object Loading : FolderVMState()
+    object Loading : FolderVMState()
 
     class Result<T>(val data: T) : FolderVMState()
 
-    data object EmptyResult : FolderVMState()
+    object EmptyResult : FolderVMState()
 
     class Error<T>(val error: T) : FolderVMState()
 }
 
 class FolderViewModelFactory
-@Inject
-constructor(
-    private val repo: FolderRepository,
-    private val dataStoreManager: DataStoreManager,
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(FolderViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return FolderViewModel(
-                repo,
-                dataStoreManager,
-            ) as T
+    @Inject
+    constructor(
+        private val repo: FolderRepository,
+//        private val dataStoreManager: DataStoreManager,
+    ) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(FolderViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return FolderViewModel(
+                    repo,
+//                    dataStoreManager,
+                ) as T
+            }
+            throw IllegalArgumentException("ukn VM class")
         }
-        throw IllegalArgumentException("ukn VM class")
     }
-}

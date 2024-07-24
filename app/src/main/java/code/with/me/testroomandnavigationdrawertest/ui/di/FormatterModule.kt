@@ -18,9 +18,12 @@ import code.with.me.testroomandnavigationdrawertest.markdown.StrikethroughFormat
 import code.with.me.testroomandnavigationdrawertest.markdown.StrikethroughFormatterImpl
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
 import javax.inject.Named
 
 @Module
+@InstallIn(ActivityComponent::class)
 class FormatterModule {
     @Provides
     fun provideFormatters(

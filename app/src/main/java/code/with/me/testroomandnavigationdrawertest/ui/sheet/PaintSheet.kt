@@ -1,5 +1,6 @@
 package code.with.me.testroomandnavigationdrawertest.ui.sheet
 
+import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -13,19 +14,19 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.drawToBitmap
 import androidx.fragment.app.setFragmentResult
-import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
-import code.with.me.testroomandnavigationdrawertest.appComponent
+import code.with.me.testroomandnavigationdrawertest.data.const.Const.Companion.PAINT_KEY_RESULT
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityPaintBinding
 import code.with.me.testroomandnavigationdrawertest.file.FilesController
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
-import code.with.me.testroomandnavigationdrawertest.ui.fragment.MakeNoteFragment.Companion.paintResultKey
 import com.flask.colorpicker.ColorPickerView
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import java.io.FileOutputStream
 import java.lang.Exception
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 class PaintSheet : BaseSheet<ActivityPaintBinding>(ActivityPaintBinding::inflate) {
@@ -41,7 +42,6 @@ class PaintSheet : BaseSheet<ActivityPaintBinding>(ActivityPaintBinding::inflate
         view: View,
         savedInstanceState: Bundle?,
     ) {
-        initAppComponent()
         super.onViewCreated(view, savedInstanceState)
         setUpClickListeners()
         setUpPaint()
@@ -53,10 +53,7 @@ class PaintSheet : BaseSheet<ActivityPaintBinding>(ActivityPaintBinding::inflate
         behavior?.isDraggable = false
     }
 
-    private fun initAppComponent() {
-        appComponent.inject(this)
-    }
-
+    @SuppressLint("ClickableViewAccessibility")
     private fun setUpClickListeners() {
         setUpColorSwitch()
         setUpClearButton()
@@ -111,7 +108,7 @@ class PaintSheet : BaseSheet<ActivityPaintBinding>(ActivityPaintBinding::inflate
                     Bundle().apply {
                         this.putString("pathBitmap", drawuri.toString())
                     }
-                setFragmentResult(paintResultKey, resultIntent)
+                setFragmentResult(PAINT_KEY_RESULT, resultIntent)
                 dismiss()
             } catch (e: Exception) {
                 println("Error in ${javaClass.simpleName} error is $e")

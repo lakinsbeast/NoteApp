@@ -3,7 +3,7 @@ package code.with.me.testroomandnavigationdrawertest.ui.fragment
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.updateLayoutParams
-import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.SETTINGS_IMAGE_HEIGHT_WIDTH
+import code.with.me.testroomandnavigationdrawertest.data.const.Const.Companion.SETTINGS_IMAGE_HEIGHT_WIDTH
 import code.with.me.testroomandnavigationdrawertest.databinding.SettingsFragmentBinding
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.SettingsSheet

@@ -1,7 +1,9 @@
 package code.with.me.testroomandnavigationdrawertest.ui.controllers
 
+import android.app.Activity
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import code.with.me.testroomandnavigationdrawertest.R
 import code.with.me.testroomandnavigationdrawertest.ui.FragmentBackStackManager
@@ -84,7 +86,7 @@ constructor() : IGetFragment {
         activity: MainActivity,
         fragmentTag: String,
     ): Fragment? {
-        for (fragment in activity.supportFragmentManager.fragments) {
+        for (fragment in activity.supportFragmentManager().fragments) {
             if (fragment.tag == fragmentTag) {
                 return fragment
             }
@@ -92,6 +94,7 @@ constructor() : IGetFragment {
         return null
     }
 }
+fun MainActivity.supportFragmentManager() = (this as FragmentActivity).supportFragmentManager
 
 class OpenFragmentImpl
 @Inject
@@ -107,14 +110,14 @@ constructor(
     ) {
         fragmentBackStackManager.clearBackStackIfNeeded(
             options.clearBackStack,
-            activity.supportFragmentManager,
+            activity.supportFragmentManager(),
         )
         fragmentBackStackManager.deleteLastFragmentIfNeeded(
             options.deleteLast,
-            activity.supportFragmentManager,
+            activity.supportFragmentManager(),
         )
 
-        activity.supportFragmentManager.beginTransaction()
+        activity.supportFragmentManager().beginTransaction()
             .setCustomAnimations(animEnter, animExit, animEnter, animExit)
             .add(options.fragmentLayout, fragment, fragment.javaClass.simpleName)
             .addToBackStack(if (options.addToBackStack) fragment.javaClass.simpleName else null)
@@ -125,7 +128,7 @@ constructor(
         activity: MainActivity,
         sheet: BottomSheetDialogFragment,
     ) {
-        sheet.show(activity.supportFragmentManager, sheet.javaClass.simpleName)
+        sheet.show(activity.supportFragmentManager(), sheet.javaClass.simpleName)
     }
 }
 
@@ -141,14 +144,14 @@ constructor(
     ) {
         fragmentBackStackManager.clearBackStackIfNeeded(
             options.clearBackStack,
-            activity.supportFragmentManager,
+            activity.supportFragmentManager(),
         )
         fragmentBackStackManager.deleteLastFragmentIfNeeded(
             options.deleteLast,
-            activity.supportFragmentManager,
+            activity.supportFragmentManager(),
         )
 
-        activity.supportFragmentManager.beginTransaction()
+        activity.supportFragmentManager().beginTransaction()
             .replace(options.fragmentLayout, fragment, fragment.javaClass.simpleName)
             .addToBackStack(if (options.addToBackStack) fragment.javaClass.simpleName else null)
             .commit()
@@ -167,7 +170,7 @@ constructor(
         try {
             val fragment = getFragmentImpl.getFragment(activity, fragmentTag)
             fragment?.let {
-                activity.supportFragmentManager.beginTransaction().remove(fragment).commit()
+                activity.supportFragmentManager().beginTransaction().remove(fragment).commit()
 
             } ?: run {
                 throw IllegalStateException()

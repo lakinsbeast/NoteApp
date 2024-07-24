@@ -8,20 +8,17 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.core.view.isGone
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.R
-import code.with.me.testroomandnavigationdrawertest.appComponent
-import code.with.me.testroomandnavigationdrawertest.data.utils.gone
-import code.with.me.testroomandnavigationdrawertest.data.utils.visible
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
 import code.with.me.testroomandnavigationdrawertest.data.enums.NoteItemsCallback
 import code.with.me.testroomandnavigationdrawertest.databinding.FragmentNotesListBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.NoteItemBinding
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
+import code.with.me.testroomandnavigationdrawertest.ui.controllers.supportFragmentManager
 import code.with.me.testroomandnavigationdrawertest.ui.dialog.PreviewNoteDialog
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.NoteMenuSheet
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteState
@@ -29,8 +26,6 @@ import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NotesListUserAction
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import javax.inject.Named
 
 class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
     FragmentNotesListBinding::inflate,
@@ -38,16 +33,17 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
     lateinit var adapter: BaseAdapter<Note, NoteItemBinding>
     private lateinit var itemsBinding: NoteItemBinding
 
-    @Inject
-    @Named("noteVMFactory")
-    lateinit var factory: ViewModelProvider.Factory
-    private val noteViewModel: NoteViewModel by lazy {
-        ViewModelProvider(this, factory)[NoteViewModel::class.java]
-    }
+//    @Inject
+//    @Named("noteVMFactory")
+//    lateinit var factory: ViewModelProvider.Factory
+    private val noteViewModel: NoteViewModel by viewModels()
+//    lazy {
+//        ViewModelProvider(this, factory)[NoteViewModel::class.java]
+//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        appComponent.inject(this)
+
         /** достаем айди папки, если он был выбран и выводим все заметки, которые
          * привязаны к папке*/
         noteViewModel.idFolder = arguments?.getLong("idFolder") ?: -1
@@ -59,7 +55,7 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
     ) {
         super.onViewCreated(view, savedInstanceState)
         initAdapterBinding()
-        initAppComponent()
+
         initAdapter()
         initRecyclerView(binding)
         listenVMObservers()
@@ -130,25 +126,21 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
         }
     }
 
-    private fun initAppComponent() {
-        appComponent.inject(this)
-    }
-
     private fun initAdapterBinding() {
         itemsBinding =
             NoteItemBinding.inflate(layoutInflater, binding.rv.parent as ViewGroup, false)
     }
-
 
     private fun initRecyclerView(binding: FragmentNotesListBinding) {
         binding.apply {
             rv.adapter = adapter
             rv.setHasFixedSize(false)
             rv.layoutManager = LinearLayoutManager(requireActivity())
-            rv.animation = AnimationUtils.loadAnimation(
-                activity(),
-                R.anim.translate_slide_recycler_anim
-            )
+            rv.animation =
+                AnimationUtils.loadAnimation(
+                    activity(),
+                    R.anim.translate_slide_recycler_anim,
+                )
         }
     }
 
@@ -175,7 +167,7 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
                             putLong("noteId", id)
                         }
 
-                    dialog.show(activity().supportFragmentManager, "CreateFolderDialog")
+                    dialog.show(activity().supportFragmentManager(), "CreateFolderDialog")
                 }
 
                 override fun onCreateViewHolder(
@@ -202,7 +194,6 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
                 ) {
                     super.onBindViewHolder(holder, position)
                     holder.binding.apply {
-
                         val item = getItem(holder.adapterPosition)
                         titleID.text = cutText(item.titleNote).checkEmptyTitle()
                         textID.text = cutText(item.textNote).checkEmptyText()
@@ -237,7 +228,10 @@ class NotesListFragment : BaseFragment<FragmentNotesListBinding>(
                     }
                 }
 
-                private fun openDetailFragment(id1: View, id: Long) {
+                private fun openDetailFragment(
+                    id1: View,
+                    id: Long,
+                ) {
                     for (fragment in activity?.supportFragmentManager?.fragments!!) {
                         println("fragment: ${fragment.javaClass.simpleName}")
                         if (fragment is MainScreenFragment) {

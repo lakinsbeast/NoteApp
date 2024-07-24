@@ -4,13 +4,12 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import code.with.me.testroomandnavigationdrawertest.appComponent
-import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.ROUNDED_CORNERS_SHEET
-import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.ROUNDED_CORNERS_STROKE
+import code.with.me.testroomandnavigationdrawertest.data.const.Const.Companion.ROUNDED_CORNERS_SHEET
+import code.with.me.testroomandnavigationdrawertest.data.const.Const.Companion.ROUNDED_CORNERS_STROKE
 import code.with.me.testroomandnavigationdrawertest.data.utils.gone
 import code.with.me.testroomandnavigationdrawertest.data.utils.setRoundedCornersView
 import code.with.me.testroomandnavigationdrawertest.data.utils.visible
@@ -18,22 +17,20 @@ import code.with.me.testroomandnavigationdrawertest.databinding.SettingsSheetBin
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.SettingsViewModel
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import javax.inject.Named
 
 class SettingsSheet(val slide: (Float) -> Unit) :
     BaseSheet<SettingsSheetBinding>(SettingsSheetBinding::inflate) {
     // TODO: Добавить превьюдиалога для настроек и добавить возможность настраивать значения dimAmount и blurBehind
 
-    @Inject
-    @Named("settingsVMFactory")
-    lateinit var factory: ViewModelProvider.Factory
-    private val viewModel: SettingsViewModel by lazy {
-        ViewModelProvider(this, factory)[SettingsViewModel::class.java]
-    }
+//    @Inject
+//    @Named("settingsVMFactory")
+//    lateinit var factory: ViewModelProvider.Factory
+    private val viewModel: SettingsViewModel by viewModels()
+//    lazy {
+//        ViewModelProvider(this, factory)[SettingsViewModel::class.java]
+//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        appComponent.inject(this)
         super.onCreate(savedInstanceState)
     }
 
@@ -69,9 +66,7 @@ class SettingsSheet(val slide: (Float) -> Unit) :
         }
     }
 
-    private fun SettingsSheetBinding.initRoundedCornersWithParams(
-        it: Float
-    ) {
+    private fun SettingsSheetBinding.initRoundedCornersWithParams(it: Float) {
         mainLayout.setRoundedCornersView(
             (1.0f - it) * ROUNDED_CORNERS_SHEET,
             Color.WHITE,
@@ -100,22 +95,22 @@ class SettingsSheet(val slide: (Float) -> Unit) :
             isUseFolderSettingsSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
                 viewModel.saveSetting(
                     SettingsViewModel.SettingAction.ApplyFolderSettings(
-                        isChecked
-                    )
+                        isChecked,
+                    ),
                 )
             }
             useABehindBlurSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
                 viewModel.saveSetting(
                     SettingsViewModel.SettingAction.ApplyBehindBlurSettings(
-                        isChecked
-                    )
+                        isChecked,
+                    ),
                 )
             }
             useABackgroundBlurSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
                 viewModel.saveSetting(
                     SettingsViewModel.SettingAction.ApplyBackgroundBlurSettings(
-                        isChecked
-                    )
+                        isChecked,
+                    ),
                 )
             }
         }

@@ -11,7 +11,7 @@ import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.viewbinding.ViewBinding
-import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.STANDARD_BLUR_RADIUS
+import code.with.me.testroomandnavigationdrawertest.data.const.Const.Companion.STANDARD_BLUR_RADIUS
 import code.with.me.testroomandnavigationdrawertest.data.utils.findActivity
 import code.with.me.testroomandnavigationdrawertest.data.utils.getDisplayMetrics
 import code.with.me.testroomandnavigationdrawertest.data.utils.gone

@@ -12,8 +12,27 @@ dependencyResolutionManagement {
         mavenCentral()
         maven { url "https://jitpack.io" }
     }
+//    versionCatalogs {
+//        libs {
+//            from(files("gradle/libs.versions.toml"))
+//        }
+//    }
+
 }
 
-rootProject.name = "(test) room and navigation drawer test"
+rootProject.name = "1Note"
 include ':app'
-include ':lint-rules'
+include ':feature'
+include ':feature:search'
+include ':core'
+include ':core:model'
+include ':core:database'
+include ':core:data'
+include ':core:utils'
+include ':core:ui'
+include ':feature:settings'
+include ':core:preferences'
+include ':feature:mainscreen'
+include ':feature:makenote'
+include ':core:files'
+include ':feature:createfolder'

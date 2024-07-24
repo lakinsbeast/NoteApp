@@ -18,7 +18,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.forEachIndexed
 import androidx.core.view.get
 import code.with.me.testroomandnavigationdrawertest.R
-import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.ROUNDED_CORNERS_STROKE
+import code.with.me.testroomandnavigationdrawertest.data.const.Const.Companion.ROUNDED_CORNERS_STROKE
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.chip.Chip
@@ -42,7 +42,6 @@ fun findActivity(context: Context): MainActivity {
     return context as MainActivity
 }
 
-
 fun View.setRoundedCornersView(
     radius: Float,
     color: Int = Color.BLACK,
@@ -63,7 +62,6 @@ fun View.setRoundedCornersView(
     val layerDrawable = LayerDrawable(arrayOf(shapeDrawable))
     background = layerDrawable
 }
-
 
 fun View.setUpperRoundedCornersView(
     radius: Float,

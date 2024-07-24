@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="17" />
+    <bytecodeTargetLevel target="18">
+      <module name="1Note.app" target="17" />
+      <module name="1Note.core" target="17" />
+      <module name="1Note.core.data" target="17" />
+      <module name="1Note.core.database" target="17" />
+      <module name="1Note.core.files" target="17" />
+      <module name="1Note.core.model" target="17" />
+      <module name="1Note.core.preferences" target="17" />
+      <module name="1Note.core.ui" target="17" />
+      <module name="1Note.core.utils" target="17" />
+      <module name="1Note.feature" target="17" />
+      <module name="1Note.feature.mainscreen" target="17" />
+      <module name="1Note.feature.makenote" target="17" />
+      <module name="1Note.feature.search" target="17" />
+      <module name="1Note.feature.settings" target="17" />
+      <module name="StudioProjects.NoteApp.1Note.feature.createfolder" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>

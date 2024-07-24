@@ -10,9 +10,12 @@ import code.with.me.testroomandnavigationdrawertest.markdown.StarTextCheckerImpl
 import code.with.me.testroomandnavigationdrawertest.markdown.StrikethroughTextCheckerImpl
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
 import javax.inject.Named
 
 @Module
+@InstallIn(ActivityComponent::class)
 class MarkdownParserModule {
     @Provides
     fun provideStarTextChecker(): ITextCheckerT<Star> {

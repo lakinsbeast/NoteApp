@@ -5,39 +5,34 @@ import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.View
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import code.with.me.testroomandnavigationdrawertest.appComponent
-import code.with.me.testroomandnavigationdrawertest.data.utils.println
+import code.with.me.testroomandnavigationdrawertest.data.data_classes.Folder
+import code.with.me.testroomandnavigationdrawertest.data.utils.launchMainScope
 import code.with.me.testroomandnavigationdrawertest.data.utils.setCancelButton
 import code.with.me.testroomandnavigationdrawertest.data.utils.setChipSelectedDesign
 import code.with.me.testroomandnavigationdrawertest.data.utils.setChipUnSelectedDesign
 import code.with.me.testroomandnavigationdrawertest.data.utils.setConfirmButton
-import code.with.me.testroomandnavigationdrawertest.data.data_classes.Folder
-import code.with.me.testroomandnavigationdrawertest.data.utils.launchMainScope
 import code.with.me.testroomandnavigationdrawertest.databinding.CreateFolderDialogBinding
-import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseDialog
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.CreateFolderViewModel
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import javax.inject.Named
 
 class CreateFolderDialog() :
     BaseDialog<CreateFolderDialogBinding>(CreateFolderDialogBinding::inflate) {
-
-    @Inject
-    @Named("createFolderVMFactory")
-    lateinit var folderVmFactory: ViewModelProvider.Factory
-    private val viewModel: CreateFolderViewModel by lazy {
-        ViewModelProvider(
-            (context as MainActivity).viewModelStore,
-            folderVmFactory,
-        )[CreateFolderViewModel::class.java]
-    }
+//    @Inject
+//    @Named("createFolderVMFactory")
+//    lateinit var folderVmFactory: ViewModelProvider.Factory
+    private val viewModel: CreateFolderViewModel by viewModels()
+//    lazy {
+//        ViewModelProvider(
+//            (context as MainActivity).viewModelStore,
+//            folderVmFactory,
+//        )[CreateFolderViewModel::class.java]
+//    }
 
     private var textListener =
         object : TextWatcher {
@@ -66,11 +61,6 @@ class CreateFolderDialog() :
             }
         }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        initAppComponent()
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
@@ -83,12 +73,6 @@ class CreateFolderDialog() :
         generateChip()
         setCornerRounded(binding.mainLayout)
         listenVM()
-    }
-
-    private fun initAppComponent() {
-        context.let {
-            appComponent.inject(this)
-        }
     }
 
     /** похоже это бесполезно, потому что вне зависимости от выбора размытие работает
@@ -225,7 +209,7 @@ class CreateFolderDialog() :
             "📸 Фотография",
             "💃🕺 Танцы",
             "🤸‍♀️ Спорт",
-            "🧘‍♀️ Медитация и йога"
+            "🧘‍♀️ Медитация и йога",
         )
 
     /** создает 4 chip'a со случайным названием из folderNames */

@@ -11,7 +11,7 @@ constructor() {
         activity: MainActivity,
         sheet: BottomSheetDialogFragment,
     ) {
-        sheet.show(activity.supportFragmentManager, sheet.javaClass.simpleName)
+        sheet.show(activity.supportFragmentManager(), sheet.javaClass.simpleName)
     }
 
     fun closeSheet(

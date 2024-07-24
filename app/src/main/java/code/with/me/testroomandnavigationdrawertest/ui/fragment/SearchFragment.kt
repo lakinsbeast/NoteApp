@@ -11,24 +11,22 @@ import android.widget.ImageView
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.R
-import code.with.me.testroomandnavigationdrawertest.appComponent
-import code.with.me.testroomandnavigationdrawertest.data.utils.hideKeyboard
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.NoteFTS
+import code.with.me.testroomandnavigationdrawertest.data.utils.hideKeyboard
 import code.with.me.testroomandnavigationdrawertest.databinding.NoteItemBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.SearchFragmentBinding
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
+import code.with.me.testroomandnavigationdrawertest.ui.controllers.supportFragmentManager
 import code.with.me.testroomandnavigationdrawertest.ui.dialog.PreviewNoteDialog
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.SearchViewModel
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import javax.inject.Named
 
 class SearchFragment : BaseFragment<SearchFragmentBinding>(
     SearchFragmentBinding::inflate,
@@ -36,16 +34,16 @@ class SearchFragment : BaseFragment<SearchFragmentBinding>(
     private lateinit var adapter: BaseAdapter<NoteFTS, NoteItemBinding>
     private lateinit var itemsBinding: NoteItemBinding
 
-    @Inject
-    @Named("searchVMFactory")
-    lateinit var factory: ViewModelProvider.Factory
-    private val searchViewModel: SearchViewModel by lazy {
-        ViewModelProvider(this, factory)[SearchViewModel::class.java]
-    }
+//    @Inject
+//    @Named("searchVMFactory")
+//    lateinit var factory: ViewModelProvider.Factory
+    private val searchViewModel: SearchViewModel by viewModels()
+//    lazy {
+//        ViewModelProvider(this, factory)[SearchViewModel::class.java]
+//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        appComponent.inject(this)
     }
 
     override fun onViewCreated(
@@ -120,7 +118,6 @@ class SearchFragment : BaseFragment<SearchFragmentBinding>(
                 }
             }
         }
-
     }
 
     /** применяем стиль для searchView*/
@@ -150,7 +147,6 @@ class SearchFragment : BaseFragment<SearchFragmentBinding>(
     private fun initAdapter() {
         adapter =
             object : BaseAdapter<NoteFTS, NoteItemBinding>(itemsBinding) {
-
                 init {
                     clickListener = {
                         val item = getItem(it.layoutPosition) as NoteFTS
@@ -175,7 +171,7 @@ class SearchFragment : BaseFragment<SearchFragmentBinding>(
                     val bundle = Bundle()
                     PreviewNoteDialog().apply {
                         arguments = bundle.apply { putLong("noteId", id) }
-                        this.show(activity().supportFragmentManager, "CreateFolderDialog")
+                        this.show(activity().supportFragmentManager(), "CreateFolderDialog")
                     }
                 }
 

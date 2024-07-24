@@ -1,7 +1,6 @@
 package code.with.me.testroomandnavigationdrawertest.data.repos
 
 import code.with.me.testroomandnavigationdrawertest.data.utils.randomId
-import code.with.me.testroomandnavigationdrawertest.data.localDataSource.DataStoreManager
 import javax.inject.Inject
 
 // черновик not used
@@ -19,10 +18,10 @@ interface SettingsRepository {
 class SettingsRepositoryImpl
     @Inject
     constructor(
-        val dataStoreManager: DataStoreManager,
+//        val dataStoreManager: DataStoreManager,
     ) : SettingsRepository {
         override suspend fun applyUseFolder(useFolder: Boolean) {
-            dataStoreManager.saveUseFolderSettings(useFolder)
+//            dataStoreManager.saveUseFolderSettings(useFolder)
         }
 
         override suspend fun getUseFolderSettings(): Boolean {

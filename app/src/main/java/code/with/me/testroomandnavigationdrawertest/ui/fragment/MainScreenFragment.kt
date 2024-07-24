@@ -14,13 +14,12 @@ import androidx.core.view.forEachIndexed
 import androidx.core.view.get
 import androidx.core.view.isGone
 import androidx.core.view.isNotEmpty
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import code.with.me.testroomandnavigationdrawertest.R
-import code.with.me.testroomandnavigationdrawertest.appComponent
-import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.CHIP_CORNER_RADIUS
+import code.with.me.testroomandnavigationdrawertest.data.const.Const.Companion.CHIP_CORNER_RADIUS
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Folder
 import code.with.me.testroomandnavigationdrawertest.data.utils.getDisplayMetrics
 import code.with.me.testroomandnavigationdrawertest.data.utils.gone
@@ -29,33 +28,31 @@ import code.with.me.testroomandnavigationdrawertest.databinding.MainScreenFragme
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.fragmentOptionsBuilder
+import code.with.me.testroomandnavigationdrawertest.ui.controllers.supportFragmentManager
 import code.with.me.testroomandnavigationdrawertest.ui.dialog.CreateFolderDialog
+import code.with.me.testroomandnavigationdrawertest.ui.mainScreenFragment.MainScreenViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.ViewANoteSheet
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MainScreenViewModel
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Named
 import com.google.android.material.R as MR
 
 class MainScreenFragment :
     BaseFragment<MainScreenFragmentBinding>(MainScreenFragmentBinding::inflate) {
-
-    @Inject
-    @Named("mainScreenVMFactory")
-    lateinit var mainScreenVMFactory: ViewModelProvider.Factory
-    private val mainScreenViewModel: MainScreenViewModel by lazy {
-        ViewModelProvider(
-            this,
-            mainScreenVMFactory,
-        )[MainScreenViewModel::class.java]
-    }
+//    @Inject
+//    @Named("mainScreenVMFactory")
+//    lateinit var mainScreenVMFactory: ViewModelProvider.Factory
+    private val mainScreenViewModel: MainScreenViewModel by viewModels()
+//    lazy {
+//        ViewModelProvider(
+//            this,
+//            mainScreenVMFactory,
+//        )[MainScreenViewModel::class.java]
+//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initAppComponent()
     }
 
     override fun onViewCreated(
@@ -74,7 +71,7 @@ class MainScreenFragment :
                 openMakeNoteFragment()
             }
             makeFolderBtn.setOnClickListener {
-                CreateFolderDialog().show(activity().supportFragmentManager, "CreateFolderDialog")
+                CreateFolderDialog().show(activity().supportFragmentManager(), "CreateFolderDialog")
             }
             settingsBtn.setOnClickListener {
                 activity().fragmentController.openFragment(
@@ -82,7 +79,7 @@ class MainScreenFragment :
                     SettingsFragment(),
                     fragmentOptionsBuilder {
                         fragmentLayout = R.id.fragment_detail
-                    }
+                    },
                 )
             }
             searchBtn.setOnClickListener {
@@ -91,14 +88,10 @@ class MainScreenFragment :
                     SearchFragment(),
                     fragmentOptionsBuilder {
                         fragmentLayout = R.id.fragment_detail
-                    }
+                    },
                 )
             }
         }
-    }
-
-    private fun initAppComponent() {
-        appComponent.inject(this)
     }
 
     private fun listenViewModel() {
@@ -209,13 +202,14 @@ class MainScreenFragment :
 
     private fun openNotesListFragment(it: Folder? = null) {
         val notesListFragment = NotesListFragment()
-        notesListFragment.arguments = Bundle().apply {
-            it?.let {
-                this.putLong("idFolder", it.id)
-            } ?: run {
-                this.putLong("idFolder", -1)
+        notesListFragment.arguments =
+            Bundle().apply {
+                it?.let {
+                    this.putLong("idFolder", it.id)
+                } ?: run {
+                    this.putLong("idFolder", -1)
+                }
             }
-        }
         (activity as MainActivity).fragmentController.replaceFragment(
             activity as MainActivity,
             notesListFragment,
@@ -228,11 +222,15 @@ class MainScreenFragment :
     }
 
     /** щас бы вспомнить что к чему тут*/
-    fun openMakeNoteFragment(id: Long = -1, view: View? = null) {
+    fun openMakeNoteFragment(
+        id: Long = -1,
+        view: View? = null,
+    ) {
         view?.let {
-            val expandedView = View(activity).apply {
-                setBackgroundColor(resources.getColor(R.color.white, null))
-            }
+            val expandedView =
+                View(activity).apply {
+                    setBackgroundColor(resources.getColor(R.color.white, null))
+                }
 
             val height = getDisplayMetrics(activity()).heightPixels
             val width = getDisplayMetrics(activity()).widthPixels
@@ -269,36 +267,40 @@ class MainScreenFragment :
                 expandedView.requestLayout()
             }
 
-            anim.addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    val fragment = MakeNoteFragment()
-                    fragment.arguments = Bundle().apply {
-                        putLong("idFolder", mainScreenViewModel.selectedChipFolderId.value)
-                        putLong("noteId", id)
+            anim.addListener(
+                object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        val fragment = MakeNoteFragment()
+                        fragment.arguments =
+                            Bundle().apply {
+                                putLong("idFolder", mainScreenViewModel.selectedChipFolderId.value)
+                                putLong("noteId", id)
+                            }
+                        activity().fragmentController.openFragment(
+                            activity(),
+                            fragment,
+                            fragmentOptionsBuilder {
+                                fragmentLayout = R.id.fragment_detail
+                            },
+                            R.anim.enter_from_right,
+                            R.anim.exit_to_left,
+                        )
+                        launchAfterTimerMain(50) {
+                            container.removeView(expandedView)
+                        }
                     }
-                    activity().fragmentController.openFragment(
-                        activity(),
-                        fragment,
-                        fragmentOptionsBuilder {
-                            fragmentLayout = R.id.fragment_detail
-                        },
-                        R.anim.enter_from_right,
-                        R.anim.exit_to_left
-                    )
-                    launchAfterTimerMain(50) {
-                        container.removeView(expandedView)
-                    }
-                }
-            })
+                },
+            )
 
             anim.duration = 300
             anim.start()
         } ?: run {
             val fragment = MakeNoteFragment()
-            fragment.arguments = Bundle().apply {
-                putLong("idFolder", mainScreenViewModel.selectedChipFolderId.value)
-                putLong("noteId", id)
-            }
+            fragment.arguments =
+                Bundle().apply {
+                    putLong("idFolder", mainScreenViewModel.selectedChipFolderId.value)
+                    putLong("noteId", id)
+                }
             activity().fragmentController.openFragment(
                 activity(),
                 fragment,
@@ -306,7 +308,7 @@ class MainScreenFragment :
                     fragmentLayout = R.id.fragment_detail
                 },
                 R.anim.enter_from_right,
-                R.anim.exit_to_left
+                R.anim.exit_to_left,
             )
         }
     }

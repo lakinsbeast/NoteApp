@@ -2,11 +2,9 @@ package code.with.me.testroomandnavigationdrawertest.ui.sheet
 
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import code.with.me.testroomandnavigationdrawertest.NotesApplication
-import code.with.me.testroomandnavigationdrawertest.appComponent
 import code.with.me.testroomandnavigationdrawertest.data.data_classes.Folder
 import code.with.me.testroomandnavigationdrawertest.databinding.RenameFolderBottomSheetBinding
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
@@ -18,8 +16,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Named
 import kotlin.coroutines.CoroutineContext
 
 /** todo не используется*/
@@ -30,26 +26,22 @@ class RenameFolderSheet :
 
     private val args: RenameFolderSheetArgs by navArgs()
 
-    @Inject
-    @Named("folderVMFactory")
-    lateinit var folderVmFactory: ViewModelProvider.Factory
-    private val folderViewModel: FolderViewModel by lazy {
-        ViewModelProvider(this, folderVmFactory).get(FolderViewModel::class.java)
-    }
+//    @Inject
+//    @Named("folderVMFactory")
+//    lateinit var folderVmFactory: ViewModelProvider.Factory
+    private val folderViewModel: FolderViewModel by viewModels()
+//    lazy {
+//        ViewModelProvider(this, folderVmFactory).get(FolderViewModel::class.java)
+//    }
 
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        initAppComponent()
+
         initClickListeners()
     }
-
-    private fun initAppComponent() {
-        appComponent.inject(this)
-    }
-
 
     private fun initClickListeners() {
         binding.renameFolderBtn.setOnClickListener {

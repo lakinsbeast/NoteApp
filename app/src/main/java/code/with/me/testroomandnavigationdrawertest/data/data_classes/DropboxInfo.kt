@@ -3,10 +3,10 @@ package code.with.me.testroomandnavigationdrawertest.data.data_classes
 import android.content.Context
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import code.with.me.testroomandnavigationdrawertest.data.const.const
+import code.with.me.testroomandnavigationdrawertest.data.const.Const
 
 val Context.dataStoreInit by preferencesDataStore(
-    name = const.appSettings,
+    name = Const.APP_SETTINGS,
 )
 
 object DropboxInfo {

@@ -10,7 +10,20 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/lint-rules" />
+            <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/core/data" />
+            <option value="$PROJECT_DIR$/core/database" />
+            <option value="$PROJECT_DIR$/core/files" />
+            <option value="$PROJECT_DIR$/core/model" />
+            <option value="$PROJECT_DIR$/core/preferences" />
+            <option value="$PROJECT_DIR$/core/ui" />
+            <option value="$PROJECT_DIR$/core/utils" />
+            <option value="$PROJECT_DIR$/feature" />
+            <option value="$PROJECT_DIR$/feature/createfolder" />
+            <option value="$PROJECT_DIR$/feature/mainscreen" />
+            <option value="$PROJECT_DIR$/feature/makenote" />
+            <option value="$PROJECT_DIR$/feature/search" />
+            <option value="$PROJECT_DIR$/feature/settings" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />

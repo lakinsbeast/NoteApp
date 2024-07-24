@@ -1,18 +1,17 @@
 package code.with.me.testroomandnavigationdrawertest.ui
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import code.with.me.testroomandnavigationdrawertest.NotesApplication
-import code.with.me.testroomandnavigationdrawertest.R
-import code.with.me.testroomandnavigationdrawertest.appComponent
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityMainBinding
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.FragmentController
 import code.with.me.testroomandnavigationdrawertest.ui.controllers.SheetController
-import code.with.me.testroomandnavigationdrawertest.ui.controllers.fragmentOptionsBuilder
-import code.with.me.testroomandnavigationdrawertest.ui.fragment.MainScreenFragment
+import dagger.hilt.android.AndroidEntryPoint
+import ru.tfk.mainscreen.CustomNavHost
 import javax.inject.Inject
 
-class MainActivity : AppCompatActivity() {
+@AndroidEntryPoint
+class MainActivity : ComponentActivity() {
     private val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
@@ -24,20 +23,20 @@ class MainActivity : AppCompatActivity() {
     lateinit var sheetController: SheetController
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        initAppComponent()
         super.onCreate(savedInstanceState)
-        setContentView(binding.root)
+//        setContentView(binding.root)
 
-        val fragment = MainScreenFragment()
-        fragmentController.openFragment(
-            this,
-            fragment,
-            fragmentOptionsBuilder {
-                fragmentLayout = R.id.fragment_detail
-            })
-    }
+        setContent {
+            CustomNavHost()
+        }
 
-    private fun initAppComponent() {
-        appComponent.inject(this)
+//        val fragment = MainScreenFragment()
+//        fragmentController.openFragment(
+//            this,
+//            fragment,
+//            fragmentOptionsBuilder {
+//                fragmentLayout = R.id.fragment_detail
+//            },
+//        )
     }
 }

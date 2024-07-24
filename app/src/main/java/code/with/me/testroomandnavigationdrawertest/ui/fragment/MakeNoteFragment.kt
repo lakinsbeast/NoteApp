@@ -2,7 +2,6 @@ package code.with.me.testroomandnavigationdrawertest.ui.fragment
 
 import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -16,25 +15,26 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.setFragmentResultListener
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.AlertCreator
-import code.with.me.testroomandnavigationdrawertest.NotesApplication
 import code.with.me.testroomandnavigationdrawertest.PermissionController
 import code.with.me.testroomandnavigationdrawertest.PermissionController.checkCameraAndWriteExternalStoragePermission
 import code.with.me.testroomandnavigationdrawertest.R
-import code.with.me.testroomandnavigationdrawertest.appComponent
+import code.with.me.testroomandnavigationdrawertest.data.const.Const.Companion.AUDIO_PATH
+import code.with.me.testroomandnavigationdrawertest.data.const.Const.Companion.PAINT_KEY_RESULT
+import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 import code.with.me.testroomandnavigationdrawertest.data.utils.setCheckable
 import code.with.me.testroomandnavigationdrawertest.data.utils.setRoundedCorners
-import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 import code.with.me.testroomandnavigationdrawertest.databinding.ActivityAddNoteBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.PhotoItemBinding
 import code.with.me.testroomandnavigationdrawertest.file.FilesController
 import code.with.me.testroomandnavigationdrawertest.ui.MainActivity
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseFragment
-import code.with.me.testroomandnavigationdrawertest.ui.sheet.AudioRecorderDialog
+import code.with.me.testroomandnavigationdrawertest.ui.controllers.supportFragmentManager
+import code.with.me.testroomandnavigationdrawertest.ui.dialog.AudioRecorderDialog
 import code.with.me.testroomandnavigationdrawertest.ui.sheet.PaintSheet
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.MakeNoteViewModel
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.UserActionNote
@@ -46,17 +46,17 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
-import javax.inject.Named
 
 class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBinding::inflate) {
     private lateinit var cameraUri: Uri
 
-    @Inject
-    @Named("makeNoteVMFactory")
-    lateinit var factory: ViewModelProvider.Factory
-    private val makeNoteViewModel: MakeNoteViewModel by lazy {
-        ViewModelProvider(this, factory)[MakeNoteViewModel::class.java]
-    }
+    //    @Inject
+//    @Named("makeNoteVMFactory")
+//    lateinit var factory: ViewModelProvider.Factory
+    private val makeNoteViewModel: MakeNoteViewModel by viewModels()
+// lazy {
+//        ViewModelProvider(this, factory)[MakeNoteViewModel::class.java]
+//    }
 
     lateinit var adapter: BaseAdapter<PhotoModel, PhotoItemBinding>
     private lateinit var photoItem: PhotoItemBinding
@@ -91,7 +91,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
                     }
 
                     else -> {
-                        println("jkghsfhkjsfgd") //??
+                        println("jkghsfhkjsfgd") // ??
                     }
                 }
             }
@@ -123,13 +123,9 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
     private val requestAudioPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
-    companion object {
-        const val paintResultKey = "paintResultKey"
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        appComponent.inject(this)
+
         listenPaintSheetResult()
         // TODO иногда не создает в папках заметки
         arguments?.getLong("idFolder")?.let {
@@ -145,13 +141,21 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
     }
 
     private fun listenPaintSheetResult() {
-        setFragmentResultListener(paintResultKey) { _: String, bundle: Bundle ->
+        setFragmentResultListener(PAINT_KEY_RESULT) { _: String, bundle: Bundle ->
             val paintBitmap = bundle.getString("pathBitmap")
             paintBitmap?.let {
                 makeNoteViewModel.setPaintSheetResult(paintBitmap)
                 saveNote()
             } ?: run {
                 throw java.lang.Exception("Не удалось получить данные paintActivity")
+            }
+        }
+
+        setFragmentResultListener(AUDIO_PATH) { _: String, bundle: Bundle ->
+            bundle.getString(AUDIO_PATH)?.let {
+                makeNoteViewModel.audioInString = it
+            } ?: run {
+                throw java.lang.Exception("Не удалось получить путь к аудио")
             }
         }
     }
@@ -170,14 +174,13 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         initViewModel()
         setBottomMarginBottomNav(20)
 
-        //установил задержку, потому что при открытии фрагмента с анимацией есть фризы
+        // установил задержку, потому что при открытии фрагмента с анимацией есть фризы
         Handler(Looper.getMainLooper()).postDelayed({
             initClickListeners()
 //            initOnEditorActionListener()
             initTextChangeListeners()
         }, 150)
     }
-
 
     private fun initOnEditorActionListener() {
         binding.apply {
@@ -239,9 +242,9 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
     }
 
     private fun openAudioRecordDialog() {
-        AudioRecorderDialog(activity()) {
-            makeNoteViewModel.audioInString = it
-        }.show()
+        AudioRecorderDialog().apply {
+            this.show(activity().supportFragmentManager(), "AudioRecorderDialog")
+        }
     }
 
     private fun sendViewAction(action: UserActionNote) {
@@ -328,7 +331,6 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
         if (makeNoteViewModel.noteId != -1L) {
             binding.textEdit.hint = ""
             binding.titleEdit.hint = ""
-
         }
     }
 
@@ -361,7 +363,7 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
 //                ) == PackageManager.PERMISSION_DENIED
 //            ) {
 //                makeNoteViewModel.setPermission(MakeNoteViewModel.Companion.TypeOfPermission.CAMERA)
-////                currentPermission = TypeOfPermission.CAMERA
+// //                currentPermission = TypeOfPermission.CAMERA
 //                request.launch(
 //                    arrayOf(
 //                        Manifest.permission.CAMERA,
@@ -404,7 +406,6 @@ class MakeNoteFragment : BaseFragment<ActivityAddNoteBinding>(ActivityAddNoteBin
     private fun initAdapter() {
         adapter =
             object : BaseAdapter<PhotoModel, PhotoItemBinding>(photoItem) {
-
                 override fun onCreateViewHolder(
                     parent: ViewGroup,
                     viewType: Int,

@@ -11,8 +11,8 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import androidx.viewbinding.ViewBinding
-import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.ROUNDED_CORNERS
-import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.STANDARD_BLUR_RADIUS
+import code.with.me.testroomandnavigationdrawertest.data.const.Const.Companion.ROUNDED_CORNERS
+import code.with.me.testroomandnavigationdrawertest.data.const.Const.Companion.STANDARD_BLUR_RADIUS
 import code.with.me.testroomandnavigationdrawertest.data.utils.findActivity
 import code.with.me.testroomandnavigationdrawertest.data.utils.setRoundedCornersView
 

@@ -7,29 +7,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import code.with.me.testroomandnavigationdrawertest.R
-import code.with.me.testroomandnavigationdrawertest.appComponent
-import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.ROUNDED_CORNERS_SHEET
-import code.with.me.testroomandnavigationdrawertest.data.const.const.Companion.ROUNDED_CORNERS_STROKE
+import code.with.me.testroomandnavigationdrawertest.data.const.Const.Companion.ROUNDED_CORNERS_SHEET
+import code.with.me.testroomandnavigationdrawertest.data.const.Const.Companion.ROUNDED_CORNERS_STROKE
+import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
+import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 import code.with.me.testroomandnavigationdrawertest.data.utils.getDate
 import code.with.me.testroomandnavigationdrawertest.data.utils.gone
-import code.with.me.testroomandnavigationdrawertest.data.utils.mainScope
 import code.with.me.testroomandnavigationdrawertest.data.utils.println
 import code.with.me.testroomandnavigationdrawertest.data.utils.setRoundedCornersView
 import code.with.me.testroomandnavigationdrawertest.data.utils.visible
-import code.with.me.testroomandnavigationdrawertest.data.data_classes.Note
-import code.with.me.testroomandnavigationdrawertest.data.data_classes.PhotoModel
 import code.with.me.testroomandnavigationdrawertest.databinding.PhotoItemBinding
 import code.with.me.testroomandnavigationdrawertest.databinding.ViewNoteDetailSheetBinding
-import code.with.me.testroomandnavigationdrawertest.markdown.StringToMarkdownTextParser
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseAdapter
 import code.with.me.testroomandnavigationdrawertest.ui.base.BaseSheet
-import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.AudioPlayerState
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.NoteState
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.UserActionAudioState
 import code.with.me.testroomandnavigationdrawertest.ui.viewmodel.ViewANoteViewModel
@@ -37,32 +33,28 @@ import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.masoudss.lib.SeekBarOnProgressChanged
 import com.masoudss.lib.WaveformSeekBar
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
-import javax.inject.Inject
-import javax.inject.Named
 
-//todo: не используется в проекте
+// todo: не используется в проекте
 class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheetBinding::inflate) {
     /**
      * Нет обработки ошибок у MediaPlayer во viewModel
      **/
 
-    @Inject
-    @Named("viewANoteVMFactory")
-    lateinit var factory: ViewModelProvider.Factory
-    private val viewModel: ViewANoteViewModel by lazy {
-        ViewModelProvider(this, factory)[ViewANoteViewModel::class.java]
-    }
+//    @Inject
+//    @Named("viewANoteVMFactory")
+//    lateinit var factory: ViewModelProvider.Factory
+    private val viewModel: ViewANoteViewModel by viewModels()
+//    lazy {
+//        ViewModelProvider(this, factory)[ViewANoteViewModel::class.java]
+//    }
 
     lateinit var adapter: BaseAdapter<PhotoModel, PhotoItemBinding>
     private lateinit var photoItem: PhotoItemBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        appComponent.inject(this)
     }
 
     override fun onViewCreated(
@@ -101,24 +93,25 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
     }
 
     private fun setWaveformProgressCallback() {
-        binding.waveForm.onProgressChanged = object : SeekBarOnProgressChanged {
-            override fun onProgressChanged(
-                waveformSeekBar: WaveformSeekBar,
-                progress: Float,
-                fromUser: Boolean,
-            ) {
-                if (fromUser) {
-                    if (viewModel.isAudioPlaying()) {
-                        sendViewAction(UserActionAudioState.PausePlaying)
+        binding.waveForm.onProgressChanged =
+            object : SeekBarOnProgressChanged {
+                override fun onProgressChanged(
+                    waveformSeekBar: WaveformSeekBar,
+                    progress: Float,
+                    fromUser: Boolean,
+                ) {
+                    if (fromUser) {
+                        if (viewModel.isAudioPlaying()) {
+                            sendViewAction(UserActionAudioState.PausePlaying)
+                        }
+                        if (!viewModel.checkAudioPlayer()) {
+                            sendViewAction(UserActionAudioState.InitPlayer(viewModel.currentNote?.audioUrl.toString()))
+                        }
+                        viewModel.setCurrentPos(progress)
+                        viewModel.startTimer(100)
                     }
-                    if (!viewModel.checkAudioPlayer()) {
-                        sendViewAction(UserActionAudioState.InitPlayer(viewModel.currentNote?.audioUrl.toString()))
-                    }
-                    viewModel.setCurrentPos(progress)
-                    viewModel.startTimer(100)
                 }
             }
-        }
     }
 
     private fun sendViewAction(userAction: UserActionAudioState) {
@@ -260,7 +253,7 @@ class ViewANoteSheet : BaseSheet<ViewNoteDetailSheetBinding>(ViewNoteDetailSheet
                     } catch (error: Exception) {
                         showError(
                             error.localizedMessage?.toString()
-                                ?: "Не удалось инициализировать волну аудио" //???
+                                ?: "Не удалось инициализировать волну аудио", // ???
                         )
                     }
                 } else {

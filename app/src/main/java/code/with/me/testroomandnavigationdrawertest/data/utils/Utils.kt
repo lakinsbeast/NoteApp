@@ -6,7 +6,6 @@ import android.os.Build
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
-import code.with.me.testroomandnavigationdrawertest.BuildConfig
 
 class Utils
 
@@ -15,9 +14,9 @@ const val providerName = "code.with.me.testroomandnavigationdrawertest.ui.MainAc
 fun randomId() = (0..8548840).random()
 
 fun Any?.println() {
-    if (BuildConfig.DEBUG) {
-        println("${this?.javaClass?.simpleName} DEBUG PRINT: $this")
-    }
+//    if (BuildConfig.DEBUG) {
+    println("${this?.javaClass?.simpleName} DEBUG PRINT: $this")
+//    }
 }
 
 // example isAndroidVersionGreaterThan(Build.VERSION_CODES.O)
